@@ -1,0 +1,11 @@
+# Laravel (WEB)
+WEB/luxe-nail/vendor/
+WEB/luxe-nail/node_modules/
+WEB/luxe-nail/storage/
+WEB/luxe-nail/.env
+
+# Flutter (MOBILE)
+MOBILE/luxe_nail/build/
+MOBILE/luxe_nail/.dart_tool/
+MOBILE/luxe_nail/.idea/
+MOBILE/luxe_nail/.packages
