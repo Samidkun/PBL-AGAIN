@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:luxe_nail/screens/dashboard_screen.dart';
 
@@ -18,14 +19,18 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     setState(() => _isLoading = true);
 
-   final url = Uri.parse('http://192.168.1.67:8000/api/login');
-    // ⚠️ pakai 127.0.0.1 kalau testing di web
-    // ganti 10.0.2.2 → IP PC kamu kalau di device fisik
+   final baseUrl = dotenv.env['BASE_URL'] ?? 'http://192.168.1.67:8000';
+final url = Uri.parse('$baseUrl/api/login');
+
+
 
     try {
       final response = await http.post(
         url,
-        headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
         body: jsonEncode({
           'name': _usernameController.text.trim(),
           'password': _passwordController.text.trim(),
@@ -35,29 +40,29 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        // ✅ sukses login
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login successful!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
 
-        // delay dikit biar UX enak
         await Future.delayed(const Duration(milliseconds: 500));
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DashboardScreen()),
+          MaterialPageRoute(
+            builder: (context) =>
+                DashboardScreen(token: data['token'], user: data['user']),
+          ),
         );
       } else {
-        // ❌ gagal login
         final message = jsonDecode(response.body)['message'] ?? 'Login failed';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       setState(() => _isLoading = false);
     }

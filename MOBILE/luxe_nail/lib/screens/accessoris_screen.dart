@@ -4,16 +4,21 @@ import 'package:luxe_nail/screens/finishing_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
-
 import 'login_screen.dart';
 
 class AccessorisScreen extends StatelessWidget {
-  AccessorisScreen({super.key});
+  final String token;
+  final Map<String, dynamic> user;
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  const AccessorisScreen({
+    super.key,
+    required this.token,
+    required this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
     final sW = (num v) => Responsive.sW(context, v);
     final sH = (num v) => Responsive.sH(context, v);
 
@@ -35,16 +40,16 @@ class AccessorisScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: sW(30),
                     backgroundColor: const Color(0xFFFFEAEE),
-                    child: Icon(
+                    child: const Icon(
                       Icons.person,
-                      size: sW(40),
-                      color: const Color(0xFF451A2B),
+                      size: 40,
+                      color: Color(0xFF451A2B),
                     ),
                   ),
                   SizedBox(height: sH(10)),
-                  const Text(
-                    "Welcome Nailist!",
-                    style: TextStyle(
+                  Text(
+                    "Welcome, ${user['name']}!",
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontFamily: "Poppins",
@@ -54,17 +59,18 @@ class AccessorisScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             _drawerItem(Icons.home, "Home", () {
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => DashboardScreen(token: token, user: user),
+                ),
+              );
             }),
-
             _drawerItem(Icons.brush, "Jenis Treatment", () {
               Navigator.pop(context);
             }),
-
             const Divider(color: Color(0xFFAF7C85)),
-
             _drawerItem(Icons.logout, "Logout", () {
               Navigator.pushAndRemoveUntil(
                 context,
@@ -124,7 +130,6 @@ class AccessorisScreen extends StatelessWidget {
                   topRight: Radius.circular(sW(30)),
                 ),
               ),
-
               child: Stack(
                 children: [
                   // Background
@@ -151,7 +156,6 @@ class AccessorisScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Title
                         SizedBox(
                           width: sW(330),
                           child: Text(
@@ -165,10 +169,7 @@ class AccessorisScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-
                         SizedBox(height: sH(20)),
-
-                        // White shadow box
                         Container(
                           width: sW(330),
                           height: sH(350),
@@ -185,10 +186,7 @@ class AccessorisScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-
                         SizedBox(height: sH(20)),
-
-                        // ================= HORIZONTAL SCROLL CARDS =================
                         SizedBox(
                           height: sH(140),
                           child: SingleChildScrollView(
@@ -206,16 +204,16 @@ class AccessorisScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-
                         SizedBox(height: sH(15)),
-
-                        // Confirm button
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => FinishingScreen(),
+                                builder: (_) => FinishingScreen(
+                                  token: token,
+                                  user: user,
+                                ),
                               ),
                             );
                           },
@@ -274,7 +272,6 @@ class AccessorisScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -285,21 +282,29 @@ class AccessorisScreen extends StatelessWidget {
                   _bottomItem(context, "Home", Icons.home, () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (_) => DashboardScreen()),
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            DashboardScreen(token: token, user: user),
+                      ),
                       (route) => false,
                     );
                   }),
                   _bottomItem(context, "Gallery", Icons.photo_album, () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (_) => GalleryScreen()),
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            GalleryScreen(token: token, user: user),
+                      ),
                       (route) => false,
                     );
                   }),
                   _bottomItem(context, "Profile", Icons.person, () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (_) => ProfileScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => ProfileScreen(token: token),
+                      ),
                       (route) => false,
                     );
                   }),
@@ -312,7 +317,7 @@ class AccessorisScreen extends StatelessWidget {
     );
   }
 
-  // ========== Drawer Item ==========
+  // ===== Drawer Item =====
   Widget _drawerItem(IconData icon, String label, VoidCallback tap) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFF451A2B)),
@@ -329,7 +334,7 @@ class AccessorisScreen extends StatelessWidget {
     );
   }
 
-  // ========== Bottom Nav Item ==========
+  // ===== Bottom Nav Item =====
   Widget _bottomItem(
     BuildContext context,
     String label,
@@ -341,11 +346,7 @@ class AccessorisScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: Responsive.sW(context, 32),
-            color: const Color(0xFF975B73),
-          ),
+          Icon(icon, size: Responsive.sW(context, 32), color: const Color(0xFF975B73)),
           SizedBox(height: Responsive.sH(context, 5)),
           Text(
             label,
@@ -361,7 +362,7 @@ class AccessorisScreen extends StatelessWidget {
     );
   }
 
-  // ========== ACCESSORY CARD (RESPONSIVE) ==========
+  // ===== Accessory Card =====
   Widget accessoryCard(BuildContext context, String price, String title) {
     final sW = (num v) => Responsive.sW(context, v);
     final sH = (num v) => Responsive.sH(context, v);
@@ -376,7 +377,6 @@ class AccessorisScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Price box
           Container(
             width: sW(98),
             height: sH(22),
@@ -396,10 +396,7 @@ class AccessorisScreen extends StatelessWidget {
               ),
             ),
           ),
-
           SizedBox(height: sH(8)),
-
-          // Title box
           Container(
             width: sW(98),
             height: sH(78),

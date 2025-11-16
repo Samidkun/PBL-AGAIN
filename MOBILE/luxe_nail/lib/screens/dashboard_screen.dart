@@ -3,24 +3,28 @@ import 'package:intl/intl.dart';
 import 'package:luxe_nail/screens/jenis_treatment_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
 import 'package:table_calendar/table_calendar.dart';
-
 import 'gallery_screen.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
-  DashboardScreen({super.key});
+  final String token;
+  final Map<String, dynamic> user;
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  const DashboardScreen({
+    super.key,
+    required this.token,
+    required this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // ==== Ganti scale ke util kamu (TANPA ubah struktur penggunaan) ====
-    final sW = Responsive.sW(context, 1); // == width / 412
-    final sH = Responsive.sH(context, 1); // == height / 917
+    final scaffoldKey = GlobalKey<ScaffoldState>();
+    final sW = Responsive.sW(context, 1);
+    final sH = Responsive.sH(context, 1);
 
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
 
       // ================= DRAWER =================
@@ -37,16 +41,16 @@ class DashboardScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 30 * sW,
                     backgroundColor: const Color(0xFFFFEAEE),
-                    child: Icon(
+                    child: const Icon(
                       Icons.person,
-                      size: 40 * sW,
-                      color: const Color(0xFF451A2B),
+                      size: 40,
+                      color: Color(0xFF451A2B),
                     ),
                   ),
                   SizedBox(height: 10 * sH),
-                  const Text(
-                    'Welcome Nailist!',
-                    style: TextStyle(
+                  Text(
+                    'Welcome, ${user['name']}!',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -81,22 +85,12 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings, color: Color(0xFF451A2B)),
-              title: const Text(
-                'Settings',
-                style: TextStyle(
-                  color: Color(0xFF451A2B),
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProfileScreen(token: token),
+                  ),
+                );
               },
             ),
             const Divider(color: Color(0xFFAF7C85)),
@@ -114,7 +108,7 @@ class DashboardScreen extends StatelessWidget {
               onTap: () {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
                   (route) => false,
                 );
               },
@@ -126,7 +120,7 @@ class DashboardScreen extends StatelessWidget {
       // ================= BODY =================
       body: Stack(
         children: [
-          // ================= HEADER =================
+          // HEADER
           Positioned(
             left: 26 * sW,
             top: 60 * sH,
@@ -135,14 +129,12 @@ class DashboardScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // LUXE NAIL ROW
+                  // TITLE BAR
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          _scaffoldKey.currentState!.openDrawer();
-                        },
+                        onTap: () => scaffoldKey.currentState!.openDrawer(),
                         child: Icon(
                           Icons.menu,
                           size: 32 * sW,
@@ -162,64 +154,50 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 39 * sH),
 
-                  // HELLO TEXTS
-                  SizedBox(
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Teks kiri
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Hello Nailist!',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: const Color(0xFF451A2B),
-                                    fontSize: 36 * sW,
-                                    fontFamily: 'Georgia',
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                SizedBox(height: 7 * sH),
-                                Text(
-                                  'Your Customers are waiting ',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: const Color(0xFF451A2B),
-                                    fontSize: 15 * sW,
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
+                  // GREETING
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Hello, ${user['name']}!',
+                            style: TextStyle(
+                              color: const Color(0xFF451A2B),
+                              fontSize: 32 * sW,
+                              fontFamily: 'Georgia',
+                              fontWeight: FontWeight.w400,
                             ),
-
-                            // Ikon kanan
-                            GestureDetector(
-                              onTap: () => _showCalendarPopup(context),
-                              child: Icon(
-                                Icons.calendar_month,
-                                color: const Color(0xFF451A2B),
-                                size: 32 * sW,
-                              ),
+                          ),
+                          SizedBox(height: 7 * sH),
+                          const Text(
+                            'Your customers are waiting 💅',
+                            style: TextStyle(
+                              color: Color(0xFF451A2B),
+                              fontSize: 15,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () => _showCalendarPopup(context),
+                        child: Icon(
+                          Icons.calendar_month,
+                          color: const Color(0xFF451A2B),
+                          size: 32 * sW,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
 
-          // ================= MAIN CONTAINER =================
+          // MAIN CONTENT
           Positioned(
             left: 13 * sW,
             top: 250 * sH,
@@ -251,18 +229,17 @@ class DashboardScreen extends StatelessWidget {
                     ),
                   ),
                   Positioned(
+                    top: 18 * sH,
                     left: 0,
                     right: 0,
-                    top: 18 * sH,
                     child: Center(
                       child: Text(
-                        'Today’s Appointments',
-                        textAlign: TextAlign.center,
+                        "Today's Appointments",
                         style: TextStyle(
                           color: const Color(0xFF451A2B),
                           fontSize: 20 * sW,
                           fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -271,17 +248,13 @@ class DashboardScreen extends StatelessWidget {
                     top: 73 * sH,
                     left: 0,
                     right: 0,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _appointmentCard(sW, sH),
-                          SizedBox(width: 12 * sW),
-                          _appointmentCard(sW, sH),
-                        ],
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _appointmentCard(sW, sH),
+                        SizedBox(width: 12 * sW),
+                        _appointmentCard(sW, sH),
+                      ],
                     ),
                   ),
                 ],
@@ -289,7 +262,7 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
 
-          // ================= BOTTOM NAVBAR =================
+          // BOTTOM NAVBAR
           Positioned(
             left: 0,
             top: 800 * sH,
@@ -325,54 +298,42 @@ class DashboardScreen extends StatelessWidget {
                   _bottomNavItem(
                     label: "Home",
                     icon: Icons.home,
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DashboardScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DashboardScreen(token: token, user: user),
+                      ),
+                    ),
                   ),
                   _bottomNavItem(
                     label: "Design",
                     icon: Icons.brush,
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => JenisTreatmentScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => JenisTreatmentScreen(token: token, user: user),
+                      ),
+                    ),
                   ),
                   _bottomNavItem(
                     label: "Gallery",
                     icon: Icons.photo_album,
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GalleryScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GalleryScreen(token: token, user: user),
+                      ),
+                    ),
                   ),
                   _bottomNavItem(
                     label: "Profile",
                     icon: Icons.person,
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProfileScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProfileScreen(token: token),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -383,7 +344,9 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // ================= BOTTOM NAV ITEM =================
+  // ==================================================
+  // COMPONENTS
+  // ==================================================
   Widget _bottomNavItem({
     required String label,
     required IconData icon,
@@ -396,7 +359,6 @@ class DashboardScreen extends StatelessWidget {
         children: [
           Icon(icon, color: const Color(0xFF975B73), size: 32),
           const SizedBox(height: 5),
-          const Text(''),
           Text(
             label,
             style: const TextStyle(
@@ -411,7 +373,6 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // ================= APPOINTMENT CARD =================
   Widget _appointmentCard(double sW, double sH) {
     return Container(
       width: 179 * sW,
@@ -430,62 +391,36 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(horizontal: 6 * sW, vertical: 7 * sH),
-            decoration: ShapeDecoration(
+            padding: EdgeInsets.all(8 * sW),
+            decoration: BoxDecoration(
               color: const Color(0xFFFFEAEE),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5 * sW),
-              ),
+              borderRadius: BorderRadius.circular(5 * sW),
             ),
-            child: Column(
+            child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
-                  child: Text(
-                    'kode reservasi',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: const Color(0xFF451A2B),
-                      fontSize: 12 * sW,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
+                  child: Text('Reservation #001',
+                      style: TextStyle(
+                          color: Color(0xFF451A2B),
+                          fontFamily: 'Poppins',
+                          fontSize: 12)),
                 ),
-                Divider(color: const Color(0xFF451A2B), height: 8),
-                Text(
-                  'Name : nama Reserfator',
-                  style: TextStyle(
-                    color: const Color(0xFF451A2B),
-                    fontSize: 12 * sW,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                Divider(color: const Color(0xFF451A2B), height: 8),
-                Text(
-                  'treatment : treatment Reserfator',
-                  style: TextStyle(
-                    color: const Color(0xFF451A2B),
-                    fontSize: 12 * sW,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
+                Divider(color: Color(0xFF451A2B)),
+                Text('Name : Bella', style: TextStyle(fontSize: 12)),
+                Text('Treatment : Nail Art', style: TextStyle(fontSize: 12)),
               ],
             ),
           ),
-          SizedBox(height: 11 * sH),
+          SizedBox(height: 10 * sH),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _actionButton("Canceled", sW, sH),
+              _actionButton("Canceled", sW),
               SizedBox(width: 13 * sW),
-              _actionButton("Confirm", sW, sH),
+              _actionButton("Confirm", sW),
             ],
           ),
         ],
@@ -493,26 +428,21 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // ================= ACTION BUTTON =================
-  Widget _actionButton(String text, double sW, double sH) {
+  Widget _actionButton(String text, double sW) {
     return Container(
       width: 70 * sW,
-      padding: EdgeInsets.symmetric(vertical: 6 * sH),
-      decoration: ShapeDecoration(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      decoration: BoxDecoration(
         color: const Color(0xFF451A2B),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14 * sW),
-        ),
+        borderRadius: BorderRadius.circular(14 * sW),
       ),
       child: Center(
         child: Text(
           text,
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white,
-            fontSize: 12 * sW,
             fontFamily: 'Poppins',
+            fontSize: 12,
             fontWeight: FontWeight.w400,
           ),
         ),
@@ -527,125 +457,68 @@ class DashboardScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: const Color(0xFFFFF8F9),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          backgroundColor: const Color(0xFFFFF8F9),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            "Select Appointment Date",
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF451A2B),
+            ),
+          ),
+          content: TableCalendar(
+            firstDay: DateTime.utc(2024, 1, 1),
+            lastDay: DateTime.utc(2026, 12, 31),
+            focusedDay: focusedDay,
+            selectedDayPredicate: (day) => isSameDay(selectedDay, day),
+            onDaySelected: (sel, focus) {
+              setState(() {
+                selectedDay = sel;
+                focusedDay = focus;
+              });
+            },
+            calendarStyle: CalendarStyle(
+              todayDecoration: BoxDecoration(
+                color: const Color(0xFFAF7C85).withOpacity(0.4),
+                shape: BoxShape.circle,
               ),
-              title: const Text(
-                "Select Appointment Date",
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF451A2B),
-                ),
+              selectedDecoration: const BoxDecoration(
+                color: Color(0xFFAF7C85),
+                shape: BoxShape.circle,
               ),
-              content: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.85,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height * 0.55,
-                        ),
-                        child: TableCalendar(
-                          firstDay: DateTime.utc(2024, 1, 1),
-                          lastDay: DateTime.utc(2026, 12, 31),
-                          focusedDay: focusedDay,
-                          selectedDayPredicate: (day) =>
-                              isSameDay(selectedDay, day),
-                          onDaySelected: (sel, focus) {
-                            setState(() {
-                              selectedDay = sel;
-                              focusedDay = focus;
-                            });
-                          },
-                          availableGestures: AvailableGestures.all,
-                          calendarStyle: CalendarStyle(
-                            todayDecoration: BoxDecoration(
-                              color: const Color(0xFFAF7C85).withOpacity(0.4),
-                              shape: BoxShape.circle,
-                            ),
-                            selectedDecoration: const BoxDecoration(
-                              color: Color(0xFFAF7C85),
-                              shape: BoxShape.circle,
-                            ),
-                            defaultTextStyle: const TextStyle(
-                              color: Color(0xFF451A2B),
-                              fontFamily: 'Poppins',
-                            ),
-                            weekendTextStyle: const TextStyle(
-                              color: Color(0xFF975B73),
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                          headerStyle: const HeaderStyle(
-                            titleCentered: true,
-                            formatButtonVisible: false,
-                            titleTextStyle: TextStyle(
-                              color: Color(0xFF451A2B),
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                            leftChevronIcon: Icon(
-                              Icons.chevron_left,
-                              color: Color(0xFF451A2B),
-                            ),
-                            rightChevronIcon: Icon(
-                              Icons.chevron_right,
-                              color: Color(0xFF451A2B),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    "Close",
-                    style: TextStyle(
-                      color: Color(0xFF451A2B),
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                if (selectedDay != null)
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            "Selected date: ${DateFormat('d MMM yyyy').format(selectedDay!)}",
-                          ),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      "Select",
-                      style: TextStyle(
-                        color: Color(0xFFAF7C85),
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold,
+            ),
+            headerStyle: const HeaderStyle(
+              titleCentered: true,
+              formatButtonVisible: false,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Close", style: TextStyle(color: Color(0xFF451A2B))),
+            ),
+            if (selectedDay != null)
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "Selected: ${DateFormat('d MMM yyyy').format(selectedDay!)}",
                       ),
                     ),
-                  ),
-              ],
-            );
-          },
-        );
-      },
+                  );
+                },
+                child: const Text("Select", style: TextStyle(color: Color(0xFFAF7C85))),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

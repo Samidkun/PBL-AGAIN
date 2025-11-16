@@ -37,6 +37,7 @@ dependencies:
   http: ^1.2.0
   table_calendar: ^3.1.2
   intl: any
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/config/.env
 
   fonts:
     - family: Poppins

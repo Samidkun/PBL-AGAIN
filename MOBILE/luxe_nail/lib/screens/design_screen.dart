@@ -4,11 +4,17 @@ import 'package:luxe_nail/screens/dashboard_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
-
 import 'login_screen.dart';
 
 class DesignScreen extends StatelessWidget {
-  DesignScreen({super.key});
+  final String token;
+  final Map<String, dynamic> user;
+
+   DesignScreen({
+    super.key,
+    required this.token,
+    required this.user,
+  });
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -21,6 +27,7 @@ class DesignScreen extends StatelessWidget {
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
 
+      // ================= DRAWER =================
       drawer: Drawer(
         backgroundColor: const Color(0xFFFFF8F9),
         child: ListView(
@@ -34,16 +41,16 @@ class DesignScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: sW(30),
                     backgroundColor: const Color(0xFFFFEAEE),
-                    child: Icon(
+                    child: const Icon(
                       Icons.person,
-                      size: sW(40),
-                      color: const Color(0xFF451A2B),
+                      size: 40,
+                      color: Color(0xFF451A2B),
                     ),
                   ),
                   SizedBox(height: sH(10)),
-                  const Text(
-                    'Welcome Nailist!',
-                    style: TextStyle(
+                  Text(
+                    'Welcome, ${user['name']}!',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontFamily: 'Poppins',
@@ -54,7 +61,12 @@ class DesignScreen extends StatelessWidget {
               ),
             ),
             _drawerItem(context, Icons.home, "Home", () {
-              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => DashboardScreen(token: token, user: user),
+                ),
+              );
             }),
             _drawerItem(context, Icons.brush, "Jenis Treatment", () {
               Navigator.pop(context);
@@ -71,6 +83,7 @@ class DesignScreen extends StatelessWidget {
         ),
       ),
 
+      // ================= BODY =================
       body: Stack(
         children: [
           // HEADER
@@ -104,7 +117,7 @@ class DesignScreen extends StatelessWidget {
             ),
           ),
 
-          // ===== MAIN CONTENT FIXED (NO OVERFLOW) =====
+          // MAIN CONTENT
           Positioned(
             left: sW(13),
             top: sH(140),
@@ -117,12 +130,9 @@ class DesignScreen extends StatelessWidget {
                   topRight: Radius.circular(sW(30)),
                 ),
               ),
-
-              // FIX: Scroll di container luar
               child: SingleChildScrollView(
                 child: Stack(
                   children: [
-                    // Background transparan
                     Opacity(
                       opacity: 0.9,
                       child: Image.asset(
@@ -132,7 +142,6 @@ class DesignScreen extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                     ),
-
                     Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: sW(20),
@@ -177,7 +186,10 @@ class DesignScreen extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => AccessorisScreen(),
+                                    builder: (_) => AccessorisScreen(
+                                      token: token,
+                                      user: user,
+                                    ),
                                   ),
                                 );
                               },
@@ -202,7 +214,6 @@ class DesignScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-
                           SizedBox(height: sH(40)),
                         ],
                       ),
@@ -241,21 +252,29 @@ class DesignScreen extends StatelessWidget {
                   _bottomItem(context, "Home", Icons.home, () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (_) => DashboardScreen()),
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            DashboardScreen(token: token, user: user),
+                      ),
                       (route) => false,
                     );
                   }),
                   _bottomItem(context, "Gallery", Icons.photo_album, () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (_) => GalleryScreen()),
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            GalleryScreen(token: token, user: user),
+                      ),
                       (route) => false,
                     );
                   }),
                   _bottomItem(context, "Profile", Icons.person, () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (_) => ProfileScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => ProfileScreen(token: token),
+                      ),
                       (route) => false,
                     );
                   }),
@@ -268,7 +287,6 @@ class DesignScreen extends StatelessWidget {
     );
   }
 
-  // Drawer Item
   Widget _drawerItem(
     BuildContext context,
     IconData icon,
@@ -290,7 +308,6 @@ class DesignScreen extends StatelessWidget {
     );
   }
 
-  // Title
   Widget _title(String text, Function sW) {
     return Text(
       text,
@@ -303,7 +320,6 @@ class DesignScreen extends StatelessWidget {
     );
   }
 
-  // Horizontal Scroll List
   Widget _horizontalScroll(Function sW, Function sH, List<Widget> children) {
     return SizedBox(
       height: sH(130),
@@ -323,7 +339,6 @@ class DesignScreen extends StatelessWidget {
     );
   }
 
-  // Card
   Widget _card(BuildContext context, String price, String name) {
     return Container(
       width: Responsive.sW(context, 108),
@@ -378,7 +393,6 @@ class DesignScreen extends StatelessWidget {
     );
   }
 
-  // Bottom Nav Item
   Widget _bottomItem(
     BuildContext context,
     String label,

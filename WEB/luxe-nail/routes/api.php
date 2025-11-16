@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReservationController;
-
+use App\Http\Controllers\Api\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,10 +18,6 @@ Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth:sanctum')
     ->name('api.logout');
 
-// ====== USER INFO (Protected) ======
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return response()->json($request->user());
-});
 
 // ====== RESERVATION API (Protected) ======
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
@@ -31,3 +27,5 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::put('/reservations/{id}', [ReservationController::class, 'update']);
     Route::delete('/reservations/{id}', [ReservationController::class, 'destroy']);
 });
+
+Route::middleware('auth:sanctum')->get('/user', [ProfileController::class, 'index']);

@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:luxe_nail/screens/dashboard_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
-
-import 'jenis_treatment_screen.dart';
-import 'login_screen.dart';
+import 'package:luxe_nail/screens/jenis_treatment_screen.dart';
+import 'package:luxe_nail/screens/login_screen.dart';
 
 class GalleryScreen extends StatelessWidget {
-  GalleryScreen({super.key});
+  final String token;
+  final Map<String, dynamic> user;
+
+   GalleryScreen({
+    super.key,
+    required this.token,
+    required this.user,
+  });
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -39,16 +45,16 @@ class GalleryScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 30 * sW,
                     backgroundColor: const Color(0xFFFFEAEE),
-                    child: Icon(
+                    child: const Icon(
                       Icons.person,
-                      size: 40 * sW,
-                      color: const Color(0xFF451A2B),
+                      size: 40,
+                      color: Color(0xFF451A2B),
                     ),
                   ),
                   SizedBox(height: 10 * sH),
-                  const Text(
-                    'Welcome Nailist!',
-                    style: TextStyle(
+                  Text(
+                    'Welcome, ${user['name']}!',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -70,7 +76,12 @@ class GalleryScreen extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DashboardScreen(token: token, user: user),
+                  ),
+                );
               },
             ),
             ListTile(
@@ -85,7 +96,15 @@ class GalleryScreen extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => JenisTreatmentScreen(
+                      token: token,
+                      user: user,
+                    ),
+                  ),
+                );
               },
             ),
             const Divider(color: Color(0xFFAF7C85)),
@@ -103,7 +122,7 @@ class GalleryScreen extends StatelessWidget {
               onTap: () {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
                   (route) => false,
                 );
               },
@@ -125,9 +144,7 @@ class GalleryScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      _scaffoldKey.currentState!.openDrawer();
-                    },
+                    onTap: () => _scaffoldKey.currentState!.openDrawer(),
                     child: Icon(
                       Icons.menu,
                       size: 32 * sW,
@@ -181,7 +198,7 @@ class GalleryScreen extends StatelessWidget {
                   ),
                   Center(
                     child: Text(
-                      "Halaman Jenis Treatment",
+                      "Your Nail Design Gallery",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: const Color(0xFF451A2B),
@@ -243,7 +260,10 @@ class GalleryScreen extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => JenisTreatmentScreen(),
+                          builder: (_) => JenisTreatmentScreen(
+                            token: token,
+                            user: user,
+                          ),
                         ),
                         (route) => false,
                       );
@@ -256,13 +276,15 @@ class GalleryScreen extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DashboardScreen(),
+                          builder: (_) => DashboardScreen(
+                            token: token,
+                            user: user,
+                          ),
                         ),
                         (route) => false,
                       );
                     },
                   ),
-
                   _bottomNavItem(
                     label: "Gallery",
                     icon: Icons.photo_album,
@@ -270,7 +292,10 @@ class GalleryScreen extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GalleryScreen(),
+                          builder: (_) => GalleryScreen(
+                            token: token,
+                            user: user,
+                          ),
                         ),
                         (route) => false,
                       );
@@ -283,7 +308,7 @@ class GalleryScreen extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProfileScreen(),
+                          builder: (_) => ProfileScreen(token: token),
                         ),
                         (route) => false,
                       );

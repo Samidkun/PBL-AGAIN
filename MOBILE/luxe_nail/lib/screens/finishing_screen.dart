@@ -3,11 +3,17 @@ import 'package:luxe_nail/screens/dashboard_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
-
 import 'login_screen.dart';
 
 class FinishingScreen extends StatelessWidget {
-  FinishingScreen({super.key});
+  final String token;
+  final Map<String, dynamic> user;
+
+   FinishingScreen({
+    super.key,
+    required this.token,
+    required this.user,
+  });
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -19,9 +25,7 @@ class FinishingScreen extends StatelessWidget {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
-
       drawer: _buildDrawer(context),
-
       body: Stack(
         children: [
           // ================= HEADER =================
@@ -71,7 +75,6 @@ class FinishingScreen extends StatelessWidget {
               ),
               child: Stack(
                 children: [
-                  // Background
                   Positioned(
                     left: 0,
                     top: 0,
@@ -102,7 +105,6 @@ class FinishingScreen extends StatelessWidget {
                               fit: BoxFit.contain,
                             ),
                           ),
-
                           SizedBox(height: sH(10)),
 
                           // ======== TITLE ========
@@ -157,146 +159,31 @@ class FinishingScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ),
+                                _posText(sW(115), sH(41), "Luxe Nail", 16, true),
+                                _posText(sW(102), sH(65),
+                                    "DD/MM/YYYY 00:00 PM", 9, false),
+                                _posText(sW(62), sH(79),
+                                    "Street. Fill with Address No.1/ABC Malang",
+                                    9, false),
+                                _posText(sW(84), sH(93),
+                                    "Phone Number : 087723456781", 9, false),
 
-                                // Title
-                                _posText(
-                                  sW(115),
-                                  sH(41),
-                                  "Luxe Nail",
-                                  16,
-                                  true,
-                                ),
+                                _posText(sW(24), sH(131), "Category Nails :", 10, false),
+                                _posText(sW(24), sH(164), "Type Nails :", 10, false),
+                                _posText(sW(24), sH(197), "Color Nails :", 10, false),
+                                _posText(sW(24), sH(228), "Accessories Nails :", 10, false),
+                                _posText(sW(118), sH(276), "Total :", 10, false),
 
-                                // DATE
-                                _posText(
-                                  sW(102),
-                                  sH(65),
-                                  "DD/MM/YYYY 00:00 PM",
-                                  9,
-                                  false,
-                                ),
+                                _posText(sW(83), sH(144), "xxxxxxx Nails", 10, false),
+                                _posText(sW(83), sH(177), "xxxxxxx Nails", 10, false),
+                                _posText(sW(83), sH(210), "xxxxxxx Nails", 10, false),
+                                _posText(sW(83), sH(243), "xxxxxxx Nails", 10, false),
 
-                                // ADDRESS
-                                _posText(
-                                  sW(62),
-                                  sH(79),
-                                  "Street. Fill with Address No.1/ABC Malang",
-                                  9,
-                                  false,
-                                ),
-
-                                // PHONE
-                                _posText(
-                                  sW(84),
-                                  sH(93),
-                                  "Phone Number : 087723456781",
-                                  9,
-                                  false,
-                                ),
-
-                                // LABELS LEFT
-                                _posText(
-                                  sW(24),
-                                  sH(131),
-                                  "Category Nails :",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(24),
-                                  sH(164),
-                                  "Type Nails :",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(24),
-                                  sH(197),
-                                  "Color Nails :",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(24),
-                                  sH(228),
-                                  "Accessories Nails :",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(118),
-                                  sH(276),
-                                  "Total :",
-                                  10,
-                                  false,
-                                ),
-
-                                // VALUES LEFT
-                                _posText(
-                                  sW(83),
-                                  sH(144),
-                                  "xxxxxxx Nails",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(83),
-                                  sH(177),
-                                  "xxxxxxx Nails",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(83),
-                                  sH(210),
-                                  "xxxxxxx Nails",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(83),
-                                  sH(243),
-                                  "xxxxxxx Nails",
-                                  10,
-                                  false,
-                                ),
-
-                                // PRICES RIGHT
-                                _posText(
-                                  sW(225),
-                                  sH(144),
-                                  "Rp. 20.000,-",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(225),
-                                  sH(177),
-                                  "Rp. 20.000,-",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(225),
-                                  sH(210),
-                                  "Rp. 20.000,-",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(225),
-                                  sH(243),
-                                  "Rp. 20.000,-",
-                                  10,
-                                  false,
-                                ),
-                                _posText(
-                                  sW(225),
-                                  sH(276),
-                                  "Rp. 20.000,-",
-                                  10,
-                                  false,
-                                ),
+                                _posText(sW(225), sH(144), "Rp. 20.000,-", 10, false),
+                                _posText(sW(225), sH(177), "Rp. 20.000,-", 10, false),
+                                _posText(sW(225), sH(210), "Rp. 20.000,-", 10, false),
+                                _posText(sW(225), sH(243), "Rp. 20.000,-", 10, false),
+                                _posText(sW(225), sH(276), "Rp. 20.000,-", 10, false),
                               ],
                             ),
                           ),
@@ -306,11 +193,15 @@ class FinishingScreen extends StatelessWidget {
                           // ======== CONFIRM BUTTON ========
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => DashboardScreen(),
+                                  builder: (_) => DashboardScreen(
+                                    token: token,
+                                    user: user,
+                                  ),
                                 ),
+                                (route) => false,
                               );
                             },
                             child: Container(
@@ -366,16 +257,16 @@ class FinishingScreen extends StatelessWidget {
                 CircleAvatar(
                   radius: Responsive.sW(context, 30),
                   backgroundColor: const Color(0xFFFFEAEE),
-                  child: Icon(
+                  child: const Icon(
                     Icons.person,
-                    size: Responsive.sW(context, 40),
-                    color: const Color(0xFF451A2B),
+                    size: 40,
+                    color: Color(0xFF451A2B),
                   ),
                 ),
                 SizedBox(height: Responsive.sH(context, 10)),
-                const Text(
-                  'Welcome Nailist!',
-                  style: TextStyle(
+                Text(
+                  'Welcome, ${user['name']}!',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontFamily: 'Poppins',
@@ -385,21 +276,22 @@ class FinishingScreen extends StatelessWidget {
               ],
             ),
           ),
-
           ListTile(
             leading: const Icon(Icons.home, color: Color(0xFF451A2B)),
             title: const Text("Home"),
-            onTap: () => Navigator.pop(context),
+            onTap: () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DashboardScreen(token: token, user: user),
+              ),
+            ),
           ),
-
           ListTile(
             leading: const Icon(Icons.brush, color: Color(0xFF451A2B)),
             title: const Text("Design"),
             onTap: () => Navigator.pop(context),
           ),
-
           const Divider(color: Color(0xFFAF7C85)),
-
           ListTile(
             leading: const Icon(Icons.logout, color: Color(0xFF451A2B)),
             title: const Text("Logout"),
@@ -460,7 +352,9 @@ class FinishingScreen extends StatelessWidget {
               Icons.home,
               () => Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => DashboardScreen()),
+                MaterialPageRoute(
+                  builder: (_) => DashboardScreen(token: token, user: user),
+                ),
                 (route) => false,
               ),
             ),
@@ -470,7 +364,9 @@ class FinishingScreen extends StatelessWidget {
               Icons.photo_album,
               () => Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => GalleryScreen()),
+                MaterialPageRoute(
+                  builder: (_) => GalleryScreen(token: token, user: user),
+                ),
                 (route) => false,
               ),
             ),
@@ -480,7 +376,9 @@ class FinishingScreen extends StatelessWidget {
               Icons.person,
               () => Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => ProfileScreen()),
+                MaterialPageRoute(
+                  builder: (_) => ProfileScreen(token: token),
+                ),
                 (route) => false,
               ),
             ),
@@ -522,9 +420,7 @@ class FinishingScreen extends StatelessWidget {
   }
 }
 
-//
 // ========== HELPER UNTUK TEKS POSISI ==========
-//
 Widget _posText(double left, double top, String txt, double size, bool bold) {
   return Positioned(
     left: left,

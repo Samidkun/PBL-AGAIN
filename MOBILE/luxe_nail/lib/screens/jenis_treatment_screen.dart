@@ -4,11 +4,17 @@ import 'package:luxe_nail/screens/design_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
-
 import 'login_screen.dart';
 
 class JenisTreatmentScreen extends StatelessWidget {
-  JenisTreatmentScreen({super.key});
+  final String token;
+  final Map<String, dynamic> user;
+
+   JenisTreatmentScreen({
+    super.key,
+    required this.token,
+    required this.user,
+  });
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -131,7 +137,12 @@ class JenisTreatmentScreen extends StatelessWidget {
                           title: "Nail Extension",
                           onTap: () => Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => DesignScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => DesignScreen(
+                                token: token,
+                                user: user,
+                              ),
+                            ),
                           ),
                         ),
                         _treatmentCard(
@@ -140,7 +151,12 @@ class JenisTreatmentScreen extends StatelessWidget {
                           title: "Nail Art",
                           onTap: () => Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => DesignScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => DesignScreen(
+                                token: token,
+                                user: user,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -173,16 +189,16 @@ class JenisTreatmentScreen extends StatelessWidget {
                 CircleAvatar(
                   radius: Responsive.sW(context, 30),
                   backgroundColor: const Color(0xFFFFEAEE),
-                  child: Icon(
+                  child: const Icon(
                     Icons.person,
-                    size: Responsive.sW(context, 40),
-                    color: const Color(0xFF451A2B),
+                    size: 40,
+                    color: Color(0xFF451A2B),
                   ),
                 ),
                 SizedBox(height: Responsive.sH(context, 10)),
-                const Text(
-                  'Welcome Nailist!',
-                  style: TextStyle(
+                Text(
+                  'Welcome, ${user['name']}!',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontFamily: 'Poppins',
@@ -195,27 +211,18 @@ class JenisTreatmentScreen extends StatelessWidget {
 
           ListTile(
             leading: const Icon(Icons.home, color: Color(0xFF451A2B)),
-            title: const Text(
-              "Home",
-              style: TextStyle(
-                color: Color(0xFF451A2B),
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.w500,
+            title: const Text("Home"),
+            onTap: () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DashboardScreen(token: token, user: user),
               ),
             ),
-            onTap: () => Navigator.pop(context),
           ),
 
           ListTile(
             leading: const Icon(Icons.brush, color: Color(0xFF451A2B)),
-            title: const Text(
-              "Jenis Treatment",
-              style: TextStyle(
-                color: Color(0xFF451A2B),
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            title: const Text("Jenis Treatment"),
             onTap: () => Navigator.pop(context),
           ),
 
@@ -223,10 +230,7 @@ class JenisTreatmentScreen extends StatelessWidget {
 
           ListTile(
             leading: const Icon(Icons.logout, color: Color(0xFF451A2B)),
-            title: const Text(
-              "Logout",
-              style: TextStyle(color: Color(0xFF451A2B), fontFamily: "Poppins"),
-            ),
+            title: const Text("Logout"),
             onTap: () => Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -299,12 +303,9 @@ class JenisTreatmentScreen extends StatelessWidget {
                 color: const Color(0xFF451A2B),
                 borderRadius: BorderRadius.circular(Responsive.sW(context, 14)),
               ),
-              child: Text(
+              child: const Text(
                 "Confirm",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: Responsive.sW(context, 14),
-                ),
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ),
@@ -346,71 +347,55 @@ class JenisTreatmentScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _bottomNavItem(
-              context,
-              label: "Back",
-              icon: Icons.arrow_back,
-              onTap: () => Navigator.pop(context),
-            ),
-            _bottomNavItem(
-              context,
-              label: "Design",
-              icon: Icons.brush,
-              onTap: () {},
-            ),
-            _bottomNavItem(
-              context,
-              label: "Home",
-              icon: Icons.home,
-              onTap: () => Navigator.pushAndRemoveUntil(
+            _bottomNavItem(context, "Back", Icons.arrow_back, () {
+              Navigator.pop(context);
+            }),
+            _bottomNavItem(context, "Design", Icons.brush, () {}),
+            _bottomNavItem(context, "Home", Icons.home, () {
+              Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => DashboardScreen()),
+                MaterialPageRoute(
+                  builder: (_) => DashboardScreen(token: token, user: user),
+                ),
                 (route) => false,
-              ),
-            ),
-            _bottomNavItem(
-              context,
-              label: "Gallery",
-              icon: Icons.photo_album,
-              onTap: () => Navigator.pushAndRemoveUntil(
+              );
+            }),
+            _bottomNavItem(context, "Gallery", Icons.photo_album, () {
+              Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => GalleryScreen()),
+                MaterialPageRoute(
+                  builder: (_) => GalleryScreen(token: token, user: user),
+                ),
                 (route) => false,
-              ),
-            ),
-            _bottomNavItem(
-              context,
-              label: "Profile",
-              icon: Icons.person,
-              onTap: () => Navigator.pushAndRemoveUntil(
+              );
+            }),
+            _bottomNavItem(context, "Profile", Icons.person, () {
+              Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => ProfileScreen()),
+                MaterialPageRoute(
+                  builder: (_) => ProfileScreen(token: token),
+                ),
                 (route) => false,
-              ),
-            ),
+              );
+            }),
           ],
         ),
       ),
     );
   }
 
-  // ================= NAV ITEM =================
   Widget _bottomNavItem(
-    BuildContext context, {
-    required String label,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
+    BuildContext context,
+    String label,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: const Color(0xFF975B73),
-            size: Responsive.sW(context, 32),
-          ),
+          Icon(icon, color: const Color(0xFF975B73), size: Responsive.sW(context, 32)),
           SizedBox(height: Responsive.sH(context, 5)),
           Text(
             label,

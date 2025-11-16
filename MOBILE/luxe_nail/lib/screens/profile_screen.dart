@@ -1,327 +1,180 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:luxe_nail/screens/dashboard_screen.dart';
-import 'package:luxe_nail/screens/gallery_screen.dart';
-import 'package:luxe_nail/screens/jenis_treatment_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:luxe_nail/screens/login_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'login_screen.dart';
+class ProfileScreen extends StatefulWidget {
+  final String token;
+  const ProfileScreen({super.key, required this.token});
 
-class ProfileScreen extends StatelessWidget {
-  ProfileScreen({super.key});
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+class _ProfileScreenState extends State<ProfileScreen> {
+  Map<String, dynamic>? user;
+  bool _isLoading = true;
+  String? errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final baseUrl = dotenv.env['BASE_URL'] ?? 'http://192.168.1.67:8000';
+      final url = Uri.parse('$baseUrl/api/user');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${widget.token}',
+          // ✅ FIX 1: Menghindari Ngrok warning page (HTML)
+          'ngrok-skip-browser-warning': 'true', 
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Cek jika response body kosong (meskipun status 200)
+        if (response.body.isNotEmpty) {
+           final data = jsonDecode(response.body);
+            setState(() {
+              user = data;
+              _isLoading = false;
+            });
+        } else {
+            // Menangani kasus 200 OK tapi tanpa body (jarang terjadi di API)
+            setState(() {
+              errorMessage = 'Failed to load profile. Empty response body.';
+              _isLoading = false;
+            });
+        }
+
+      } else if (response.statusCode == 401) {
+        setState(() {
+          errorMessage = 'Session expired. Please log in again.';
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage =
+              'Failed to load profile. [${response.statusCode}] ${response.reasonPhrase}';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Unexpected error: $e';
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    final h = MediaQuery.of(context).size.height;
-
-    const figmaW = 412;
-    const figmaH = 917;
-
-    final sW = w / figmaW;
-    final sH = h / figmaH;
-
     return Scaffold(
-      key: _scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
-
-      // ================= DRAWER =================
-      drawer: Drawer(
-        backgroundColor: const Color(0xFFFFF8F9),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFFAF7C85)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: 30 * sW,
-                    backgroundColor: const Color(0xFFFFEAEE),
-                    child: Icon(
-                      Icons.person,
-                      size: 40 * sW,
-                      color: const Color(0xFF451A2B),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFEF909D),
+        title: const Text('Profile'),
+        centerTitle: true,
+      ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFFEF909D)),
+            )
+          : errorMessage != null
+          ? Center(
+              child: Text(
+                errorMessage!,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.redAccent,
+                  fontSize: 16,
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              // ✅ FIX 2A: Agar semua konten mengikuti perataan tengah
+              crossAxisAlignment: CrossAxisAlignment.center, 
+              children: [
+                const CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Color(0xFFEF909D),
+                  child: Icon(Icons.person, color: Colors.white, size: 60),
+                ),
+                const SizedBox(height: 20),
+                // ✅ FIX 2B: Membungkus Text dengan Center agar benar-benar rata tengah
+                Center( 
+                  child: Text(
+                    user?['name'] ?? 'Unknown',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      color: Color(0xFF451A2B),
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 10 * sH),
-                  const Text(
-                    'Welcome Nailist!',
-                    style: TextStyle(
-                      color: Colors.white,
+                ),
+                const SizedBox(height: 10),
+                // ✅ FIX 2B: Membungkus Text dengan Center
+                Center( 
+                  child: Text(
+                    user?['role'] ?? '-',
+                    style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF451A2B),
                       fontFamily: 'Poppins',
                     ),
                   ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home, color: Color(0xFF451A2B)),
-              title: const Text(
-                'Home',
-                style: TextStyle(
-                  color: Color(0xFF451A2B),
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
                 ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.brush, color: Color(0xFF451A2B)),
-              title: const Text(
-                'Jenis Treatment',
-                style: TextStyle(
-                  color: Color(0xFF451A2B),
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            const Divider(color: Color(0xFFAF7C85)),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Color(0xFF451A2B)),
-              title: const Text(
-                'Logout',
-                style: TextStyle(
-                  color: Color(0xFF451A2B),
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              onTap: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  (route) => false,
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-
-      // ================= BODY =================
-      body: Stack(
-        children: [
-          // ================= HEADER =================
-          Positioned(
-            left: 26 * sW,
-            top: 60 * sH,
-            child: SizedBox(
-              width: 351 * sW,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      _scaffoldKey.currentState!.openDrawer();
-                    },
-                    child: Icon(
-                      Icons.menu,
-                      size: 32 * sW,
-                      color: const Color(0xFF451A2B),
+                const SizedBox(height: 10),
+                // ✅ FIX 2B: Membungkus Text dengan Center
+                Center( 
+                  child: Text(
+                    user?['email'] ?? '-',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF451A2B),
+                      fontFamily: 'Poppins',
                     ),
                   ),
-                  Text(
-                    'LUXE NAIL',
+                ),
+                const SizedBox(height: 40),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFEF909D),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 12,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  child: const Text(
+                    'Logout',
                     style: TextStyle(
-                      color: const Color(0xFF975B73),
-                      fontSize: 20 * sW,
-                      fontFamily: 'Georgia',
-                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontFamily: 'Poppins',
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // ================= MAIN CONTAINER =================
-          Positioned(
-            left: 13 * sW,
-            top: 160 * sH,
-            child: Container(
-              width: 386 * sW,
-              height: 720 * sH,
-              decoration: ShapeDecoration(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30 * sW),
-                    topRight: Radius.circular(30 * sW),
                   ),
                 ),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: -10 * sW,
-                    top: -10 * sH,
-                    child: Opacity(
-                      opacity: 0.9,
-                      child: Image.asset(
-                        "assets/images/Splas1-HAND.png",
-                        width: 386 * sW,
-                        height: 720 * sH,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      "Halaman Jenis Treatment",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: const Color(0xFF451A2B),
-                        fontSize: 22 * sW,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              ],
             ),
-          ),
-
-          // ================= BOTTOM NAVBAR =================
-          Positioned(
-            left: 0,
-            top: 800 * sH,
-            child: Container(
-              width: 412 * sW,
-              height: 120 * sH,
-              padding: EdgeInsets.only(
-                top: 24 * sH,
-                left: 46 * sW,
-                right: 46 * sW,
-                bottom: 30 * sH,
-              ),
-              decoration: ShapeDecoration(
-                color: const Color(0xFFFFF8F9),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(27 * sW),
-                    topRight: Radius.circular(27 * sW),
-                  ),
-                ),
-                shadows: const [
-                  BoxShadow(
-                    color: Color(0x3F000000),
-                    blurRadius: 9,
-                    offset: Offset(5, -4),
-                    spreadRadius: -1,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _bottomNavItem(
-                    label: "Back",
-                    icon: Icons.arrow_back,
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  _bottomNavItem(
-                    label: "Design",
-                    icon: Icons.brush,
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => JenisTreatmentScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
-                  ),
-                  _bottomNavItem(
-                    label: "Home",
-                    icon: Icons.home,
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DashboardScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
-                  ),
-
-                  _bottomNavItem(
-                    label: "Gallery",
-                    icon: Icons.photo_album,
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GalleryScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
-                  ),
-                  _bottomNavItem(
-                    label: "Profile",
-                    icon: Icons.person,
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProfileScreen(),
-                        ),
-                        (route) => false,
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ================= BOTTOM NAV ITEM =================
-  Widget _bottomNavItem({
-    required String label,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: const Color(0xFF975B73), size: 32),
-          const SizedBox(height: 5),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFFCEA8BC),
-              fontSize: 11,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
