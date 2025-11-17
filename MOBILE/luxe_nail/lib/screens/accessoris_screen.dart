@@ -4,26 +4,23 @@ import 'package:luxe_nail/screens/finishing_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
+
 import 'login_screen.dart';
 
 class AccessorisScreen extends StatelessWidget {
   final String token;
   final Map<String, dynamic> user;
 
-  const AccessorisScreen({
-    super.key,
-    required this.token,
-    required this.user,
-  });
+  const AccessorisScreen({super.key, required this.token, required this.user});
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-    final sW = (num v) => Responsive.sW(context, v);
-    final sH = (num v) => Responsive.sH(context, v);
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+    double sW(num v) => Responsive.sW(context, v);
+    double sH(num v) => Responsive.sH(context, v);
 
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
 
       // ================= DRAWER =================
@@ -95,7 +92,7 @@ class AccessorisScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () => _scaffoldKey.currentState!.openDrawer(),
+                    onTap: () => scaffoldKey.currentState!.openDrawer(),
                     child: Icon(
                       Icons.menu,
                       size: sW(32),
@@ -210,10 +207,8 @@ class AccessorisScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => FinishingScreen(
-                                  token: token,
-                                  user: user,
-                                ),
+                                builder: (_) =>
+                                    FinishingScreen(token: token, user: user),
                               ),
                             );
                           },
@@ -293,8 +288,7 @@ class AccessorisScreen extends StatelessWidget {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            GalleryScreen(token: token, user: user),
+                        builder: (_) => GalleryScreen(token: token, user: user),
                       ),
                       (route) => false,
                     );
@@ -346,7 +340,11 @@ class AccessorisScreen extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: Responsive.sW(context, 32), color: const Color(0xFF975B73)),
+          Icon(
+            icon,
+            size: Responsive.sW(context, 32),
+            color: const Color(0xFF975B73),
+          ),
           SizedBox(height: Responsive.sH(context, 5)),
           Text(
             label,
@@ -364,8 +362,8 @@ class AccessorisScreen extends StatelessWidget {
 
   // ===== Accessory Card =====
   Widget accessoryCard(BuildContext context, String price, String title) {
-    final sW = (num v) => Responsive.sW(context, v);
-    final sH = (num v) => Responsive.sH(context, v);
+    double sW(num v) => Responsive.sW(context, v);
+    double sH(num v) => Responsive.sH(context, v);
 
     return Container(
       width: sW(108),
