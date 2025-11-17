@@ -217,4 +217,88 @@ class ReservationController extends Controller
         'available' => true
     ]);
 }
+public function dashboard()
+{
+    return view('dashboard.reservations.dashboard_reservations');
+}
+
+public function getReservationsByDate($date)
+{
+    try {
+        $reservations = Reservation::where('reservation_date', $date)
+            ->orderBy('reservation_time')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'reservations' => $reservations
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error fetching reservations'
+        ], 500);
+    }
+}
+
+public function updateStatus(Request $request, $id)
+{
+    try {
+        $request->validate([
+            'status' => 'required|in:pending,confirmed,completed,cancelled'
+        ]);
+
+        $reservation = Reservation::findOrFail($id);
+        $reservation->status = $request->status;
+        $reservation->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status updated successfully'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error updating status'
+        ], 500);
+    }
+}
+
+public function getReservation($id)
+{
+    try {
+        $reservation = Reservation::findOrFail($id);
+        return response()->json($reservation);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Reservation not found'
+        ], 404);
+    }
+}
+
+public function updateReservation(Request $request, $id)
+{
+    try {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'treatment_type' => 'required|in:nail_extension,nail_art',
+            'reservation_time' => 'required|date_format:H:i'
+        ]);
+
+        $reservation = Reservation::findOrFail($id);
+        $reservation->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Reservation updated successfully'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error updating reservation'
+        ], 500);
+    }
+}
 }

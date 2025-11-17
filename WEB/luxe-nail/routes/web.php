@@ -61,5 +61,12 @@ Route::middleware('auth')->group(function () {
 });
 
 // ====== OWNER DASHBOARD ======
-Route::get('/dashboard/reservations', [OwnerReservationController::class, 'index'])
-    ->name('dashboard.reservations');
+//Route::get('/dashboard/reservations', [OwnerReservationController::class, 'index'])
+   // ->name('dashboard.reservations');
+   Route::prefix('dashboard')->middleware(['auth'])->group(function () {
+    Route::get('/reservations', [ReservationController::class, 'dashboard'])->name('dashboard.reservations');
+    Route::get('/reservations/date/{date}', [ReservationController::class, 'getReservationsByDate']);
+    Route::put('/reservations/{id}/status', [ReservationController::class, 'updateStatus']);
+    Route::get('/reservations/{id}', [ReservationController::class, 'getReservation']);
+    Route::put('/reservations/{id}', [ReservationController::class, 'updateReservation']);
+});
