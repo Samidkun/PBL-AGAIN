@@ -30,7 +30,6 @@ class ReservationController extends Controller
         ]);
 
         try {
-            // Validasi jam operasional (8:00 - 22:00)
             $reservationTime = Carbon::parse($validated['reservation_time']);
             $openTime = Carbon::parse('08:00');
             $closeTime = Carbon::parse('22:00');
@@ -42,7 +41,6 @@ class ReservationController extends Controller
                 ], 422);
             }
 
-            // Cek apakah sudah mencapai batas 8 booking di tanggal yang sama
             $existingBookings = Reservation::where('reservation_date', $validated['reservation_date'])->count();
             if ($existingBookings >= 8) {
                 return response()->json([
@@ -51,7 +49,6 @@ class ReservationController extends Controller
                 ], 422);
             }
 
-            // Cek apakah waktu sudah dipesan
             $existingTime = Reservation::where('reservation_date', $validated['reservation_date'])
                 ->where('reservation_time', $validated['reservation_time'])
                 ->exists();
@@ -63,7 +60,6 @@ class ReservationController extends Controller
                 ], 422);
             }
 
-            // Generate queue number
             $queueNumber = $this->generateQueueNumber();
 
             $reservation = Reservation::create([
@@ -360,7 +356,7 @@ public function updateReservation(Request $request, $id)
             'phone' => 'required|string|max:20',
             'address' => 'required|string|max:500',
             'treatment_type' => 'required|in:nail_extension,nail_art',
-            'reservation_time' => 'required' // Hapus format validation sementara
+            'reservation_time' => 'required' 
         ]);
 
         if ($validator->fails()) {
@@ -368,14 +364,10 @@ public function updateReservation(Request $request, $id)
         }
 
         $validated = $validator->validated();
-
-        // Handle waktu - terima kedua format (dengan/tanpa detik)
         $reservationTime = $validated['reservation_time'];
         if (strlen($reservationTime) > 5) {
-            // Format dengan detik: "08:00:00" -> "08:00"
             $validated['reservation_time'] = substr($reservationTime, 0, 5);
         } else {
-            // Format tanpa detik: "21:00" -> tetap "21:00"
             $validated['reservation_time'] = $reservationTime;
         }
 

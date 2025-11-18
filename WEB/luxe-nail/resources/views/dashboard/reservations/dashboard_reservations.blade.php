@@ -458,7 +458,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         noReservations.classList.remove('show');
         
-        // Escape HTML untuk mencegah XSS
         const escapeHtml = (text) => {
             const div = document.createElement('div');
             div.textContent = text;
@@ -519,7 +518,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('completedCount').textContent = counts.completed;
     }
 
-    // Custom Confirmation Function
     window.showConfirmation = function(reservationId, actionType, customerName) {
         currentReservationId = reservationId;
         currentActionType = actionType;
@@ -552,7 +550,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const confirmBtn = document.getElementById('confirmActionBtn');
         const originalText = confirmBtn.innerHTML;
         
-        // Show loading state
         confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
         confirmBtn.disabled = true;
         
@@ -565,7 +562,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         updateReservationStatus(currentReservationId, status, successMessage)
             .finally(() => {
-                // Reset button state
                 confirmBtn.innerHTML = originalText;
                 confirmBtn.disabled = false;
             });
@@ -632,7 +628,6 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(reservation => {
             console.log('Reservation data loaded:', reservation);
             
-            // Check if reservation data is valid
             if (!reservation.id) {
                 throw new Error('Invalid reservation data received');
             }
@@ -642,8 +637,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('editPhone').value = reservation.phone || '';
             document.getElementById('editAddress').value = reservation.address || '';
             document.getElementById('editTreatmentType').value = reservation.treatment_type || 'nail_extension';
-            
-            // Format waktu untuk dropdown (pastikan tanpa detik)
+
             let reservationTime = reservation.reservation_time || '';
             if (reservationTime.length > 5) {
                 reservationTime = reservationTime.substring(0, 5);
@@ -663,14 +657,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const updateBtn = document.getElementById('updateReservationBtn');
         const originalText = updateBtn.innerHTML;
 
-        // Show loading state
+
         updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
         updateBtn.disabled = true;
 
-        // Format waktu ke HH:MM (tanpa detik)
+
         let reservationTime = document.getElementById('editReservationTime').value;
         if (reservationTime.length > 5) {
-            reservationTime = reservationTime.substring(0, 5); // Ambil hanya HH:MM
+            reservationTime = reservationTime.substring(0, 5);
         }
 
         const formData = {
@@ -678,8 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
             phone: document.getElementById('editPhone').value,
             address: document.getElementById('editAddress').value,
             treatment_type: document.getElementById('editTreatmentType').value,
-            reservation_time: reservationTime // Format HH:MM
-        };
+            reservation_time: reservationTime
 
         console.log('Updating reservation:', reservationId, formData);
 
@@ -725,7 +718,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showErrorModal(errorMessage + ': ' + error.message);
         })
         .finally(() => {
-            // Reset button state
             updateBtn.innerHTML = originalText;
             updateBtn.disabled = false;
         });
