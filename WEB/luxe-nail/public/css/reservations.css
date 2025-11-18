@@ -538,3 +538,164 @@
 .reservation-table th:nth-child(5) { width: 150px; } /* Date & Time */
 .reservation-table th:nth-child(6) { width: 100px; } /* Status */
 .reservation-table th:nth-child(7) { width: 200px; } /* Actions - lebih lebar */
+
+/* Modern Modal Styling */
+.modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+.modal-body {
+    padding: 3rem 2rem;
+}
+
+/* Confirmation Modal Specific */
+.confirmation-icon {
+    animation: pulse 2s infinite;
+}
+
+.success-animation .checkmark {
+    animation: scaleIn 0.5s ease-out;
+}
+
+.error-icon {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Button Styling */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-lg {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+}
+
+.btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Success Button */
+#confirmActionBtn.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+#confirmActionBtn.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+/* Danger Button */
+#confirmActionBtn.btn-danger {
+    background: linear-gradient(135deg, #dc3545, #e83e8c);
+    border: none;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+#confirmActionBtn.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+/* Success Modal Button */
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border: none;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+/* Error Modal Button */
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+    border: none;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes scaleIn {
+    0% { 
+        transform: scale(0);
+        opacity: 0;
+    }
+    70% { 
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Backdrop Styling */
+.modal-backdrop {
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .modal-body {
+        padding: 2rem 1rem;
+    }
+    
+    .btn-lg {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+}
+/* Styling untuk dropdown time di modal edit */
+#editReservationTime.form-select {
+    border: 1px solid #dee2e6;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#editReservationTime.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-text {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+}
