@@ -673,6 +673,7 @@ document.addEventListener('DOMContentLoaded', function() {
             address: document.getElementById('editAddress').value,
             treatment_type: document.getElementById('editTreatmentType').value,
             reservation_time: reservationTime
+        };
 
         console.log('Updating reservation:', reservationId, formData);
 
