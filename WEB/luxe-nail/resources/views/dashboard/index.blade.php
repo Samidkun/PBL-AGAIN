@@ -5,24 +5,25 @@
 
 @section('content')
 
+<hr class="section-divider">
 <!-- === FILTER TANGGAL (DITAMBAHKAN) === -->
 <form action="{{ route('dashboard') }}" method="GET" class="mb-4">
     <div class="row g-3 align-items-end">
         <div class="col-md-3">
-            <label class="form-label text-light">Filter by Date</label>
+            <h3 class="bold" style="color:#ffffff; font-family:'Georgia', serif;">Filter by Date</h3>
             <input type="date" name="date" class="form-control" 
                    value="{{ request('date') }}">
         </div>
         <div class="col-md-2">
             <button class="btn w-100 text-light" 
-                style="background:#ee9ca7; border-radius:10px;">
+                style="background:#f3b8c2; border-radius:10px;">
                 Apply
             </button>
         </div>
         <div class="col-md-2">
             <a href="{{ route('dashboard') }}" 
                class="btn w-100 text-light"
-               style="background:#6c757d; border-radius:10px;">
+               style="background:#d87a87; border-radius:10px;">
                 Reset
             </a>
         </div>
