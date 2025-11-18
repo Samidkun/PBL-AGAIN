@@ -187,10 +187,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const editReservationModal = new bootstrap.Modal(document.getElementById('editReservationModal'));
     const updateReservationBtn = document.getElementById('updateReservationBtn');
 
+    // Get today's date dengan format yang benar
+    function getTodayDate() {
+        const today = new Date();
+        // Adjust untuk timezone Indonesia (UTC+7)
+        const offset = today.getTimezoneOffset();
+        today.setMinutes(today.getMinutes() - offset);
+        return today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    }
+
+    function initializeDate() {
+        const todayString = getTodayDate();
+        
+        console.log('Today date:', todayString); // Debug
+        
+        // Set selected date ke hari ini
+        selectedDate = todayString;
+        selectedDateSpan.textContent = formatDate(new Date(todayString));
+        
+        // Load reservations untuk hari ini
+        loadReservationsForDate(todayString);
+        
+        // Update calendar
+        updateCalendar();
+    }
+
     // Initialize
-    updateCalendar();
-    loadReservationsForDate(new Date().toISOString().split('T')[0]);
-    selectedDateSpan.textContent = formatDate(new Date());
+    initializeDate();
 
     // Event Listeners
     datePickerBtn.addEventListener('click', toggleCalendar);
@@ -265,7 +288,13 @@ document.addEventListener('DOMContentLoaded', function() {
             dayElement.className = 'calendar-day';
             dayElement.textContent = day;
             
-            // Check if this is the selected date
+            // Highlight hari ini
+            const todayString = getTodayDate();
+            if (dateString === todayString) {
+                dayElement.classList.add('selected');
+            }
+            
+            // Check jika ini selected date
             if (selectedDate === dateString) {
                 dayElement.classList.add('selected');
             }
@@ -300,61 +329,91 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadReservationsForDate(date) {
+        console.log('Loading reservations for date:', date); // Debug
+        
+        // Show loading state
+        reservationTableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 mb-0">Loading reservations...</p>
+                </td>
+            </tr>
+        `;
+        
         fetch(`/dashboard/reservations/date/${date}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('API Response:', data); // Debug
                 updateReservationTable(data.reservations);
                 updateStats(data.reservations);
             })
             .catch(error => {
                 console.error('Error loading reservations:', error);
+                reservationTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Error loading reservations
+                        </td>
+                    </tr>
+                `;
             });
     }
 
     function updateReservationTable(reservations) {
-        if (reservations.length === 0) {
-            reservationTableBody.innerHTML = '';
-            noReservations.classList.add('show');
-            return;
-        }
+    if (reservations.length === 0) {
+        reservationTableBody.innerHTML = '';
+        noReservations.classList.add('show');
+        return;
+    }
 
-        noReservations.classList.remove('show');
-        
-        reservationTableBody.innerHTML = reservations.map(reservation => `
-            <tr>
-                <td>
-                    <strong>${reservation.queue_number}</strong>
-                </td>
-                <td>${reservation.name}</td>
-                <td>${reservation.phone}</td>
-                <td>${reservation.treatment_type === 'nail_extension' ? 'Nail Extension' : 'Nail Art'}</td>
-                <td>
-                    ${new Date(reservation.reservation_date).toLocaleDateString()} 
-                    at ${reservation.reservation_time}
-                </td>
-                <td>
-                    <span class="status-badge status-${reservation.status}">
-                        ${reservation.status}
-                    </span>
-                </td>
-                <td>
+    noReservations.classList.remove('show');
+    
+    reservationTableBody.innerHTML = reservations.map(reservation => `
+        <tr>
+            <td>
+                <strong>${reservation.queue_number}</strong>
+            </td>
+            <td>${reservation.name}</td>
+            <td>${reservation.phone}</td>
+            <td>${reservation.treatment_type === 'nail_extension' ? 'Nail Extension' : 'Nail Art'}</td>
+            <td>
+                ${new Date(reservation.reservation_date).toLocaleDateString()} 
+                at ${reservation.reservation_time}
+            </td>
+            <td>
+                <span class="status-badge status-${reservation.status}">
+                    ${reservation.status.toUpperCase()}
+                </span>
+            </td>
+            <td>
+                <div class="actions-container">
                     ${reservation.status === 'pending' ? `
-                        <button class="btn-action btn-confirm" onclick="confirmReservation(${reservation.id})">
+                        <button class="btn-action btn-confirm" onclick="confirmReservation(${reservation.id})" title="Confirm">
                             <i class="fas fa-check me-1"></i>Confirm
                         </button>
-                        <button class="btn-action btn-cancel" onclick="cancelReservation(${reservation.id})">
+                        <button class="btn-action btn-cancel" onclick="cancelReservation(${reservation.id})" title="Cancel">
                             <i class="fas fa-times me-1"></i>Cancel
                         </button>
                     ` : ''}
                     ${reservation.status !== 'cancelled' && reservation.status !== 'completed' ? `
-                        <button class="btn-action btn-edit" onclick="editReservation(${reservation.id})">
+                        <button class="btn-action btn-edit" onclick="editReservation(${reservation.id})" title="Edit">
                             <i class="fas fa-edit me-1"></i>Edit
                         </button>
                     ` : ''}
-                </td>
-            </tr>
-        `).join('');
-    }
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
 
     function updateStats(reservations) {
         const counts = {
@@ -387,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
             body: JSON.stringify({ status: status })
         })
@@ -439,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
             body: JSON.stringify(formData)
         })
@@ -460,7 +519,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showAlert(message, type) {
-        // Create alert element
         const alert = document.createElement('div');
         alert.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
         alert.style.cssText = `
@@ -477,7 +535,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.body.appendChild(alert);
         
-        // Auto remove after 3 seconds
         setTimeout(() => {
             if (alert.parentNode) {
                 alert.parentNode.removeChild(alert);
@@ -485,5 +542,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 });
+
 </script>
 @endsection

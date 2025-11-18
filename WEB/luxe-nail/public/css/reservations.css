@@ -464,3 +464,77 @@
         margin: 5px 0;
     }
 }
+/* Fix Action Buttons Layout */
+.reservation-table td:last-child {
+    white-space: nowrap;
+}
+
+.actions-container {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    min-width: 70px;
+    transition: all 0.2s ease;
+}
+
+.btn-confirm {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #218838;
+    color: white;
+}
+
+.btn-cancel {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #c82333;
+    color: white;
+}
+
+.btn-edit {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-edit:hover {
+    background-color: #e0a800;
+    color: #212529;
+}
+
+/* Ensure table responsive design */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.reservation-table {
+    min-width: 800px;
+}
+
+/* Specific column widths */
+.reservation-table th:nth-child(1) { width: 100px; } /* Queue No */
+.reservation-table th:nth-child(2) { width: 120px; } /* Customer Name */
+.reservation-table th:nth-child(3) { width: 120px; } /* Phone */
+.reservation-table th:nth-child(4) { width: 120px; } /* Treatment */
+.reservation-table th:nth-child(5) { width: 150px; } /* Date & Time */
+.reservation-table th:nth-child(6) { width: 100px; } /* Status */
+.reservation-table th:nth-child(7) { width: 200px; } /* Actions - lebih lebar */
