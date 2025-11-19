@@ -1,21 +1,77 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:luxe_nail/screens/jenis_treatment_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'gallery_screen.dart';
+import 'jenis_treatment_screen.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   final String token;
   final Map<String, dynamic> user;
 
   DashboardScreen({super.key, required this.token, required this.user});
 
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+  List<dynamic> reservations = [];
+  DateTime selectedDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchReservations();
+  }
+
+  // ========================= FETCH DATA =========================
+  Future<void> fetchReservations() async {
+    try {
+      final url = Uri.parse(
+        "https://unglorifying-rutha-insincerely.ngrok-free.dev/api/v1/reservations",
+      );
+
+      final response = await http.get(
+        url,
+        headers: {
+          "Authorization": "Bearer ${widget.token}",
+          "Accept": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final List<dynamic> all = json["data"];
+
+        // FILTER: Hanya yang confirmed + sesuai tanggal
+        String dateStr = DateFormat('yyyy-MM-dd').format(selectedDate);
+
+        final filtered = all.where((r) {
+          return r["status"] == "confirmed" &&
+              r["reservation_date"].toString().startsWith(dateStr);
+        }).toList();
+
+        setState(() {
+          reservations = filtered;
+        });
+      } else {
+        print("Error: ${response.body}");
+      }
+    } catch (e) {
+      print("Fetch error: $e");
+    }
+  }
+
+  // ========================= UI =========================
   @override
   Widget build(BuildContext context) {
     final sW = Responsive.sW(context, 1);
@@ -25,7 +81,6 @@ class DashboardScreen extends StatelessWidget {
       key: scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
 
-      // ================= DRAWER =================
       drawer: Drawer(
         backgroundColor: const Color(0xFFFFF8F9),
         child: ListView(
@@ -45,9 +100,9 @@ class DashboardScreen extends StatelessWidget {
                       color: Color(0xFF451A2B),
                     ),
                   ),
-                  SizedBox(height: 10 * sH),
+                  SizedBox(height: 10),
                   Text(
-                    'Welcome, ${user['name']}!',
+                    'Welcome, ${widget.user['name']}!',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -82,14 +137,12 @@ class DashboardScreen extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ProfileScreen(token: token),
-                  ),
-                );
-              },
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProfileScreen(token: widget.token),
+                ),
+              ),
             ),
             const Divider(color: Color(0xFFAF7C85)),
             ListTile(
@@ -103,40 +156,37 @@ class DashboardScreen extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              onTap: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
-              },
+              onTap: () => Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (route) => false,
+              ),
             ),
           ],
         ),
       ),
 
-      // ================= BODY =================
+      // ========================= BODY =========================
       body: Column(
         children: [
-          // ================= HEADER =================
           Padding(
-            padding: EdgeInsets.fromLTRB(26 * sW, 60 * sH, 26 * sW, 10 * sH),
+            padding: EdgeInsets.fromLTRB(26, 60, 26, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
                   onTap: () => scaffoldKey.currentState!.openDrawer(),
-                  child: Icon(
+                  child: const Icon(
                     Icons.menu,
-                    size: 32 * sW,
-                    color: const Color(0xFF451A2B),
+                    size: 32,
+                    color: Color(0xFF451A2B),
                   ),
                 ),
-                Text(
+                const Text(
                   'LUXE NAIL',
                   style: TextStyle(
-                    color: const Color(0xFF975B73),
-                    fontSize: 20 * sW,
+                    color: Color(0xFF975B73),
+                    fontSize: 20,
                     fontFamily: 'Georgia',
                     fontWeight: FontWeight.w700,
                   ),
@@ -146,7 +196,7 @@ class DashboardScreen extends StatelessWidget {
           ),
 
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 26 * sW),
+            padding: EdgeInsets.symmetric(horizontal: 26),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -154,15 +204,15 @@ class DashboardScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hello, ${user['name']}!',
-                      style: TextStyle(
-                        color: const Color(0xFF451A2B),
-                        fontSize: 32 * sW,
+                      'Hello, ${widget.user['name']}!',
+                      style: const TextStyle(
+                        color: Color(0xFF451A2B),
+                        fontSize: 32,
                         fontFamily: 'Georgia',
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    SizedBox(height: 7 * sH),
+                    SizedBox(height: 7),
                     const Text(
                       'Your customers are waiting 💅',
                       style: TextStyle(
@@ -173,31 +223,32 @@ class DashboardScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+
                 GestureDetector(
                   onTap: () => _showCalendarPopup(context),
-                  child: Icon(
+                  child: const Icon(
                     Icons.calendar_month,
-                    size: 32 * sW,
-                    color: const Color(0xFF451A2B),
+                    size: 32,
+                    color: Color(0xFF451A2B),
                   ),
                 ),
               ],
             ),
           ),
 
-          SizedBox(height: 20 * sH),
+          const SizedBox(height: 20),
 
-          // ================= MAIN CONTENT =================
+          // ========================= CONTENT =========================
           Expanded(
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30 * sW),
-                  topRight: Radius.circular(30 * sW),
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
                 ),
-                image: DecorationImage(
+                image: const DecorationImage(
                   image: AssetImage("assets/images/Splas1-HAND.png"),
                   fit: BoxFit.cover,
                   opacity: 0.9,
@@ -205,122 +256,160 @@ class DashboardScreen extends StatelessWidget {
               ),
 
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 20 * sH,
-                    horizontal: 20 * sW,
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        "Today's Appointments",
-                        style: TextStyle(
-                          color: const Color(0xFF451A2B),
-                          fontSize: 20 * sW,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                        ),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Today's Appointments",
+                      style: TextStyle(
+                        color: Color(0xFF451A2B),
+                        fontSize: 20,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
                       ),
-                      SizedBox(height: 20 * sH),
+                    ),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _appointmentCard(sW, sH),
-                          SizedBox(width: 12 * sW),
-                          _appointmentCard(sW, sH),
-                        ],
+                    const SizedBox(height: 20),
+
+                    if (reservations.isEmpty)
+                      const Text("No confirmed reservations today"),
+
+                    if (reservations.isNotEmpty)
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: reservations
+                            .map((r) => _appointmentCard(r))
+                            .toList(),
                       ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ),
           ),
 
-          // ================= BOTTOM NAVBAR =================
-          _bottomNavbar(context, sW, sH),
+          _bottomNavbar(context),
         ],
       ),
     );
   }
 
-  // ==================================================
-  // COMPONENTS
-  // ==================================================
-  Widget _bottomNavbar(BuildContext context, double sW, double sH) {
-    return Container(
-      height: 90 * sH,
-      padding: EdgeInsets.symmetric(horizontal: 40 * sW),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F9),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(27 * sW),
-          topRight: Radius.circular(27 * sW),
+  Widget _appointmentCard(dynamic r) {
+    return GestureDetector(
+      onTap: () {
+        // nanti diarahkan ke design_screen.dart
+      },
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFAF7C85),
+          borderRadius: BorderRadius.circular(12),
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x3F000000),
-            blurRadius: 9,
-            offset: Offset(5, -4),
-          ),
-        ],
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFEAEE),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Text(
+                      "Reservation # ${r['queue_number']}",
+                      style: const TextStyle(
+                        color: Color(0xFF451A2B),
+                        fontFamily: 'Poppins',
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const Divider(color: Color(0xFF451A2B)),
+                  Text(
+                    "Name: ${r['name']}",
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  Text(
+                    "Address: ${r['address']}",
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  Text(
+                    "Treatment: ${r['treatment_type']}",
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  Text(
+                    "Phone: ${r['phone']}",
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  Text(
+                    "Status: ${r['status']}",
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _bottomNavbar(BuildContext context) {
+    return Container(
+      height: 90,
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      decoration: const BoxDecoration(color: Color(0xFFFFF8F9)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _bottomNavItem(label: "Home", icon: Icons.home, onTap: () {}),
-
-          _bottomNavItem(
-            label: "Design",
-            icon: Icons.brush,
-            onTap: () => Navigator.pushReplacement(
+          _navItem("Home", Icons.home, () {}),
+          _navItem("Design", Icons.brush, () {
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => JenisTreatmentScreen(token: token, user: user),
+                builder: (_) => JenisTreatmentScreen(
+                  token: widget.token,
+                  user: widget.user,
+                ),
               ),
-            ),
-          ),
-
-          _bottomNavItem(
-            label: "Gallery",
-            icon: Icons.photo_album,
-            onTap: () => Navigator.pushReplacement(
+            );
+          }),
+          _navItem("Gallery", Icons.photo_album, () {
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => GalleryScreen(token: token, user: user),
+                builder: (_) =>
+                    GalleryScreen(token: widget.token, user: widget.user),
               ),
-            ),
-          ),
-
-          _bottomNavItem(
-            label: "Profile",
-            icon: Icons.person,
-            onTap: () => Navigator.push(
+            );
+          }),
+          _navItem("Profile", Icons.person, () {
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ProfileScreen(token: token)),
-            ),
-          ),
+              MaterialPageRoute(
+                builder: (_) => ProfileScreen(token: widget.token),
+              ),
+            );
+          }),
         ],
       ),
     );
   }
 
-  Widget _bottomNavItem({
-    required String label,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
+  Widget _navItem(String text, IconData icon, VoidCallback tap) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: tap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 30, color: const Color(0xFF975B73)),
-          SizedBox(height: 3),
+          const SizedBox(height: 3),
           Text(
-            label,
-            style: TextStyle(
+            text,
+            style: const TextStyle(
               color: Color(0xFFCEA8BC),
               fontSize: 11,
               fontFamily: 'Poppins',
@@ -332,185 +421,104 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _appointmentCard(double sW, double sH) {
-    return Container(
-      width: 160 * sW,
-      padding: EdgeInsets.all(10 * sW),
-      decoration: BoxDecoration(
-        color: const Color(0xFFAF7C85),
-        borderRadius: BorderRadius.circular(12 * sW),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x33000000),
-            blurRadius: 4,
-            offset: Offset(2, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8 * sW),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFEAEE),
-              borderRadius: BorderRadius.circular(5 * sW),
-            ),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'Reservation #001',
-                    style: TextStyle(
-                      color: Color(0xFF451A2B),
-                      fontFamily: 'Poppins',
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                Divider(color: Color(0xFF451A2B)),
-                Text('Name : Bella', style: TextStyle(fontSize: 12)),
-                Text('Treatment : Nail Art', style: TextStyle(fontSize: 12)),
-              ],
-            ),
-          ),
-          SizedBox(height: 10 * sH),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _actionButton("Canceled", sW),
-              SizedBox(width: 10 * sW),
-              _actionButton("Confirm", sW),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _actionButton(String text, double sW) {
-    return Container(
-      width: 65 * sW,
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      decoration: BoxDecoration(
-        color: const Color(0xFF451A2B),
-        borderRadius: BorderRadius.circular(14 * sW),
-      ),
-      child: Center(
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 11,
-            fontFamily: 'Poppins',
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ================= CALENDAR POPUP =================
-  void _showCalendarPopup(BuildContext context) {
-    DateTime focusedDay = DateTime.now();
-    DateTime? selectedDay;
-
-    showDialog(
+  // ========================= CALENDAR =========================
+  void _showCalendarPopup(BuildContext context) async {
+    DateTime? picked = await showDialog(
       context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          backgroundColor: const Color(0xFFFFF8F9),
+      builder: (context) => CalendarDialog(selected: selectedDate),
+    );
 
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.75, // 🔥 Aman!
-              minWidth: MediaQuery.of(context).size.width * 0.90,
+    if (picked != null) {
+      setState(() => selectedDate = picked);
+      fetchReservations();
+    }
+  }
+}
+
+class CalendarDialog extends StatefulWidget {
+  final DateTime selected;
+  const CalendarDialog({super.key, required this.selected});
+
+  @override
+  State<CalendarDialog> createState() => _CalendarDialogState();
+}
+
+class _CalendarDialogState extends State<CalendarDialog> {
+  late DateTime selectedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDay = widget.selected;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: const Color(0xFFFFF8F9),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Select Appointment Date",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+                color: Color(0xFF451A2B),
+              ),
             ),
+            const SizedBox(height: 10),
 
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      "Select Appointment Date",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                        color: Color(0xFF451A2B),
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    TableCalendar(
-                      firstDay: DateTime.utc(2024, 1, 1),
-                      lastDay: DateTime.utc(2026, 12, 31),
-                      focusedDay: focusedDay,
-                      selectedDayPredicate: (day) =>
-                          isSameDay(selectedDay, day),
-                      onDaySelected: (sel, focus) {
-                        selectedDay = sel;
-                        focusedDay = focus;
-                      },
-                      headerStyle: const HeaderStyle(
-                        titleCentered: true,
-                        formatButtonVisible: false,
-                      ),
-                      calendarStyle: CalendarStyle(
-                        todayDecoration: BoxDecoration(
-                          color: Color(0xFFAF7C85).withOpacity(0.4),
-                          shape: BoxShape.circle,
-                        ),
-                        selectedDecoration: const BoxDecoration(
-                          color: Color(0xFFAF7C85),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                          child: const Text(
-                            "Close",
-                            style: TextStyle(color: Color(0xFF451A2B)),
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        if (selectedDay != null)
-                          TextButton(
-                            child: const Text(
-                              "Select",
-                              style: TextStyle(color: Color(0xFFAF7C85)),
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Selected: ${DateFormat('d MMM yyyy').format(selectedDay!)}",
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                      ],
-                    ),
-                  ],
+            TableCalendar(
+              firstDay: DateTime.utc(2024, 1, 1),
+              lastDay: DateTime.utc(2026, 12, 31),
+              focusedDay: selectedDay,
+              selectedDayPredicate: (d) => isSameDay(d, selectedDay),
+              onDaySelected: (sel, focus) {
+                setState(() => selectedDay = sel);
+              },
+              headerStyle: const HeaderStyle(
+                titleCentered: true,
+                formatButtonVisible: false,
+              ),
+              calendarStyle: CalendarStyle(
+                todayDecoration: BoxDecoration(
+                  color: const Color(0xFFAF7C85).withOpacity(0.4),
+                  shape: BoxShape.circle,
+                ),
+                selectedDecoration: const BoxDecoration(
+                  color: Color(0xFFAF7C85),
+                  shape: BoxShape.circle,
                 ),
               ),
             ),
-          ),
-        );
-      },
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  child: const Text(
+                    "Close",
+                    style: TextStyle(color: Color(0xFF451A2B)),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                TextButton(
+                  child: const Text(
+                    "Select",
+                    style: TextStyle(color: Color(0xFFAF7C85)),
+                  ),
+                  onPressed: () => Navigator.pop(context, selectedDay),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
