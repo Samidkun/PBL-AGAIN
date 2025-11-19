@@ -32,6 +32,10 @@
             <i class="bi bi-person me-2"></i> Profile
         </a>
 
+        <a href="{{ route('kategori.index') }}" class="{{ request()->routeIs('kategori.*') ? 'active' : '' }}">
+            <i class="bi bi-tags me-2"></i> Kategori
+        </a>
+
         <hr class="divider">
 
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-danger fw-semibold" style="text-decoration:none;">

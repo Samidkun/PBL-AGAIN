@@ -1,0 +1,140 @@
+:root {
+    --baby-pink: #f8d7da;
+    --soft-pink: #f3b8c2;
+    --medium-pink: #ee9ca7;
+    --dark-pink: #d87a87;
+    --accent-gold: #ffd700;
+    --text-dark: #451a2b;
+    --text-light: #ffffff;
+}
+
+/* SEMBUNYIKAN HEADER DASHBOARD DEFAULT - SAMA PERSIS KAYA RESERVASI */
+.topbar {
+    display: none !important;
+}
+
+.main-content {
+    padding-top: 20px !important;
+    background: transparent !important;
+}
+
+.kategori-container {
+    padding: 20px;
+    min-height: calc(100vh - 80px);
+    background: transparent !important;
+}
+
+/* HEADER KATEGORI CUSTOM */
+.kategori-header {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.header-content h1 {
+    color: var(--text-dark);
+    font-weight: 700;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.header-content p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* FILTER DI HEADER */
+.header-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-select {
+    border: 1px solid var(--soft-pink);
+    border-radius: 8px;
+    padding: 8px 15px;
+    background: white;
+    color: var(--text-dark);
+    min-width: 180px;
+    font-size: 0.9rem;
+}
+
+.filter-select:focus {
+    border-color: var(--dark-pink);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(216, 122, 135, 0.2);
+}
+
+.btn-reset {
+    background: var(--dark-pink);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-reset:hover {
+    background: var(--medium-pink);
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* KARTU KATEGORI */
+.kategori-card {
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+}
+
+.kategori-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(216, 122, 135, 0.15);
+    border-color: var(--soft-pink);
+}
+
+.category-badge {
+    background: linear-gradient(135deg, var(--dark-pink), var(--medium-pink)) !important;
+}
+
+.empty-state {
+    opacity: 0.7;
+}
+
+.text-dark-pink {
+    color: var(--dark-pink) !important;
+}
+
+.empty-state i {
+    font-size: 4rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .kategori-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .header-filters {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    
+    .filter-select {
+        flex: 1;
+        min-width: auto;
+    }
+}

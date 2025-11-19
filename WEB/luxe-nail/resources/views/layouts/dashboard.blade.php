@@ -15,6 +15,11 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/income.css') }}">
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    @yield('styles')
 </head>
 
 <body>
@@ -56,6 +61,7 @@
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('sidebar-collapsed');
         });
+         @yield('scripts')
     </script>
 </body>
 
