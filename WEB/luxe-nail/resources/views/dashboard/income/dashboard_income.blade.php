@@ -1,12 +1,20 @@
 @extends('layouts.dashboard')
 
+@section('title', 'Income Dashboard')
+
 @section('content')
+<link rel="stylesheet" href="{{ asset('css/income.css') }}">
 
 <div class="income-page">
-
-    <!-- TITLE -->
-    <h2 class="text-white mb-3" style="font-family:'Georgia', serif;">Income Dashboard</h2>
-    <p class="page-subtitle">Ringkasan transaksi dan pendapatan berdasarkan reservasi.</p>
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="dashboard-title">
+                <i class="fas fa-chart-line me-3"></i>Income Dashboard
+            </h1>
+            <p class="dashboard-subtitle">Summary of transactions and revenue by reservation.</p>
+        </div>
+    </div>
 
     <!-- FILTER SECTION -->
     <div class="card-section filter-card mb-6">

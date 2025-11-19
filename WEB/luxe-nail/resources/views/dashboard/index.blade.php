@@ -1,7 +1,12 @@
 @extends('layouts.dashboard')
 
 @section('title', 'Dashboard - Luxe Nail')
-@section('page-title', 'Dashboard Overview')
+
+{{-- INI DITARUH DI SINI --}}
+@section('greeting')
+    <h2>Hello Owner!</h2>
+    <h5>Get ready for a productive day with Luxe Nail</h5>
+@endsection
 
 @section('content')
 
