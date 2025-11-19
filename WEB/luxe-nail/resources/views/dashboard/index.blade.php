@@ -5,11 +5,11 @@
 
 @section('content')
 
-<!-- === FILTER TANGGAL (DITAMBAHKAN) === -->
+<!-- === FILTER TANGGAL di dashboard === -->
 <form action="{{ route('dashboard') }}" method="GET" class="mb-4">
     <div class="row g-3 align-items-end mt-2"">
         <div class="col-md-3">
-            <h5 class="bold" style="color:#ffffff; font-family:'Georgia', serif; margin-bottom:20px;">
+            <h5 class="bold" style="color:#ffffff; font-family:'Georgia', serif; margin-bottom:25px;">
                 Filter by Date
             </h5>
             <input type="date" name="date" class="form-control" 
