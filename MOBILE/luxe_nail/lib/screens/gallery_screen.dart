@@ -12,6 +12,110 @@ class GalleryScreen extends StatelessWidget {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  // ===================== DATA GALERI ======================
+  final List<Map<String, String>> galleryData = [
+  {
+    "img": "assets/images/gallery/nail1.jpg",
+    "name": "Elegant French",
+    "desc": "Classic white tips with golden accents",
+  },
+  {
+    "img": "assets/images/gallery/nail2.jpg",
+    "name": "Sparkling Glitter",
+    "desc": "Dazzling glitter with crystal details",
+  },
+  {
+    "img": "assets/images/gallery/nail3.jpg",
+    "name": "Floral Art",
+    "desc": "Delicate hand-painted flower designs",
+  },
+  {
+    "img": "assets/images/gallery/nail4.jpg",
+    "name": "Marble Effect",
+    "desc": "Sophisticated marble patterns",
+  },
+  {
+    "img": "assets/images/gallery/nail5.jpg",
+    "name": "Geometric Patterns",
+    "desc": "Modern geometric designs",
+  },
+  {
+    "img": "assets/images/gallery/nail6.jpg",
+    "name": "Ombre Gradient",
+    "desc": "Beautiful color transitions",
+  },
+  {
+    "img": "assets/images/gallery/nail7.jpg",
+    "name": "3D Nail Art",
+    "desc": "Textured 3D designs",
+  },
+  {
+    "img": "assets/images/gallery/nail8.jpg",
+    "name": "Minimalist Style",
+    "desc": "Simple yet elegant designs",
+  },
+  {
+    "img": "assets/images/gallery/nail9.jpg",
+    "name": "Chrome Finish",
+    "desc": "Metallic chrome effects",
+  },
+  {
+    "img": "assets/images/gallery/nail10.jpg",
+    "name": "Animal Print",
+    "desc": "Wild leopard and zebra patterns",
+  },
+  {
+    "img": "assets/images/gallery/nail11.jpg",
+    "name": "Holographic",
+    "desc": "Rainbow holographic effects",
+  },
+  {
+    "img": "assets/images/gallery/nail12.jpg",
+    "name": "Stiletto Shape",
+    "desc": "Edgy stiletto nail shape",
+  },
+  {
+    "img": "assets/images/gallery/nail13.jpg",
+    "name": "Coffin Shape",
+    "desc": "Trendy coffin nail shape",
+  },
+  {
+    "img": "assets/images/gallery/nail14.jpg",
+    "name": "Almond Shape",
+    "desc": "Elegant almond nail shape",
+  },
+  {
+    "img": "assets/images/gallery/nail15.jpg",
+    "name": "Bridal Style",
+    "desc": "Elegant designs for special occasions",
+  },
+  {
+    "img": "assets/images/gallery/nail16.jpg",
+    "name": "Holiday Theme",
+    "desc": "Festive Christmas designs",
+  },
+  {
+    "img": "assets/images/gallery/nail17.jpg",
+    "name": "Halloween Theme",
+    "desc": "Spooky Halloween designs",
+  },
+  {
+    "img": "assets/images/gallery/nail18.jpg",
+    "name": "Summer Vibes",
+    "desc": "Bright summer colors",
+  },
+  {
+    "img": "assets/images/gallery/nail19.jpg",
+    "name": "Abstract Art",
+    "desc": "Modern abstract patterns",
+  },
+  {
+    "img": "assets/images/gallery/nail20.jpg",
+    "name": "Pearl Accents",
+    "desc": "Elegant pearl decorations",
+  },
+];
+
   @override
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
@@ -161,7 +265,7 @@ class GalleryScreen extends StatelessWidget {
             ),
           ),
 
-          // ================= MAIN CONTAINER =================
+// ================= MAIN CONTAINER =================
           Positioned(
             left: 13 * sW,
             top: 160 * sH,
@@ -177,25 +281,13 @@ class GalleryScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: -10 * sW,
-                    top: -10 * sH,
-                    child: Opacity(
-                      opacity: 0.9,
-                      child: Image.asset(
-                        "assets/images/Splas1-HAND.png",
-                        width: 386 * sW,
-                        height: 720 * sH,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Text(
+              child: Padding(
+                padding: EdgeInsets.all(20 * sW),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
                       "Your Nail Design Gallery",
-                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: const Color(0xFF451A2B),
                         fontSize: 22 * sW,
@@ -203,8 +295,43 @@ class GalleryScreen extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                ],
+
+                    SizedBox(height: 20 * sH),
+
+                    // ================= GALERI VERTICAL =================
+                    Expanded(
+                      child: GridView.builder(
+                        padding: EdgeInsets.only(top: 10 * sH),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,          // 2 kolom
+                          childAspectRatio: 0.75,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                        itemCount: galleryData.length,
+                        itemBuilder: (context, index) {
+                          final item = galleryData[index];
+
+                          return GestureDetector(
+                            onTap: () => _showImagePopup(
+                              context,
+                              item["img"]!,
+                              item["name"]!,
+                              item["desc"]!,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(18),
+                              child: Image.asset(
+                                item["img"]!,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -312,6 +439,71 @@ class GalleryScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // ================= POPUP GALERI =================
+  void _showImagePopup(
+      BuildContext context, String imgPath, String title, String desc) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    imgPath,
+                    height: 220,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF451A2B),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  desc,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF975B73),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF975B73),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    "Close",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -5,12 +5,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\OwnerReservationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TreatmentTypeController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +26,8 @@ Route::post('/login-page', [AuthController::class, 'login'])->name('login.page.s
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ====== DASHBOARD ======
-Route::get('/dashboard', fn() => view('dashboard.index'))->name('dashboard');
+// Route::get('/dashboard', fn() => view('dashboard.index'))->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
 // ====== HALAMAN UTAMA ======
 Route::get('/', [HomeController::class, 'index'])->name('home');
