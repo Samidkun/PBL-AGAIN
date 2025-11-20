@@ -86,7 +86,6 @@ class CategoryController extends Controller
 
     $data = $request->all();
 
-    // ⚠️ PERBAIKAN: Gunakan method generateCode dari Model
     if (empty($data['code'])) {
         $data['code'] = Category::generateCode($data['type']);
     }
@@ -130,10 +129,10 @@ class CategoryController extends Controller
 
     $data = $request->all();
 
-    // ⚠️ PERBAIKAN: Jika code kosong, generate otomatis
-    if (empty($data['code'])) {
-        $data['code'] = Category::generateCode($data['type']);
-    }
+    if (!isset($data['code']) || $data['code'] === '' || $data['code'] === null) {
+    $data['code'] = $category->code;
+}
+
 
     if ($request->hasFile('image')) {
         if ($category->image) {
@@ -281,9 +280,10 @@ class CategoryController extends Controller
 
         $data = $request->all();
 
-        if (empty($data['code'])) {
-            $data['code'] = Category::generateCode($data['type']);
-        }
+        if (!isset($data['code']) || $data['code'] === '' || $data['code'] === null) {
+    $data['code'] = $category->code;
+}
+
 
         if ($request->hasFile('image')) {
             if ($category->image && file_exists(public_path($category->image))) {

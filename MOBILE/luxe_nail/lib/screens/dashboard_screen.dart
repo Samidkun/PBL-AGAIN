@@ -25,16 +25,18 @@ class DashboardScreen extends StatelessWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
   List<dynamic> reservations = [];
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    fetchReservations();
+    _fetchReservationsForDate(_selectedDate);
   }
 
-  // ================= FETCH DATA RESERVASI =================
-  Future<void> fetchReservations() async {
+  // ====================== FETCH DATA BY DATE ==========================
+  Future<void> _fetchReservationsForDate(DateTime date) async {
     try {
       final url = Uri.parse(
         "https://unglorifying-rutha-insincerely.ngrok-free.dev/api/v1/reservations",
@@ -50,17 +52,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+
+        final List<dynamic> raw = data["data"] ?? [];
+        final String selectedDateStr = DateFormat(
+          "yyyy-MM-dd",
+        ).format(date.toUtc());
+        final List<dynamic> filtered = raw.where((item) {
+          // reservation_date di API: "2025-11-26T00:00:00.000000Z"
+          final String rawDate = (item["reservation_date"] ?? "").toString();
+          final String onlyDate = rawDate.length >= 10
+              ? rawDate.substring(0, 10)
+              : rawDate;
+
+          final String status = (item["status"] ?? "")
+              .toString()
+              .trim()
+              .toLowerCase();
+
+          return onlyDate == selectedDateStr && status == "confirmed";
+        }).toList();
+
+        // SORT by reservation_time (HH:mm:ss)
+        DateTime parseTime(dynamic value) {
+          final str = (value ?? "").toString();
+          try {
+            return DateFormat("HH:mm:ss").parse(str);
+          } catch (_) {
+            return DateTime(2000, 1, 1, 23, 59, 59);
+          }
+        }
+
+        filtered.sort((a, b) {
+          final tA = parseTime(a["reservation_time"]);
+          final tB = parseTime(b["reservation_time"]);
+          return tA.compareTo(tB);
+        });
+
         setState(() {
-          reservations = data["data"] ?? [];
+          reservations = filtered;
         });
       } else {
-        print("❌ Failed: ${response.body}");
+        debugPrint("❌ Failed: ${response.body}");
       }
     } catch (e) {
-      print("❌ ERROR: $e");
+      debugPrint("❌ ERROR: $e");
     }
   }
 
+  void _onDateSelected(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+    });
+    _fetchReservationsForDate(date);
+  }
+
+  // =========================== UI ================================
   @override
   Widget build(BuildContext context) {
     final sW = Responsive.sW(context, 1);
@@ -162,8 +208,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       // ================= BODY =================
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ================= HEADER =================
+          // ===== HEADER LUXE NAIL =====
           Padding(
             padding: EdgeInsets.fromLTRB(26 * sW, 60 * sH, 26 * sW, 10 * sH),
             child: Row(
@@ -190,6 +237,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
 
+          // ===== HELLO + ICON KALENDER =====
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 26 * sW),
             child: Row(
@@ -232,7 +280,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           SizedBox(height: 20 * sH),
 
-          // ================= MAIN CONTENT =================
+          // ================= BOX PUTIH (TITLE + LIST SCROLL) =================
           Expanded(
             child: Container(
               width: double.infinity,
@@ -248,132 +296,102 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   opacity: 0.9,
                 ),
               ),
-
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 20 * sH,
-                    horizontal: 20 * sW,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Today's Appointments",
-                        style: TextStyle(
-                          color: const Color(0xFF451A2B),
-                          fontSize: 20 * sW,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                        ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ===== TITLE DI DALAM BOX PUTIH (TIDAK SCROLL) =====
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(26 * sW, 20 * sH, 26 * sW, 0),
+                    child: const Text(
+                      "Today's Appointments",
+                      style: TextStyle(
+                        color: Color(0xFF451A2B),
+                        fontSize: 20,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
                       ),
-
-          // ================= BOTTOM NAVBAR (UPDATED) =================
-          Positioned(
-            left: 0,
-            top: 800 * sH,
-            child: Container(
-              width: 412 * sW,
-              height: 120 * sH,
-              padding: EdgeInsets.only(
-                top: 24 * sH,
-                left: 46 * sW,
-                right: 46 * sW,
-                bottom: 30 * sH,
-              ),
-              decoration: ShapeDecoration(
-                color: const Color(0xFFFFF8F9),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(27 * sW),
-                    topRight: Radius.circular(27 * sW),
+                    ),
                   ),
-                ),
-                shadows: const [
-                  BoxShadow(
-                    color: Color(0x3F000000),
-                    blurRadius: 9,
-                    offset: Offset(5, -4),
-                    spreadRadius: -1,
+
+                  SizedBox(height: 10 * sH),
+
+                  // ===== AREA SCROLL (CARD-CARD) =====
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 10 * sH,
+                        horizontal: 20 * sW,
+                      ),
+                      child: reservations.isEmpty
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.6,
+                              child: Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Icon(
+                                      Icons.calendar_today,
+                                      size: 50,
+                                      color: Color(0xFFB97A8B),
+                                    ),
+                                    SizedBox(height: 14),
+                                    Text(
+                                      "No reservations for this date",
+                                      style: TextStyle(
+                                        color: Color(0xFF451A2B),
+                                        fontSize: 16,
+                                        fontFamily: "Poppins",
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      "Try selecting another day 💅",
+                                      style: TextStyle(
+                                        color: Color(0xFF451A2B),
+                                        fontSize: 13,
+                                        fontFamily: "Poppins",
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Column(
+                              children: reservations
+                                  .map(
+                                    (res) =>
+                                        _reservationCard(context, res, sW, sH),
+                                  )
+                                  .toList(),
+                            ),
+                    ),
                   ),
                 ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _bottomNavItem(
-                    label: "Home",
-                    icon: Icons.home,
-                    onTap: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => DashboardScreen(token: token, user: user),
-                      ),
-                    ),
-                  ),
-
-                  _bottomNavItem(
-                    label: "Design",
-                    icon: Icons.brush,
-                    onTap: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => JenisTreatmentScreen(token: token, user: user),
-                      ),
-                    ),
-                  ),
-
-                  // ⭐ AI BUTTON
-                  _bottomNavItem(
-                    label: "AI",
-                    icon: Icons.auto_awesome,
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AIScreen(token: token, user: user),
-                      ),
-                    ),
-                  ),
-
-                  _bottomNavItem(
-                    label: "Gallery",
-                    icon: Icons.photo_album,
-                    onTap: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => GalleryScreen(token: token, user: user),
-                      ),
-                    ),
-                  ),
-
-                  _bottomNavItem(
-                    label: "Profile",
-                    icon: Icons.person,
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ProfileScreen(token: token),
-                      ),
-                    ],
-                  ),
-                ),
               ),
             ),
           ),
 
+          // ====== BOTTOM NAVBAR ======
           _bottomNavbar(context, sW, sH),
         ],
       ),
     );
   }
 
-  // ================= CARD VIEW =================
+  // ================= CARD DESIGN =================
   Widget _reservationCard(
     BuildContext context,
     Map<String, dynamic> res,
     double sW,
     double sH,
   ) {
+    final treatment = (res["treatment_type"] ?? "").toString();
+    final treatmentLabel = _prettyTreatment(treatment);
+    final time = (res["reservation_time"] ?? "").toString();
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -388,13 +406,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
       },
       child: Container(
-        width: double.infinity,
         margin: EdgeInsets.only(bottom: 16 * sH),
-        padding: EdgeInsets.all(16 * sW),
+        padding: EdgeInsets.all(6 * sW),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFEAEE),
-          borderRadius: BorderRadius.circular(16 * sW),
-          border: Border.all(color: const Color(0xFFAF7C85), width: 2),
+          color: const Color(0xFFB97A8B),
+          borderRadius: BorderRadius.circular(18 * sW),
           boxShadow: const [
             BoxShadow(
               color: Color(0x33000000),
@@ -403,40 +419,102 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                "Reservation #${res['queue_number']}",
-                style: const TextStyle(
-                  color: Color(0xFF451A2B),
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(14 * sW),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF1F3),
+            borderRadius: BorderRadius.circular(14 * sW),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  "Reservation #${res['queue_number']}",
+                  style: TextStyle(
+                    color: const Color(0xFF451A2B),
+                    fontFamily: "Poppins",
+                    fontSize: 14 * sW,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-            ),
 
-            const Divider(color: Color(0xFF451A2B)),
+              SizedBox(height: 6 * sH),
+              const Divider(color: Color(0xFF451A2B), thickness: 1, height: 1),
+              SizedBox(height: 8 * sH),
 
-            _info("Name", res["name"]),
-            _info("Address", res["address"]),
-            _info("Treatment", res["treatment_type"]),
-            _info("Phone", res["phone"]),
-            _info("Status", res["status"]),
-          ],
+              // baris icon treatment + label + jam
+              Row(
+                children: [
+                  Icon(
+                    _treatmentIcon(treatment),
+                    size: 18 * sW,
+                    color: const Color(0xFF451A2B),
+                  ),
+                  SizedBox(width: 8 * sW),
+                  Text(
+                    treatmentLabel,
+                    style: TextStyle(
+                      color: const Color(0xFF451A2B),
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13 * sW,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    time,
+                    style: TextStyle(
+                      color: const Color(0xFF451A2B),
+                      fontFamily: "Poppins",
+                      fontSize: 12 * sW,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 10 * sH),
+
+              _info("Name", res["name"]),
+              _info("Address", res["address"]),
+              _info("Phone", res["phone"]),
+              _info("Status", res["status"]),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _info(String label, String value) {
+  IconData _treatmentIcon(String t) {
+    switch (t) {
+      case "nail_art":
+        return Icons.brush;
+      case "nail_extension":
+        return Icons.pan_tool_alt;
+      default:
+        return Icons.brush;
+    }
+  }
+
+  String _prettyTreatment(String t) {
+    switch (t) {
+      case "nail_art":
+        return "Nail Art";
+      case "nail_extension":
+        return "Nail Extension";
+      default:
+        return t;
+    }
+  }
+
+  Widget _info(String label, dynamic value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.only(bottom: 4),
       child: Text(
-        "$label : $value",
+        "$label : ${value ?? '-'}",
         style: const TextStyle(
           fontSize: 13,
           fontFamily: "Poppins",
@@ -481,6 +559,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
+
           _bottomNavItem(
             label: "Gallery",
             icon: Icons.photo_album,
@@ -536,106 +615,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // ================= CALENDAR POPUP =================
   void _showCalendarPopup(BuildContext context) {
-    DateTime focusedDay = DateTime.now();
-    DateTime? selectedDay;
-
     showDialog(
       context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          backgroundColor: const Color(0xFFFFF8F9),
+      builder: (dialogCtx) {
+        DateTime tempSelectedDay = _selectedDate;
+        DateTime focusedDay = _selectedDate;
 
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.75,
-              minWidth: MediaQuery.of(context).size.width * 0.90,
-            ),
-
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      "Select Appointment Date",
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                        color: Color(0xFF451A2B),
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    TableCalendar(
-                      firstDay: DateTime.utc(2024, 1, 1),
-                      lastDay: DateTime.utc(2026, 12, 31),
-                      focusedDay: focusedDay,
-                      selectedDayPredicate: (day) =>
-                          isSameDay(selectedDay, day),
-                      onDaySelected: (sel, focus) {
-                        setState(() {
-                          selectedDay = sel;
-                          focusedDay = focus;
-                        });
-                      },
-                      headerStyle: const HeaderStyle(
-                        titleCentered: true,
-                        formatButtonVisible: false,
-                      ),
-                      calendarStyle: CalendarStyle(
-                        todayDecoration: BoxDecoration(
-                          color: const Color(0xFFAF7C85).withOpacity(0.4),
-                          shape: BoxShape.circle,
-                        ),
-                        selectedDecoration: const BoxDecoration(
-                          color: Color(0xFFAF7C85),
-                          shape: BoxShape.circle,
+        return StatefulBuilder(
+          builder: (ctx, setStateDialog) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backgroundColor: const Color(0xFFFFF8F9),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.75,
+                  minWidth: MediaQuery.of(context).size.width * 0.90,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        "Select Appointment Date",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: Color(0xFF451A2B),
                         ),
                       ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                          child: const Text(
-                            "Close",
-                            style: TextStyle(color: Color(0xFF451A2B)),
+                      const SizedBox(height: 10),
+                      TableCalendar(
+                        firstDay: DateTime.utc(2024, 1, 1),
+                        lastDay: DateTime.utc(2026, 12, 31),
+                        focusedDay: focusedDay,
+                        selectedDayPredicate: (day) =>
+                            isSameDay(tempSelectedDay, day),
+                        onDaySelected: (sel, focus) {
+                          setStateDialog(() {
+                            tempSelectedDay = sel;
+                            focusedDay = focus;
+                          });
+                        },
+                        headerStyle: const HeaderStyle(
+                          titleCentered: true,
+                          formatButtonVisible: false,
+                        ),
+                        calendarStyle: CalendarStyle(
+                          todayDecoration: BoxDecoration(
+                            color: const Color(0xFFAF7C85).withOpacity(0.4),
+                            shape: BoxShape.circle,
                           ),
-                          onPressed: () => Navigator.pop(context),
+                          selectedDecoration: const BoxDecoration(
+                            color: Color(0xFFAF7C85),
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                        if (selectedDay != null)
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextButton(
+                            child: const Text(
+                              "Close",
+                              style: TextStyle(color: Color(0xFF451A2B)),
+                            ),
+                            onPressed: () => Navigator.pop(dialogCtx),
+                          ),
                           TextButton(
                             child: const Text(
                               "Select",
                               style: TextStyle(color: Color(0xFFAF7C85)),
                             ),
                             onPressed: () {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Selected: ${DateFormat('d MMM yyyy').format(selectedDay!)}",
-                                  ),
-                                ),
-                              );
+                              Navigator.pop(dialogCtx);
+                              _onDateSelected(tempSelectedDay);
                             },
                           ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
