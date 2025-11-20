@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:luxe_nail/screens/dashboard_screen.dart';
-import 'package:luxe_nail/screens/profile_screen.dart';
-import 'package:luxe_nail/screens/jenis_treatment_screen.dart';
+//import 'package:luxe_nail/screens/jenis_treatment_screen.dart';
 import 'package:luxe_nail/screens/login_screen.dart';
+import 'package:luxe_nail/screens/profile_screen.dart';
 
 class GalleryScreen extends StatelessWidget {
   final String token;
   final Map<String, dynamic> user;
 
-   GalleryScreen({
-    super.key,
-    required this.token,
-    required this.user,
-  });
+  GalleryScreen({super.key, required this.token, required this.user});
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -199,17 +195,17 @@ class GalleryScreen extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => JenisTreatmentScreen(
-                      token: token,
-                      user: user,
-                    ),
-                  ),
-                );
-              },
+              // onTap: () {
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (_) => JenisTreatmentScreen(
+              //       token: token,
+              //       user: user,
+              //     ),
+              //    ),
+              //   );
+              // },
             ),
             const Divider(color: Color(0xFFAF7C85)),
             ListTile(
@@ -380,22 +376,22 @@ class GalleryScreen extends StatelessWidget {
                       Navigator.pop(context);
                     },
                   ),
-                  _bottomNavItem(
-                    label: "Design",
-                    icon: Icons.brush,
-                    onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => JenisTreatmentScreen(
-                            token: token,
-                            user: user,
-                          ),
-                        ),
-                        (route) => false,
-                      );
-                    },
-                  ),
+                  // _bottomNavItem(
+                  //  label: "Design",
+                  //  icon: Icons.brush,
+                  //   onTap: () {
+                  //    Navigator.pushAndRemoveUntil(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //      builder: (_) => JenisTreatmentScreen(
+                  //       token: token,
+                  //       user: user,
+                  //    ),
+                  //   ),
+                  //   (route) => false,
+                  //  );
+                  //  },
+                  //  ),
                   _bottomNavItem(
                     label: "Home",
                     icon: Icons.home,
@@ -403,10 +399,8 @@ class GalleryScreen extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => DashboardScreen(
-                            token: token,
-                            user: user,
-                          ),
+                          builder: (_) =>
+                              DashboardScreen(token: token, user: user),
                         ),
                         (route) => false,
                       );
@@ -419,10 +413,8 @@ class GalleryScreen extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => GalleryScreen(
-                            token: token,
-                            user: user,
-                          ),
+                          builder: (_) =>
+                              GalleryScreen(token: token, user: user),
                         ),
                         (route) => false,
                       );

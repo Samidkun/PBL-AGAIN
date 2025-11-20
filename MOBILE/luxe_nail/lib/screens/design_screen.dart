@@ -4,16 +4,21 @@ import 'package:luxe_nail/screens/dashboard_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
+
 import 'login_screen.dart';
 
 class DesignScreen extends StatelessWidget {
   final String token;
   final Map<String, dynamic> user;
 
-   DesignScreen({
+  /// Reservation optional
+  final Map<String, dynamic>? reservation;
+
+  DesignScreen({
     super.key,
     required this.token,
     required this.user,
+    this.reservation,
   });
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -27,7 +32,7 @@ class DesignScreen extends StatelessWidget {
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
 
-      // ================= DRAWER =================
+      // DRAWER
       drawer: Drawer(
         backgroundColor: const Color(0xFFFFF8F9),
         child: ListView(
@@ -60,6 +65,7 @@ class DesignScreen extends StatelessWidget {
                 ],
               ),
             ),
+
             _drawerItem(context, Icons.home, "Home", () {
               Navigator.pushReplacement(
                 context,
@@ -68,10 +74,13 @@ class DesignScreen extends StatelessWidget {
                 ),
               );
             }),
+
             _drawerItem(context, Icons.brush, "Jenis Treatment", () {
               Navigator.pop(context);
             }),
+
             const Divider(color: Color(0xFFAF7C85)),
+
             _drawerItem(context, Icons.logout, "Logout", () {
               Navigator.pushAndRemoveUntil(
                 context,
@@ -83,151 +92,59 @@ class DesignScreen extends StatelessWidget {
         ),
       ),
 
-      // ================= BODY =================
+      // BODY
       body: Stack(
         children: [
-          // HEADER
+          // ======= HEADER =======
           Positioned(
-            left: sW(26),
             top: sH(60),
-            child: SizedBox(
-              width: sW(351),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () => _scaffoldKey.currentState!.openDrawer(),
-                    child: Icon(
-                      Icons.menu,
-                      size: sW(32),
-                      color: const Color(0xFF451A2B),
-                    ),
+            left: sW(20),
+            right: sW(20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () => _scaffoldKey.currentState!.openDrawer(),
+                  child: Icon(
+                    Icons.menu,
+                    size: sW(32),
+                    color: const Color(0xFF451A2B),
                   ),
-                  Text(
-                    "LUXE NAIL",
-                    style: TextStyle(
-                      color: const Color(0xFF975B73),
-                      fontSize: sW(20),
-                      fontFamily: "Georgia",
-                      fontWeight: FontWeight.w700,
-                    ),
+                ),
+                Text(
+                  "LUXE NAIL",
+                  style: TextStyle(
+                    color: const Color(0xFF975B73),
+                    fontSize: sW(20),
+                    fontFamily: "Georgia",
+                    fontWeight: FontWeight.w700,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
 
-          // MAIN CONTENT
+          // ======= MAIN AREA =======
           Positioned(
-            left: sW(13),
             top: sH(140),
+            left: sW(13),
             child: Container(
               width: sW(386),
+              height: sH(720),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(sW(30)),
-                  topRight: Radius.circular(sW(30)),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(sW(30)),
                 ),
               ),
-              child: SingleChildScrollView(
-                child: Stack(
-                  children: [
-                    Opacity(
-                      opacity: 0.9,
-                      child: Image.asset(
-                        "assets/images/Splas1-HAND.png",
-                        width: sW(386),
-                        height: sH(1000),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: sW(20),
-                        vertical: sH(20),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _title("Choose Your Category Of Nails", sW),
-                          SizedBox(height: sH(10)),
-                          _horizontalScroll(sW, sH, [
-                            _card(context, "Rp. 20.000", "Coffin"),
-                            _card(context, "Rp. 20.000", "Almond"),
-                            _card(context, "Rp. 20.000", "Stiletto"),
-                            _card(context, "Rp. 25.000", "Round"),
-                            _card(context, "Rp. 30.000", "Square"),
-                          ]),
-
-                          SizedBox(height: sH(30)),
-                          _title("Choose Your Type Of Nails", sW),
-                          SizedBox(height: sH(10)),
-                          _horizontalScroll(sW, sH, [
-                            _card(context, "Rp. 20.000", "Coffin"),
-                            _card(context, "Rp. 20.000", "Almond"),
-                            _card(context, "Rp. 20.000", "Stiletto"),
-                          ]),
-
-                          SizedBox(height: sH(30)),
-                          _title("Choose Your Type Of Nails", sW),
-                          SizedBox(height: sH(10)),
-                          _horizontalScroll(sW, sH, [
-                            _card(context, "Rp. 20.000", "Coffin"),
-                            _card(context, "Rp. 20.000", "Almond"),
-                            _card(context, "Rp. 20.000", "Stiletto"),
-                          ]),
-
-                          SizedBox(height: sH(40)),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => AccessorisScreen(
-                                      token: token,
-                                      user: user,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: sW(16),
-                                  vertical: sH(8),
-                                ),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF451A2B),
-                                  borderRadius: BorderRadius.circular(sW(18)),
-                                ),
-                                child: Text(
-                                  "Next",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: sW(14),
-                                    fontFamily: "Poppins",
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: sH(40)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              child: _buildMain(context, sW, sH),
             ),
           ),
 
-          // BOTTOM NAVBAR
+          // ======= BOTTOM NAVBAR =======
           Positioned(
-            left: 0,
             top: sH(800),
+            left: 0,
             child: Container(
               width: sW(412),
               height: sH(120),
@@ -237,45 +154,51 @@ class DesignScreen extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFF8F9),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(sW(27)),
-                  topRight: Radius.circular(sW(27)),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(sW(27)),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // FIX BACK BUTTON
                   _bottomItem(context, "Back", Icons.arrow_back, () {
-                    Navigator.pop(context);
-                  }),
-                  _bottomItem(context, "Design", Icons.brush, () {}),
-                  _bottomItem(context, "Home", Icons.home, () {
-                    Navigator.pushAndRemoveUntil(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
                             DashboardScreen(token: token, user: user),
                       ),
-                      (route) => false,
                     );
                   }),
-                  _bottomItem(context, "Gallery", Icons.photo_album, () {
-                    Navigator.pushAndRemoveUntil(
+
+                  _bottomItem(context, "Design", Icons.brush, () {}),
+
+                  _bottomItem(context, "Home", Icons.home, () {
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            GalleryScreen(token: token, user: user),
+                            DashboardScreen(token: token, user: user),
                       ),
-                      (route) => false,
                     );
                   }),
+
+                  _bottomItem(context, "Gallery", Icons.photo_album, () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GalleryScreen(token: token, user: user),
+                      ),
+                    );
+                  }),
+
                   _bottomItem(context, "Profile", Icons.person, () {
-                    Navigator.pushAndRemoveUntil(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (_) => ProfileScreen(token: token),
                       ),
-                      (route) => false,
                     );
                   }),
                 ],
@@ -287,6 +210,126 @@ class DesignScreen extends StatelessWidget {
     );
   }
 
+  // ======================================================
+  // MAIN CONTENT
+  // ======================================================
+  Widget _buildMain(BuildContext context, dynamic sW, dynamic sH) {
+    if (reservation == null) {
+      return Stack(
+        children: [
+          // Background image
+          Opacity(
+            opacity: 0.9,
+            child: Image.asset(
+              "assets/images/Splas1-HAND.png",
+              width: sW(386),
+              height: sH(1000),
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          // Message
+          Center(
+            child: Text(
+              "Please select a reservation first",
+              style: TextStyle(
+                color: const Color(0xFF451A2B),
+                fontSize: sW(16),
+                fontWeight: FontWeight.bold,
+                fontFamily: "Poppins",
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Stack(
+        children: [
+          Opacity(
+            opacity: 0.8,
+            child: Image.asset(
+              "assets/images/Splas1-HAND.png",
+              width: sW(386),
+              height: sH(1000),
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: sW(20), vertical: sH(20)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _title("Choose Your Category Of Nails", sW),
+                SizedBox(height: sH(10)),
+                _horizontalScroll(sW, sH, [
+                  _card(context, "Rp. 20.000", "Coffin"),
+                  _card(context, "Rp. 20.000", "Almond"),
+                  _card(context, "Rp. 20.000", "Stiletto"),
+                  _card(context, "Rp. 25.000", "Round"),
+                  _card(context, "Rp. 30.000", "Square"),
+                ]),
+
+                SizedBox(height: sH(30)),
+                _title("Choose Your Type Of Nails", sW),
+                SizedBox(height: sH(10)),
+
+                _horizontalScroll(sW, sH, [
+                  _card(context, "Rp. 20.000", "Coffin"),
+                  _card(context, "Rp. 20.000", "Almond"),
+                  _card(context, "Rp. 20.000", "Stiletto"),
+                ]),
+
+                SizedBox(height: sH(40)),
+
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: sW(16),
+                      vertical: sH(8),
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF451A2B),
+                      borderRadius: BorderRadius.circular(sW(18)),
+                    ),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                AccessorisScreen(token: token, user: user),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Next",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: sW(14),
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: sH(40)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ======================================================
+  // COMPONENTS
+  // ======================================================
   Widget _drawerItem(
     BuildContext context,
     IconData icon,
@@ -308,33 +351,26 @@ class DesignScreen extends StatelessWidget {
     );
   }
 
-  Widget _title(String text, Function sW) {
+  Widget _title(String text, Function sw) {
     return Text(
       text,
       style: TextStyle(
         color: const Color(0xFF451A2B),
-        fontSize: sW(14),
+        fontSize: sw(14),
         fontFamily: "Poppins",
         fontWeight: FontWeight.w600,
       ),
     );
   }
 
-  Widget _horizontalScroll(Function sW, Function sH, List<Widget> children) {
+  Widget _horizontalScroll(Function sw, Function sh, List<Widget> children) {
     return SizedBox(
-      height: sH(130),
-      child: SingleChildScrollView(
+      height: sh(130),
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            ...children.map(
-              (e) => Padding(
-                padding: EdgeInsets.only(right: sW(12)),
-                child: e,
-              ),
-            ),
-          ],
-        ),
+        itemCount: children.length,
+        separatorBuilder: (context, i) => SizedBox(width: sw(12)),
+        itemBuilder: (context, i) => children[i],
       ),
     );
   }
@@ -343,48 +379,39 @@ class DesignScreen extends StatelessWidget {
     return Container(
       width: Responsive.sW(context, 108),
       height: Responsive.sH(context, 130),
-      padding: EdgeInsets.symmetric(
-        horizontal: Responsive.sW(context, 5),
-        vertical: Responsive.sH(context, 11),
-      ),
+      padding: EdgeInsets.all(Responsive.sW(context, 5)),
       decoration: BoxDecoration(
         color: const Color(0xFFAF7C85),
-        borderRadius: BorderRadius.circular(Responsive.sW(context, 12)),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         children: [
           Container(
-            width: Responsive.sW(context, 98),
             height: Responsive.sH(context, 20),
+            width: double.infinity,
             decoration: BoxDecoration(
               color: const Color(0xFFFFEAEE),
-              borderRadius: BorderRadius.circular(Responsive.sW(context, 5)),
+              borderRadius: BorderRadius.circular(5),
             ),
             child: Center(
               child: Text(
                 price,
-                style: TextStyle(
-                  color: const Color(0xFF451A2B),
-                  fontSize: Responsive.sW(context, 12),
-                ),
+                style: const TextStyle(color: Color(0xFF451A2B)),
               ),
             ),
           ),
-          SizedBox(height: Responsive.sH(context, 6)),
+          SizedBox(height: 8),
           Container(
-            width: Responsive.sW(context, 98),
             height: Responsive.sH(context, 78),
+            width: double.infinity,
             decoration: BoxDecoration(
               color: const Color(0xFFFFEAEE),
-              borderRadius: BorderRadius.circular(Responsive.sW(context, 5)),
+              borderRadius: BorderRadius.circular(5),
             ),
             child: Center(
               child: Text(
                 name,
-                style: TextStyle(
-                  color: const Color(0xFF451A2B),
-                  fontSize: Responsive.sW(context, 12),
-                ),
+                style: const TextStyle(color: Color(0xFF451A2B)),
               ),
             ),
           ),
@@ -402,19 +429,14 @@ class DesignScreen extends StatelessWidget {
     return GestureDetector(
       onTap: tap,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: Responsive.sW(context, 32),
-            color: const Color(0xFF975B73),
-          ),
-          SizedBox(height: Responsive.sH(context, 5)),
+          Icon(icon, size: 28, color: const Color(0xFF975B73)),
+          SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
-              color: const Color(0xFFCEA8BC),
-              fontSize: Responsive.sW(context, 11),
+            style: const TextStyle(
+              color: Color(0xFFCEA8BC),
+              fontSize: 11,
               fontFamily: "Poppins",
               fontWeight: FontWeight.w600,
             ),
