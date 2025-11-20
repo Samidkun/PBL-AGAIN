@@ -10,7 +10,10 @@ import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class DashboardScreen extends StatefulWidget {
+// ⭐ IMPORT AI SCREEN
+import 'ai_screen.dart';
+
+class DashboardScreen extends StatelessWidget {
   final String token;
   final Map<String, dynamic> user;
 
@@ -265,15 +268,91 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
 
-                      SizedBox(height: 20 * sH),
+          // ================= BOTTOM NAVBAR (UPDATED) =================
+          Positioned(
+            left: 0,
+            top: 800 * sH,
+            child: Container(
+              width: 412 * sW,
+              height: 120 * sH,
+              padding: EdgeInsets.only(
+                top: 24 * sH,
+                left: 46 * sW,
+                right: 46 * sW,
+                bottom: 30 * sH,
+              ),
+              decoration: ShapeDecoration(
+                color: const Color(0xFFFFF8F9),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(27 * sW),
+                    topRight: Radius.circular(27 * sW),
+                  ),
+                ),
+                shadows: const [
+                  BoxShadow(
+                    color: Color(0x3F000000),
+                    blurRadius: 9,
+                    offset: Offset(5, -4),
+                    spreadRadius: -1,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _bottomNavItem(
+                    label: "Home",
+                    icon: Icons.home,
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DashboardScreen(token: token, user: user),
+                      ),
+                    ),
+                  ),
 
-                      // ============ 1 CARD PER ROW ============
-                      Column(
-                        children: reservations
-                            .map(
-                              (res) => _reservationCard(context, res, sW, sH),
-                            )
-                            .toList(),
+                  _bottomNavItem(
+                    label: "Design",
+                    icon: Icons.brush,
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => JenisTreatmentScreen(token: token, user: user),
+                      ),
+                    ),
+                  ),
+
+                  // ⭐ AI BUTTON
+                  _bottomNavItem(
+                    label: "AI",
+                    icon: Icons.auto_awesome,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AIScreen(token: token, user: user),
+                      ),
+                    ),
+                  ),
+
+                  _bottomNavItem(
+                    label: "Gallery",
+                    icon: Icons.photo_album,
+                    onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => GalleryScreen(token: token, user: user),
+                      ),
+                    ),
+                  ),
+
+                  _bottomNavItem(
+                    label: "Profile",
+                    icon: Icons.person,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProfileScreen(token: token),
                       ),
                     ],
                   ),

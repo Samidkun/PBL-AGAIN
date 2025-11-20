@@ -1,16 +1,22 @@
 @extends('layouts.dashboard')
 
 @section('title', 'Dashboard - Luxe Nail')
-@section('page-title', 'Dashboard Overview')
+
+{{-- INI DITARUH DI SINI --}}
+@section('greeting')
+    <h2>Hello Owner!</h2>
+    <h5>Get ready for a productive day with Luxe Nail</h5>
+@endsection
 
 @section('content')
 
-<hr class="section-divider">
-<!-- === FILTER TANGGAL (DITAMBAHKAN) === -->
+<!-- === FILTER TANGGAL di dashboard === -->
 <form action="{{ route('dashboard') }}" method="GET" class="mb-4">
-    <div class="row g-3 align-items-end">
+    <div class="row g-3 align-items-end mt-2"">
         <div class="col-md-3">
-            <h3 class="bold" style="color:#ffffff; font-family:'Georgia', serif;">Filter by Date</h3>
+            <h5 class="bold" style="color:#ffffff; font-family:'Georgia', serif; margin-bottom:25px;">
+                Filter by Date
+            </h5>
             <input type="date" name="date" class="form-control" 
                    value="{{ request('date') }}">
         </div>
@@ -70,13 +76,9 @@
 <hr class="section-divider">
 
 <!-- === Recent Reservations === -->
-<div class="recent-reservations mt-5">
+<div class="recent-reservations mt-2">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="bold" style="color:#ffffff; font-family:'Georgia', serif;">Recent Reservations</h3>
-        <a href="#" class="btn btn-sm text-light px-3 py-2" 
-           style="background-color:#ee9ca7; border:none; border-radius:10px; font-family:'Georgia', serif;">
-            See all →
-        </a>
     </div>
 
     <div class="card border-0 shadow-sm p-4" 

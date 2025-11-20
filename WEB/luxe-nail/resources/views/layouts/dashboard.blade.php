@@ -32,8 +32,7 @@
         <div class="topbar d-flex justify-content-between align-items-center mb-4 px-2">
             <div class="d-flex align-items-center gap-3">
                 <div class="greeting">
-                    <h2>Hello Owner!</h2>
-                    <h5>Get ready for a productive day with Luxe Nail</h5>
+                    @yield('greeting')
                 </div>
             </div>
 
