@@ -7,6 +7,9 @@ import 'gallery_screen.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
 
+// ⭐ IMPORT AI SCREEN
+import 'ai_screen.dart';
+
 class DashboardScreen extends StatelessWidget {
   final String token;
   final Map<String, dynamic> user;
@@ -262,7 +265,7 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
 
-          // BOTTOM NAVBAR
+          // ================= BOTTOM NAVBAR (UPDATED) =================
           Positioned(
             left: 0,
             top: 800 * sH,
@@ -305,6 +308,7 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   _bottomNavItem(
                     label: "Design",
                     icon: Icons.brush,
@@ -315,6 +319,19 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
+                  // ⭐ AI BUTTON
+                  _bottomNavItem(
+                    label: "AI",
+                    icon: Icons.auto_awesome,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AIScreen(token: token, user: user),
+                      ),
+                    ),
+                  ),
+
                   _bottomNavItem(
                     label: "Gallery",
                     icon: Icons.photo_album,
@@ -325,6 +342,7 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   _bottomNavItem(
                     label: "Profile",
                     icon: Icons.person,

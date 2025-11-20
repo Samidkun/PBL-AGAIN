@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\AIController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -29,3 +30,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->get('/user', [ProfileController::class, 'index']);
+
+Route::post('/ai/generate', [AIController::class, 'generate']);
+Route::get('/ai-generator', [AIController::class, 'index']);
+

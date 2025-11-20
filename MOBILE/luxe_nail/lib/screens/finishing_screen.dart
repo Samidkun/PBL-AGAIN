@@ -19,8 +19,8 @@ class FinishingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sW = (num v) => Responsive.sW(context, v);
-    final sH = (num v) => Responsive.sH(context, v);
+    double sW(num v) => Responsive.sW(context, v);
+    double sH(num v) => Responsive.sH(context, v);
 
     return Scaffold(
       key: _scaffoldKey,
