@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\CategoryController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -29,3 +30,10 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->get('/user', [ProfileController::class, 'index']);
+
+// ====== CATEGORY API FOR MOBILE ======
+Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories/by-type/{type}', [CategoryController::class, 'getByType']);
+    Route::get('/categories/{id}', [CategoryController::class, 'show']);
+});
