@@ -55,6 +55,30 @@
         </form>
     </div>
 
+    <!-- SUMMARY CARDS -->
+    <div class="summary-grid mb-6">
+        <div class="summary-card">
+            <p class="page-subtitle">Total Income Bulanan</p>
+            <p class="value">Rp 23.500.000</p>
+        </div>
+        <div class="summary-card">
+            <p class="page-subtitle">Total Income Hari Ini</p>
+            <p class="value">Rp 1.250.000</p>
+        </div>
+        <div class="summary-card">
+            <p class="page-subtitle">Total Reservation</p>
+            <p class="value">145</p>
+        </div>
+    </div>
+    
+    <!-- CHART -->
+    <div class="card-section income-chart-card mb-10">
+        <h2 class="card-title" style="font-family: 'Georgia', serif;">Income Chart</h2> 
+        <div class="chart-placeholder">
+            (Chart income akan tampil di sini)
+        </div>
+    </div>
+    
     <!-- CUSTOMER LIST -->
     <div class="card-section filter-card mb-6">
         <h2 class="card-title" style="font-family: 'Georgia', serif;">Reservation Customer Data</h2> 
@@ -80,30 +104,6 @@
                 </div>
                 <h4 class="payment-amount">Rp 250.000</h4>
             </div>
-        </div>
-    </div>
-
-    <!-- SUMMARY CARDS -->
-    <div class="summary-grid mb-6">
-        <div class="summary-card">
-            <p class="page-subtitle">Total Income Bulanan</p>
-            <p class="value">Rp 23.500.000</p>
-        </div>
-        <div class="summary-card">
-            <p class="page-subtitle">Total Income Hari Ini</p>
-            <p class="value">Rp 1.250.000</p>
-        </div>
-        <div class="summary-card">
-            <p class="page-subtitle">Total Reservation</p>
-            <p class="value">145</p>
-        </div>
-    </div>
-
-    <!-- CHART -->
-    <div class="card-section income-chart-card mb-10">
-        <h2 class="card-title" style="font-family: 'Georgia', serif;">Income Chart</h2> 
-        <div class="chart-placeholder">
-            (Chart income akan tampil di sini)
         </div>
     </div>
 
