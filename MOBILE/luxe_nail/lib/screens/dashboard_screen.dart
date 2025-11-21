@@ -11,9 +11,8 @@ import 'package:luxe_nail/utils/responsive.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 // ⭐ IMPORT AI SCREEN
-import 'ai_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   final String token;
   final Map<String, dynamic> user;
 
