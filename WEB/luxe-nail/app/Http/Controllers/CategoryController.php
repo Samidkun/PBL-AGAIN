@@ -155,9 +155,10 @@ class CategoryController extends Controller
 
         $data = $request->all();
 
-        if (empty($data['code'])) {
-            $data['code'] = Category::generateCode($data['type']);
-        }
+        if (!isset($data['code']) || $data['code'] === '' || $data['code'] === null) {
+    $data['code'] = $category->code;
+}
+
 
         // upload image
         if ($request->hasFile('image')) {

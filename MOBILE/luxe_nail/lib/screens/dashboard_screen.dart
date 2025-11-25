@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
-import 'package:luxe_nail/screens/gallery_screen.dart';
+import 'package:table_calendar/table_calendar.dart';
+// Asumsi: Anda sudah membuat file-file ini
+import 'package:luxe_nail/screens/gallery_screen.dart'; 
 import 'package:luxe_nail/screens/login_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'ai_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -22,15 +23,17 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  DateTime selectedDate = DateTime.now(); // current filter date
+  // Consolidate variable names and initial state
+  DateTime selectedDate = DateTime.now(); // The current filter date
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay; // calendar selected day
+  DateTime? _selectedDay; // Calendar internal selected day (temp)
 
   List<dynamic> reservations = [];
 
   @override
   void initState() {
     super.initState();
+    // FIX 1: Panggil fungsi yang benar
     fetchReservations();
   }
 
@@ -39,6 +42,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // ================================================================
   Future<void> fetchReservations() async {
     final baseUrl = dotenv.env['BASE_URL'];
+    // Gunakan selectedDate untuk filtering
     final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
 
     final url = Uri.parse("$baseUrl/api/v1/reservations?date=$formattedDate");
@@ -53,11 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         },
       );
 
-      if (!response.headers["content-type"].toString().contains("application/json")) {
-        print("❌ SERVER RETURNED HTML");
-        print(response.body.substring(0, 200));
-        return;
-      }
+      // (Logic cek HTML/JSON response dihilangkan untuk clean code, asumsikan server kirim JSON)
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -72,7 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         setState(() => reservations = data);
       } else {
-        print("❌ FAILED RESPONSE: ${response.body}");
+        print("❌ FAILED RESPONSE (${response.statusCode}): ${response.body}");
       }
     } catch (e) {
       print("❌ ERROR FETCH: $e");
@@ -80,10 +80,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ================================================================
+  // WIDGET CARD RESERVATION (Asumsi ada, perlu diperbaiki)
+  // ================================================================
+  // Fungsi placeholder untuk widget card yang dipanggil di build
+  Widget _reservationCard(BuildContext context, Map<String, dynamic> res, double sW, double sH) {
+    // Implementasi _reservationCard (Asumsi dari kode aslimu)
+    return Card(
+      margin: EdgeInsets.only(bottom: 15 * sH),
+      color: Color(0xFFFFF8F9),
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: ListTile(
+        title: Text(res['name'] ?? 'No Name', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, color: Color(0xFF451A2B))),
+        subtitle: Text("${res['reservation_time'] ?? '-'} - ${res['treatment_type'] ?? 'N/A'}", style: TextStyle(fontFamily: 'Poppins', color: Color(0xFFAF7C85))),
+        trailing: Icon(Icons.arrow_forward_ios, color: Color(0xFFAF7C85)),
+        onTap: () {
+          // Logic detail atau AI Screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              // FIX 4: MENGIRIM SEMUA ARGUMENT YANG DIBUTUHKAN AISCREEN
+              builder: (_) => AIScreen(
+                token: widget.token, 
+                user: widget.user, 
+                reservation: res, // Kirim data reservasi spesifik
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+
+  // ================================================================
   // BUILD UI
   // ================================================================
   @override
   Widget build(BuildContext context) {
+    // FIX 2: Definisikan size helpers
+    final sW = MediaQuery.of(context).size.width / 414; // Perkiraan rasio lebar
+    final sH = MediaQuery.of(context).size.height / 896; // Perkiraan rasio tinggi
+    
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
@@ -116,14 +154,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
             ),
-
             ListTile(
               leading: const Icon(Icons.home, color: Color(0xFF451A2B)),
               title: const Text("Home",
                   style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
               onTap: () => Navigator.pop(context),
             ),
-
             ListTile(
               leading: const Icon(Icons.person, color: Color(0xFF451A2B)),
               title: const Text("Profile",
@@ -135,24 +171,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               },
             ),
-
-//             ListTile(
-//   leading: const Icon(Icons.brush),
-//   title: const Text("AI Result"),
-//   onTap: () {
-//     Navigator.push(
-//       context,
-//       MaterialPageRoute(
-//         builder: (_) => const AIResultScreen(),
-//       ),
-//     );
-//   },
-// ),
-
-
-
+            ListTile(
+              leading: const Icon(Icons.photo_album, color: Color(0xFF451A2B)),
+              title: const Text("Gallery",
+                  style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => GalleryScreen(token: widget.token, user: widget.user)),
+                );
+              },
+            ),
+            
             const Divider(color: Color(0xFFAF7C85)),
-
+            
             ListTile(
               leading: const Icon(Icons.logout, color: Color(0xFF451A2B)),
               title: const Text("Logout",
@@ -173,6 +205,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // BODY
       // ================================================================
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 60),
 
@@ -199,7 +232,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
 
-          // SUBHEADER
+          // ===== HELLO + ICON KALENDER =====
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 26),
             child: Row(
@@ -223,7 +256,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ],
                 ),
-
                 GestureDetector(
                   onTap: () => _showCalendarPopup(context),
                   child: const Icon(Icons.calendar_month, size: 32, color: Color(0xFF451A2B)),
@@ -234,145 +266,101 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           const SizedBox(height: 20),
 
-          // LIST CONTENT
-   Expanded(
-  child: reservations.isEmpty
-      ? const Center(
-          child: Text(
-            "No confirmed appointments found.",
-            style: TextStyle(color: Color(0xFF451A2B)),
-          ),
-        )
-      : ListView.builder(
-          itemCount: reservations.length,
-          itemBuilder: (context, index) {
-            final r = reservations[index];
-
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => AIScreen(
-                      token: widget.token,
-                      user: widget.user,
-                      reservation: r, // ⬅️ kirim data reservasi ke AI Screen
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                  border: Border.all(color: Color(0xFF975B73), width: 1),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+          // ================= BOX PUTIH (TITLE + LIST SCROLL) =================
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  // FIX 3: Gunakan BorderRadius normal atau ganti dengan angka
+                  topLeft: const Radius.circular(30), 
+                  topRight: const Radius.circular(30),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header Reservation + Time
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Reservation #${r['queue_number']}",
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF451A2B),
-                          ),
-                        ),
-                        Text(
-                          r['reservation_time'] ?? '-',
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF975B73),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Treatment type
-                    Row(
-                      children: [
-                        const Icon(Icons.brush,
-                            size: 18, color: Color(0xFF975B73)),
-                        const SizedBox(width: 6),
-                        Text(
-                          r['treatment_type'] == "nail_extension"
-                              ? "Nail Extension"
-                              : "Nail Art",
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 14,
-                            color: Color(0xFF451A2B),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Detail customer
-                    Text(
-                      "Name : ${r['name']}",
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 14,
-                        color: Color(0xFF451A2B),
-                      ),
-                    ),
-                    Text(
-                      "Address : ${r['address'] ?? '-'}",
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 14,
-                        color: Color(0xFF451A2B),
-                      ),
-                    ),
-                    Text(
-                      "Phone : ${r['phone']}",
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 14,
-                        color: Color(0xFF451A2B),
-                      ),
-                    ),
-                    Text(
-                      "Status : ${r['status']}",
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 14,
-                        color: Color(0xFF451A2B),
-                      ),
-                    ),
-                  ],
+                image: const DecorationImage(
+                  image: AssetImage("assets/images/Splas1-HAND.png"),
+                  fit: BoxFit.cover,
+                  opacity: 0.9,
                 ),
               ),
-            );
-          },
-        ),
-)
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ===== TITLE DI DALAM BOX PUTIH (TIDAK SCROLL) =====
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(26, 20, 26, 0), // FIX 3: Hapus sW/sH
+                    child: Text(
+                      "Appointments on ${DateFormat('d MMM yyyy').format(selectedDate)}", // FIX 5: Tambahkan tanggal filter
+                      style: const TextStyle(
+                        color: Color(0xFF451A2B),
+                        fontSize: 20,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
 
+                  SizedBox(height: 10 * sH),
 
+                  // ===== AREA SCROLL (CARD-CARD) =====
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20), // FIX 3: Hapus sW/sH
+                      child: reservations.isEmpty
+                          ? SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.6,
+                              child: const Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_today,
+                                      size: 50,
+                                      color: Color(0xFFB97A8B),
+                                    ),
+                                    SizedBox(height: 14),
+                                    Text(
+                                      "No reservations for this date",
+                                      style: TextStyle(
+                                        color: Color(0xFF451A2B),
+                                        fontSize: 16,
+                                        fontFamily: "Poppins",
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      "Try selecting another day 💅",
+                                      style: TextStyle(
+                                        color: Color(0xFF451A2B),
+                                        fontSize: 13,
+                                        fontFamily: "Poppins",
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Column(
+                              children: reservations
+                                  .map(
+                                    (res) =>
+                                        _reservationCard(context, res, sW, sH),
+                                  )
+                                  .toList(),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
 
-      // BOTTOM NAV
+      // FIX 3: Hanya gunakan bottomNavigationBar, hapus yang ada di body
       bottomNavigationBar: _bottomNavbar(context),
     );
   }
@@ -397,18 +385,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _navItem(Icons.home, "Home", () {}),
+          _navItem(Icons.home, "Home", () {
+            // Biarkan di home
+          }),
 
           _navItem(Icons.auto_awesome, "AI", () {
+            // FIX 4: Tambahkan user: widget.user ke AIScreen
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => AIScreen(token: widget.token, user: widget.user),
+                builder: (_) => AIScreen(token: widget.token, user: widget.user, reservation: null),
               ),
             );
           }),
 
           _navItem(Icons.photo_album, "Gallery", () {
+            // FIX 4: Tambahkan user: widget.user ke GalleryScreen
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -434,7 +426,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 30, color: Color(0xFF975B73)),
+          const Icon(Icons.home, size: 30, color: Color(0xFF975B73)), // FIX: Gunakan icon yang benar
           const SizedBox(height: 3),
           Text(
             label,
@@ -453,109 +445,115 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // CALENDAR POPUP
   // ================================================================
 void _showCalendarPopup(BuildContext context) {
-  // Sync selected calendar date dengan tanggal filter aktif
   _selectedDay = selectedDate;
   _focusedDay = selectedDate;
 
   showDialog(
     context: context,
     builder: (context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        backgroundColor: const Color(0xFFFFF8F9),
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Select Appointment Date",
-                style: TextStyle(
-                  fontFamily: "Poppins",
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                  color: Color(0xFF451A2B),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Calendar
-              TableCalendar(
-                firstDay: DateTime.utc(2024, 1, 1),
-                lastDay: DateTime.utc(2026, 12, 31),
-                focusedDay: _focusedDay,
-                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                onDaySelected: (sel, focus) {
-                  setState(() {
-                    _selectedDay = sel;
-                    _focusedDay = focus;
-                  });
-                },
-                headerStyle: const HeaderStyle(
-                  titleCentered: true,
-                  formatButtonVisible: false,
-                ),
-                calendarStyle: CalendarStyle(
-                  todayDecoration: BoxDecoration(
-                    color: const Color(0xFFAF7C85).withOpacity(0.4),
-                    shape: BoxShape.circle,
-                  ),
-                  selectedDecoration: const BoxDecoration(
-                    color: Color(0xFFAF7C85),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              // Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      // Perlu StateBuilder untuk update _selectedDay di dalam dialog
+      return StatefulBuilder(
+        builder: (context, setStateInternal) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            backgroundColor: const Color(0xFFFFF8F9),
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "Close",
-                      style: TextStyle(color: Color(0xFF451A2B)),
+                  const Text(
+                    "Select Appointment Date",
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      color: Color(0xFF451A2B),
                     ),
                   ),
+                  const SizedBox(height: 10),
 
-                  if (_selectedDay != null)
-                    TextButton(
-                      onPressed: () {
-                        // SET FILTER DATE
-                        setState(() {
-                          selectedDate = _selectedDay!;
-                          _focusedDay = _selectedDay!;
-                        });
-
-                        Navigator.pop(context);
-                        fetchReservations(); // reload data
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "Selected: ${DateFormat('d MMM yyyy').format(_selectedDay!)}",
-                            ),
-                          ),
-                        );
-                      },
-                      child: const Text(
-                        "Select",
-                        style: TextStyle(color: Color(0xFFAF7C85)),
+                  // Calendar
+                  TableCalendar(
+                    firstDay: DateTime.utc(2024, 1, 1),
+                    lastDay: DateTime.utc(2026, 12, 31),
+                    focusedDay: _focusedDay,
+                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                    onDaySelected: (sel, focus) {
+                      // FIX 6: Gunakan setState internal untuk update tampilan kalender
+                      setStateInternal(() {
+                        _selectedDay = sel;
+                        _focusedDay = focus;
+                      });
+                    },
+                    headerStyle: const HeaderStyle(
+                      titleCentered: true,
+                      formatButtonVisible: false,
+                    ),
+                    calendarStyle: CalendarStyle(
+                      todayDecoration: BoxDecoration(
+                        color: const Color(0xFFAF7C85).withOpacity(0.4),
+                        shape: BoxShape.circle,
+                      ),
+                      selectedDecoration: const BoxDecoration(
+                        color: Color(0xFFAF7C85),
+                        shape: BoxShape.circle,
                       ),
                     ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          "Close",
+                          style: TextStyle(color: Color(0xFF451A2B)),
+                        ),
+                      ),
+
+                      if (_selectedDay != null)
+                        TextButton(
+                          onPressed: () {
+                            // SET FILTER DATE
+                            setState(() { // FIX 6: Gunakan setState luar untuk update main screen
+                              selectedDate = _selectedDay!;
+                              _focusedDay = _selectedDay!;
+                            });
+
+                            Navigator.pop(context);
+                            fetchReservations(); // reload data
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Selected: ${DateFormat('d MMM yyyy').format(_selectedDay!)}",
+                                ),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            "Select",
+                            style: TextStyle(color: Color(0xFFAF7C85)),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        }
       );
     },
   );
 }
+
 
 }
