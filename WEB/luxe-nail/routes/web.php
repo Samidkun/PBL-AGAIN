@@ -19,7 +19,8 @@ use App\Http\Controllers\DashboardController;
 */
 
 // ====== LOGIN PAGE (Web) ======
-Route::view('/login-page', 'auth.login')->name('login.page');
+// Route::view('/login-page', 'auth.login')->name('login.page');
+Route::view('/login-page', 'auth.login')->name('login');
 Route::post('/login-page', [AuthController::class, 'login'])->name('login.page.submit');
 
 // ====== LOGOUT ======
@@ -55,37 +56,50 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/change-password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 });
 
-// ====== INCOME ======
-Route::view('/dashboard/income', 'dashboard.income.dashboard_income')->name('dashboard.income');
+// ====== INCOME (YANG LAMA - PENYEBAB ERROR) ======
+// Baris ini dikomentari karena Route::view tidak mengirim data $incomes ke view.
+// Route::view('/dashboard/income', 'dashboard.income.dashboard_income')->name('dashboard.income');
+
 
 // ====== STAFF MANAGEMENT ======
 Route::middleware('auth')->group(function () {
     Route::resource('staff', StaffController::class);
 });
 
-// ====== OWNER DASHBOARD ======
-//Route::get('/dashboard/reservations', [OwnerReservationController::class, 'index'])
-   // ->name('dashboard.reservations');
-   Route::prefix('dashboard')->middleware(['auth'])->group(function () {
+// ====== OWNER DASHBOARD & INCOME ======
+// Prefix 'dashboard' membuat semua URL di dalam grup ini dimulai dengan /dashboard
+Route::prefix('dashboard')->middleware(['auth'])->group(function () {
+    // Reservations
     Route::get('/reservations', [ReservationController::class, 'dashboard'])->name('dashboard.reservations');
     Route::get('/reservations/date/{date}', [ReservationController::class, 'getReservationsByDate']);
     Route::put('/reservations/{id}/status', [ReservationController::class, 'updateStatus']);
     Route::get('/reservations/{id}', [ReservationController::class, 'getReservation']);
     Route::put('/reservations/{id}', [ReservationController::class, 'updateReservation']);
+
+    // ====== INCOME (YANG BENAR) ======
+    // Rute ini ditambahkan di sini agar URL-nya menjadi /dashboard/income
+    // dan menggunakan IncomeController@index untuk mengirim data $incomes.
+    Route::get('/income', [IncomeController::class, 'index'])->name('dashboard.income');
 });
 
 // ====== CATEGORY MANAGEMENT ======
-Route::get('/kategori', [CategoryController::class, 'index'])->name('kategori.index');
-Route::get('/kategori/create', [CategoryController::class, 'create'])->name('kategori.create');
-Route::post('/kategori', [CategoryController::class, 'store'])->name('kategori.store');
-Route::get('/kategori/{category}/edit', [CategoryController::class, 'edit'])->name('kategori.edit');
-Route::put('/kategori/{category}', [CategoryController::class, 'update'])->name('kategori.update');
-Route::delete('/kategori/{category}', [CategoryController::class, 'destroy'])->name('kategori.destroy');
-Route::get('/kategori/{category}/ajax-edit', [CategoryController::class, 'ajaxEdit'])->name('kategori.ajax-edit');
-Route::post('/kategori/ajax-store', [CategoryController::class, 'ajaxStore'])->name('kategori.ajax-store');
-Route::put('/kategori/{category}/ajax-update', [CategoryController::class, 'ajaxUpdate'])->name('kategori.ajax-update');
-Route::get('/kategori/get-create-form', [CategoryController::class, 'getCreateForm'])->name('kategori.get-create-form');
-Route::delete('/kategori/{category}/ajax-delete', [CategoryController::class, 'ajaxDestroy'])->name('kategori.ajax-destroy');
+// Sebaiknya route resource diletakkan dalam middleware auth jika ini untuk admin
+Route::middleware('auth')->group(function () {
+    Route::get('/kategori', [CategoryController::class, 'index'])->name('kategori.index');
+    Route::get('/kategori/create', [CategoryController::class, 'create'])->name('kategori.create');
+    Route::post('/kategori', [CategoryController::class, 'store'])->name('kategori.store');
+    Route::get('/kategori/{category}/edit', [CategoryController::class, 'edit'])->name('kategori.edit');
+    Route::put('/kategori/{category}', [CategoryController::class, 'update'])->name('kategori.update');
+    Route::delete('/kategori/{category}', [CategoryController::class, 'destroy'])->name('kategori.destroy');
+    Route::get('/kategori/{category}/ajax-edit', [CategoryController::class, 'ajaxEdit'])->name('kategori.ajax-edit');
+    Route::post('/kategori/ajax-store', [CategoryController::class, 'ajaxStore'])->name('kategori.ajax-store');
+    Route::put('/kategori/{category}/ajax-update', [CategoryController::class, 'ajaxUpdate'])->name('kategori.ajax-update');
+    Route::get('/kategori/get-create-form', [CategoryController::class, 'getCreateForm'])->name('kategori.get-create-form');
+    Route::delete('/kategori/{category}/ajax-delete', [CategoryController::class, 'ajaxDestroy'])->name('kategori.ajax-destroy');
 
-// TREATMENT TYPES
-Route::resource('treatment-types', TreatmentTypeController::class);
+    // TREATMENT TYPES
+    Route::resource('treatment-types', TreatmentTypeController::class);
+});
+
+// Rute income yang paling bawah ini dihapus/dikomentari karena sudah dipindahkan ke dalam grup 'dashboard' di atas.
+// Route::get('/income', [IncomeController::class, 'index'])->name('dashboard.income');

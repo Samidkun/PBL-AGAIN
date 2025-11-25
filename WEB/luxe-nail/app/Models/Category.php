@@ -38,21 +38,32 @@ class Category extends Model
     }
 
     // Method untuk generate kode otomatis
-    public static function generateCode($type)
-    {
-        $prefixes = [
-            'nail_shape' => 'NS',
-            'nail_type' => 'NT', 
-            'color' => 'CL',
-            'accessory' => 'AC'
-        ];
+public static function generateCode($type)
+{
+    // Tentukan prefix berdasarkan type kategori
+    $prefix = match($type) {
+        'shape'     => 'SH',
+        'color'     => 'CL',
+        'finish'    => 'FN',
+        'accessory' => 'AC',
+        default     => 'CT'
+    };
 
-        $prefix = $prefixes[$type] ?? 'CT';
-        $lastCategory = self::where('type', $type)->orderBy('id', 'desc')->first();
-        $nextNumber = $lastCategory ? (int) substr($lastCategory->code, 2) + 1 : 1;
-        
-        return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+    // Cari kode terakhir berdasarkan prefix
+    $last = self::where('code', 'like', $prefix . '%')
+                ->orderBy('id', 'desc')
+                ->first();
+
+    if (!$last) {
+        $number = 1;
+    } else {
+        // Ambil angka setelah prefix, misal SH012 → 12
+        $number = intval(substr($last->code, strlen($prefix))) + 1;
     }
+
+    return $prefix . str_pad($number, 3, '0', STR_PAD_LEFT);
+}
+
 
     // Accessor untuk format price
     public function getFormattedPriceAttribute()

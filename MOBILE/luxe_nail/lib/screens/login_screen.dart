@@ -17,56 +17,77 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _login() async {
-    setState(() => _isLoading = true);
+  setState(() => _isLoading = true);
 
-   final baseUrl = dotenv.env['BASE_URL'] ?? 'http://192.168.1.67:8000';
-final url = Uri.parse('$baseUrl/api/login');
+  final baseUrl = dotenv.env['BASE_URL'] ?? 'http://192.168.1.67:8000';
+  final url = Uri.parse('$baseUrl/api/login');
 
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      },
+      body: jsonEncode({
+        'username': _usernameController.text.trim(), // <-- FIX DISINI
+        'password': _passwordController.text.trim(),
+      }),
+    );
 
+    final data = jsonDecode(response.body);
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'name': _usernameController.text.trim(),
-          'password': _passwordController.text.trim(),
-        }),
+    // ROLE VALIDATION
+    if (response.statusCode == 403) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Hanya Nail Artist yang bisa login di mobile.")),
       );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Login successful!')));
-
-        await Future.delayed(const Duration(milliseconds: 500));
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                DashboardScreen(token: data['token'], user: data['user']),
-          ),
-        );
-      } else {
-        final message = jsonDecode(response.body)['message'] ?? 'Login failed';
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(message)));
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
-    } finally {
-      setState(() => _isLoading = false);
+      return;
     }
+
+    if (response.statusCode != 200) {
+      final message = data['message'] ?? 'Login failed';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+      return;
+    }
+
+    if (data['user']['role'] != 'nail_artist') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Akun ini bukan Nail Artist.")),
+      );
+      return;
+    }
+
+    // SUCCESS
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Login successful!')),
+    );
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DashboardScreen(
+          token: data['token'],
+          user: data['user'],
+        ),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $e')),
+    );
+  } finally {
+    setState(() => _isLoading = false);
   }
+}
+
+
 
   @override
   Widget build(BuildContext context) {

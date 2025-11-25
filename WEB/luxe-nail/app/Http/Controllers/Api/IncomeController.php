@@ -57,18 +57,18 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('/ai/generate', [AIController::class, 'generate']);
 
     // ==============================================================
-    // INCOME AND PAYMENT CONFIRMATION (API ROUTE)
+    // INCOME AND PAYMENT CONFIRMATION (DIPINDAHKAN KE SINI AGAR AMAN & SESUAI PREFIX)
     // ==============================================================
     Route::post('/income/store', [IncomeController::class, 'store']);
-
-    // ROUTE YANG SALAH TELAH DIHAPUS DARI SINI
-    // Route::get('/dashboard/income/{income}/edit', [App\Http\Controllers\IncomeController::class, 'edit'])->name('dashboard.income.edit');
+    Route::get('/dashboard/income/{income}/edit', [App\Http\Controllers\IncomeController::class, 'edit'])
+    ->name('dashboard.income.edit');
 });
 
 
 /*
 |--------------------------------------------------------------------------
-| WEB DASHBOARD ROUTES (PASTIKAN ROUTE EDIT ADA DI SINI)
+| INCOME (SECTION LAMA DIHAPUS / DIKOSONGKAN)
 |--------------------------------------------------------------------------
 */
-// PENTING: Pindahkan route edit yang kamu inginkan ke routes/web.php
+
+// Section ini dikosongkan karena route sudah dipindahkan ke atas.
