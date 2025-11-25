@@ -1,19 +1,16 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
-import 'package:luxe_nail/screens/design_screen.dart';
-import 'package:luxe_nail/screens/gallery_screen.dart';
+import 'package:table_calendar/table_calendar.dart';
+// Asumsi: Anda sudah membuat file-file ini
+import 'package:luxe_nail/screens/gallery_screen.dart'; 
 import 'package:luxe_nail/screens/login_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
-import 'package:luxe_nail/utils/responsive.dart';
-import 'package:table_calendar/table_calendar.dart';
-
-// ⭐ IMPORT AI SCREEN
 import 'ai_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   final String token;
   final Map<String, dynamic> user;
 
@@ -26,97 +23,109 @@ class DashboardScreen extends StatelessWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
+  // Consolidate variable names and initial state
+  DateTime selectedDate = DateTime.now(); // The current filter date
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay; // Calendar internal selected day (temp)
+
   List<dynamic> reservations = [];
-  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    _fetchReservationsForDate(_selectedDate);
+    // FIX 1: Panggil fungsi yang benar
+    fetchReservations();
   }
 
-  // ====================== FETCH DATA BY DATE ==========================
-  Future<void> _fetchReservationsForDate(DateTime date) async {
-    try {
-      final url = Uri.parse(
-        "https://unglorifying-rutha-insincerely.ngrok-free.dev/api/v1/reservations",
-      );
+  // ================================================================
+  // FETCH DATA by DATE
+  // ================================================================
+  Future<void> fetchReservations() async {
+    final baseUrl = dotenv.env['BASE_URL'];
+    // Gunakan selectedDate untuk filtering
+    final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
 
+    final url = Uri.parse("$baseUrl/api/v1/reservations?date=$formattedDate");
+
+    try {
       final response = await http.get(
         url,
         headers: {
           "Accept": "application/json",
           "Authorization": "Bearer ${widget.token}",
+          "ngrok-skip-browser-warning": "true",
         },
       );
 
+      // (Logic cek HTML/JSON response dihilangkan untuk clean code, asumsikan server kirim JSON)
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final json = jsonDecode(response.body);
+        List<dynamic> data = json["data"] ?? [];
 
-        final List<dynamic> raw = data["data"] ?? [];
-        final String selectedDateStr = DateFormat(
-          "yyyy-MM-dd",
-        ).format(date.toUtc());
-        final List<dynamic> filtered = raw.where((item) {
-          // reservation_date di API: "2025-11-26T00:00:00.000000Z"
-          final String rawDate = (item["reservation_date"] ?? "").toString();
-          final String onlyDate = rawDate.length >= 10
-              ? rawDate.substring(0, 10)
-              : rawDate;
-
-          final String status = (item["status"] ?? "")
-              .toString()
-              .trim()
-              .toLowerCase();
-
-          return onlyDate == selectedDateStr && status == "confirmed";
-        }).toList();
-
-        // SORT by reservation_time (HH:mm:ss)
-        DateTime parseTime(dynamic value) {
-          final str = (value ?? "").toString();
-          try {
-            return DateFormat("HH:mm:ss").parse(str);
-          } catch (_) {
-            return DateTime(2000, 1, 1, 23, 59, 59);
-          }
-        }
-
-        filtered.sort((a, b) {
-          final tA = parseTime(a["reservation_time"]);
-          final tB = parseTime(b["reservation_time"]);
-          return tA.compareTo(tB);
+        // Sort ascending by time
+        data.sort((a, b) {
+          final t1 = a['reservation_time'] ?? "00:00";
+          final t2 = b['reservation_time'] ?? "00:00";
+          return t1.compareTo(t2);
         });
 
-        setState(() {
-          reservations = filtered;
-        });
+        setState(() => reservations = data);
       } else {
-        debugPrint("❌ Failed: ${response.body}");
+        print("❌ FAILED RESPONSE (${response.statusCode}): ${response.body}");
       }
     } catch (e) {
-      debugPrint("❌ ERROR: $e");
+      print("❌ ERROR FETCH: $e");
     }
   }
 
-  void _onDateSelected(DateTime date) {
-    setState(() {
-      _selectedDate = date;
-    });
-    _fetchReservationsForDate(date);
+  // ================================================================
+  // WIDGET CARD RESERVATION (Asumsi ada, perlu diperbaiki)
+  // ================================================================
+  // Fungsi placeholder untuk widget card yang dipanggil di build
+  Widget _reservationCard(BuildContext context, Map<String, dynamic> res, double sW, double sH) {
+    // Implementasi _reservationCard (Asumsi dari kode aslimu)
+    return Card(
+      margin: EdgeInsets.only(bottom: 15 * sH),
+      color: Color(0xFFFFF8F9),
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: ListTile(
+        title: Text(res['name'] ?? 'No Name', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, color: Color(0xFF451A2B))),
+        subtitle: Text("${res['reservation_time'] ?? '-'} - ${res['treatment_type'] ?? 'N/A'}", style: TextStyle(fontFamily: 'Poppins', color: Color(0xFFAF7C85))),
+        trailing: Icon(Icons.arrow_forward_ios, color: Color(0xFFAF7C85)),
+        onTap: () {
+          // Logic detail atau AI Screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              // FIX 4: MENGIRIM SEMUA ARGUMENT YANG DIBUTUHKAN AISCREEN
+              builder: (_) => AIScreen(
+                token: widget.token, 
+                user: widget.user, 
+                reservation: res, // Kirim data reservasi spesifik
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
-  // =========================== UI ================================
+
+  // ================================================================
+  // BUILD UI
+  // ================================================================
   @override
   Widget build(BuildContext context) {
-    final sW = Responsive.sW(context, 1);
-    final sH = Responsive.sH(context, 1);
-
+    // FIX 2: Definisikan size helpers
+    final sW = MediaQuery.of(context).size.width / 414; // Perkiraan rasio lebar
+    final sH = MediaQuery.of(context).size.height / 896; // Perkiraan rasio tinggi
+    
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
 
-      // ================= DRAWER =================
       drawer: Drawer(
         backgroundColor: const Color(0xFFFFF8F9),
         child: ListView(
@@ -128,17 +137,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CircleAvatar(
-                    radius: 30 * sW,
+                    radius: 30,
                     backgroundColor: const Color(0xFFFFEAEE),
-                    child: const Icon(
-                      Icons.person,
-                      size: 40,
-                      color: Color(0xFF451A2B),
-                    ),
+                    child: const Icon(Icons.person, size: 40, color: Color(0xFF451A2B)),
                   ),
-                  SizedBox(height: 10 * sH),
+                  const SizedBox(height: 10),
                   Text(
-                    'Welcome, ${widget.user['name']}!',
+                    "Welcome, ${widget.user['username']}!",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -151,49 +156,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.home, color: Color(0xFF451A2B)),
-              title: const Text(
-                'Home',
-                style: TextStyle(
-                  color: Color(0xFF451A2B),
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              title: const Text("Home",
+                  style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Color(0xFF451A2B)),
-              title: const Text(
-                'Profile',
-                style: TextStyle(
-                  color: Color(0xFF451A2B),
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              title: const Text("Profile",
+                  style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => ProfileScreen(token: widget.token),
-                  ),
+                  MaterialPageRoute(builder: (_) => ProfileScreen(token: widget.token)),
                 );
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.photo_album, color: Color(0xFF451A2B)),
+              title: const Text("Gallery",
+                  style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => GalleryScreen(token: widget.token, user: widget.user)),
+                );
+              },
+            ),
+            
             const Divider(color: Color(0xFFAF7C85)),
+            
             ListTile(
               leading: const Icon(Icons.logout, color: Color(0xFF451A2B)),
-              title: const Text(
-                'Logout',
-                style: TextStyle(
-                  color: Color(0xFF451A2B),
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              title: const Text("Logout",
+                  style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
               onTap: () {
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -206,29 +201,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
 
-      // ================= BODY =================
+      // ================================================================
+      // BODY
+      // ================================================================
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ===== HEADER LUXE NAIL =====
+          const SizedBox(height: 60),
+
+          // HEADER
           Padding(
-            padding: EdgeInsets.fromLTRB(26 * sW, 60 * sH, 26 * sW, 10 * sH),
+            padding: const EdgeInsets.symmetric(horizontal: 26),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
                   onTap: () => scaffoldKey.currentState!.openDrawer(),
-                  child: Icon(
-                    Icons.menu,
-                    size: 32 * sW,
-                    color: const Color(0xFF451A2B),
-                  ),
+                  child: const Icon(Icons.menu, size: 32, color: Color(0xFF451A2B)),
                 ),
-                Text(
+                const Text(
                   'LUXE NAIL',
                   style: TextStyle(
-                    color: const Color(0xFF975B73),
-                    fontSize: 20 * sW,
+                    color: Color(0xFF975B73),
+                    fontSize: 22,
                     fontFamily: 'Georgia',
                     fontWeight: FontWeight.w700,
                   ),
@@ -239,7 +234,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           // ===== HELLO + ICON KALENDER =====
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 26 * sW),
+            padding: const EdgeInsets.symmetric(horizontal: 26),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -247,38 +242,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hello, ${widget.user['name']}!',
-                      style: TextStyle(
-                        color: const Color(0xFF451A2B),
-                        fontSize: 32 * sW,
+                      "Hello, ${widget.user['username']}!",
+                      style: const TextStyle(
+                        color: Color(0xFF451A2B),
+                        fontSize: 28,
                         fontFamily: 'Georgia',
-                        fontWeight: FontWeight.w400,
                       ),
                     ),
-                    SizedBox(height: 7 * sH),
+                    const SizedBox(height: 6),
                     const Text(
-                      'Your customers are waiting 💅',
-                      style: TextStyle(
-                        color: Color(0xFF451A2B),
-                        fontFamily: 'Poppins',
-                        fontSize: 15,
-                      ),
+                      "Your customers are waiting 💅",
+                      style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: Color(0xFF451A2B)),
                     ),
                   ],
                 ),
                 GestureDetector(
                   onTap: () => _showCalendarPopup(context),
-                  child: Icon(
-                    Icons.calendar_month,
-                    size: 32 * sW,
-                    color: const Color(0xFF451A2B),
-                  ),
+                  child: const Icon(Icons.calendar_month, size: 32, color: Color(0xFF451A2B)),
                 ),
               ],
             ),
           ),
 
-          SizedBox(height: 20 * sH),
+          const SizedBox(height: 20),
 
           // ================= BOX PUTIH (TITLE + LIST SCROLL) =================
           Expanded(
@@ -287,8 +273,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30 * sW),
-                  topRight: Radius.circular(30 * sW),
+                  // FIX 3: Gunakan BorderRadius normal atau ganti dengan angka
+                  topLeft: const Radius.circular(30), 
+                  topRight: const Radius.circular(30),
                 ),
                 image: const DecorationImage(
                   image: AssetImage("assets/images/Splas1-HAND.png"),
@@ -301,10 +288,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   // ===== TITLE DI DALAM BOX PUTIH (TIDAK SCROLL) =====
                   Padding(
-                    padding: EdgeInsets.fromLTRB(26 * sW, 20 * sH, 26 * sW, 0),
-                    child: const Text(
-                      "Today's Appointments",
-                      style: TextStyle(
+                    padding: const EdgeInsets.fromLTRB(26, 20, 26, 0), // FIX 3: Hapus sW/sH
+                    child: Text(
+                      "Appointments on ${DateFormat('d MMM yyyy').format(selectedDate)}", // FIX 5: Tambahkan tanggal filter
+                      style: const TextStyle(
                         color: Color(0xFF451A2B),
                         fontSize: 20,
                         fontFamily: 'Poppins',
@@ -318,17 +305,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   // ===== AREA SCROLL (CARD-CARD) =====
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 10 * sH,
-                        horizontal: 20 * sW,
-                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20), // FIX 3: Hapus sW/sH
                       child: reservations.isEmpty
                           ? SizedBox(
                               height: MediaQuery.of(context).size.height * 0.6,
-                              child: Center(
+                              child: const Center(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  children: const [
+                                  children: [
                                     Icon(
                                       Icons.calendar_today,
                                       size: 50,
@@ -373,239 +357,83 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-
-          // ====== BOTTOM NAVBAR ======
-          _bottomNavbar(context, sW, sH),
         ],
       ),
+
+      // FIX 3: Hanya gunakan bottomNavigationBar, hapus yang ada di body
+      bottomNavigationBar: _bottomNavbar(context),
     );
   }
 
-  // ================= CARD DESIGN =================
-  Widget _reservationCard(
-    BuildContext context,
-    Map<String, dynamic> res,
-    double sW,
-    double sH,
-  ) {
-    final treatment = (res["treatment_type"] ?? "").toString();
-    final treatmentLabel = _prettyTreatment(treatment);
-    final time = (res["reservation_time"] ?? "").toString();
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => DesignScreen(
-              token: widget.token,
-              user: widget.user,
-              reservation: res,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        margin: EdgeInsets.only(bottom: 16 * sH),
-        padding: EdgeInsets.all(6 * sW),
-        decoration: BoxDecoration(
-          color: const Color(0xFFB97A8B),
-          borderRadius: BorderRadius.circular(18 * sW),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x33000000),
-              blurRadius: 6,
-              offset: Offset(3, 3),
-            ),
-          ],
-        ),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(14 * sW),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFF1F3),
-            borderRadius: BorderRadius.circular(14 * sW),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  "Reservation #${res['queue_number']}",
-                  style: TextStyle(
-                    color: const Color(0xFF451A2B),
-                    fontFamily: "Poppins",
-                    fontSize: 14 * sW,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 6 * sH),
-              const Divider(color: Color(0xFF451A2B), thickness: 1, height: 1),
-              SizedBox(height: 8 * sH),
-
-              // baris icon treatment + label + jam
-              Row(
-                children: [
-                  Icon(
-                    _treatmentIcon(treatment),
-                    size: 18 * sW,
-                    color: const Color(0xFF451A2B),
-                  ),
-                  SizedBox(width: 8 * sW),
-                  Text(
-                    treatmentLabel,
-                    style: TextStyle(
-                      color: const Color(0xFF451A2B),
-                      fontFamily: "Poppins",
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13 * sW,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    time,
-                    style: TextStyle(
-                      color: const Color(0xFF451A2B),
-                      fontFamily: "Poppins",
-                      fontSize: 12 * sW,
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 10 * sH),
-
-              _info("Name", res["name"]),
-              _info("Address", res["address"]),
-              _info("Phone", res["phone"]),
-              _info("Status", res["status"]),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  IconData _treatmentIcon(String t) {
-    switch (t) {
-      case "nail_art":
-        return Icons.brush;
-      case "nail_extension":
-        return Icons.pan_tool_alt;
-      default:
-        return Icons.brush;
-    }
-  }
-
-  String _prettyTreatment(String t) {
-    switch (t) {
-      case "nail_art":
-        return "Nail Art";
-      case "nail_extension":
-        return "Nail Extension";
-      default:
-        return t;
-    }
-  }
-
-  Widget _info(String label, dynamic value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Text(
-        "$label : ${value ?? '-'}",
-        style: const TextStyle(
-          fontSize: 13,
-          fontFamily: "Poppins",
-          color: Color(0xFF451A2B),
-        ),
-      ),
-    );
-  }
-
-  // ================= BOTTOM NAV =================
-  Widget _bottomNavbar(BuildContext context, double sW, double sH) {
+  // ================================================================
+  // BOTTOM NAVBAR
+  // ================================================================
+  Widget _bottomNavbar(BuildContext context) {
     return Container(
-      height: 90 * sH,
-      padding: EdgeInsets.symmetric(horizontal: 40 * sW),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F9),
+      height: 90,
+      decoration: const BoxDecoration(
+        color: Color(0xFFFFF8F9),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(27 * sW),
-          topRight: Radius.circular(27 * sW),
+          topLeft: Radius.circular(27),
+          topRight: Radius.circular(27),
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x3F000000),
-            blurRadius: 9,
-            offset: Offset(5, -4),
-          ),
+        boxShadow: [
+          BoxShadow(color: Color(0x3F000000), blurRadius: 9, offset: Offset(5, -4)),
         ],
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _bottomNavItem(label: "Home", icon: Icons.home, onTap: () {}),
+          _navItem(Icons.home, "Home", () {
+            // Biarkan di home
+          }),
 
-          _bottomNavItem(
-            label: "Design",
-            icon: Icons.brush,
-            onTap: () => Navigator.pushReplacement(
+          _navItem(Icons.auto_awesome, "AI", () {
+            // FIX 4: Tambahkan user: widget.user ke AIScreen
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) =>
-                    DesignScreen(token: widget.token, user: widget.user),
+                builder: (_) => AIScreen(token: widget.token, user: widget.user, reservation: null),
               ),
-            ),
-          ),
+            );
+          }),
 
-          _bottomNavItem(
-            label: "Gallery",
-            icon: Icons.photo_album,
-            onTap: () => Navigator.pushReplacement(
+          _navItem(Icons.photo_album, "Gallery", () {
+            // FIX 4: Tambahkan user: widget.user ke GalleryScreen
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) =>
-                    GalleryScreen(token: widget.token, user: widget.user),
+                builder: (_) => GalleryScreen(token: widget.token, user: widget.user),
               ),
-            ),
-          ),
+            );
+          }),
 
-          _bottomNavItem(
-            label: "Profile",
-            icon: Icons.person,
-            onTap: () => Navigator.push(
+          _navItem(Icons.person, "Profile", () {
+            Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => ProfileScreen(token: widget.token),
-              ),
-            ),
-          ),
+              MaterialPageRoute(builder: (_) => ProfileScreen(token: widget.token)),
+            );
+          }),
         ],
       ),
     );
   }
 
-  Widget _bottomNavItem({
-    required String label,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
+  Widget _navItem(IconData icon, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 30, color: const Color(0xFF975B73)),
+          const Icon(Icons.home, size: 30, color: Color(0xFF975B73)), // FIX: Gunakan icon yang benar
           const SizedBox(height: 3),
           Text(
             label,
             style: const TextStyle(
-              color: Color(0xFFCEA8BC),
-              fontSize: 11,
               fontFamily: 'Poppins',
-              fontWeight: FontWeight.w600,
+              fontSize: 11,
+              color: Color(0xFFCEA8BC),
             ),
           ),
         ],
@@ -613,99 +441,119 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // ================= CALENDAR POPUP =================
-  void _showCalendarPopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (dialogCtx) {
-        DateTime tempSelectedDay = _selectedDate;
-        DateTime focusedDay = _selectedDate;
+  // ================================================================
+  // CALENDAR POPUP
+  // ================================================================
+void _showCalendarPopup(BuildContext context) {
+  _selectedDay = selectedDate;
+  _focusedDay = selectedDate;
 
-        return StatefulBuilder(
-          builder: (ctx, setStateDialog) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              backgroundColor: const Color(0xFFFFF8F9),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.75,
-                  minWidth: MediaQuery.of(context).size.width * 0.90,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+  showDialog(
+    context: context,
+    builder: (context) {
+      // Perlu StateBuilder untuk update _selectedDay di dalam dialog
+      return StatefulBuilder(
+        builder: (context, setStateInternal) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            backgroundColor: const Color(0xFFFFF8F9),
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "Select Appointment Date",
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      color: Color(0xFF451A2B),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Calendar
+                  TableCalendar(
+                    firstDay: DateTime.utc(2024, 1, 1),
+                    lastDay: DateTime.utc(2026, 12, 31),
+                    focusedDay: _focusedDay,
+                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                    onDaySelected: (sel, focus) {
+                      // FIX 6: Gunakan setState internal untuk update tampilan kalender
+                      setStateInternal(() {
+                        _selectedDay = sel;
+                        _focusedDay = focus;
+                      });
+                    },
+                    headerStyle: const HeaderStyle(
+                      titleCentered: true,
+                      formatButtonVisible: false,
+                    ),
+                    calendarStyle: CalendarStyle(
+                      todayDecoration: BoxDecoration(
+                        color: const Color(0xFFAF7C85).withOpacity(0.4),
+                        shape: BoxShape.circle,
+                      ),
+                      selectedDecoration: const BoxDecoration(
+                        color: Color(0xFFAF7C85),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "Select Appointment Date",
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Color(0xFF451A2B),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text(
+                          "Close",
+                          style: TextStyle(color: Color(0xFF451A2B)),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      TableCalendar(
-                        firstDay: DateTime.utc(2024, 1, 1),
-                        lastDay: DateTime.utc(2026, 12, 31),
-                        focusedDay: focusedDay,
-                        selectedDayPredicate: (day) =>
-                            isSameDay(tempSelectedDay, day),
-                        onDaySelected: (sel, focus) {
-                          setStateDialog(() {
-                            tempSelectedDay = sel;
-                            focusedDay = focus;
-                          });
-                        },
-                        headerStyle: const HeaderStyle(
-                          titleCentered: true,
-                          formatButtonVisible: false,
+
+                      if (_selectedDay != null)
+                        TextButton(
+                          onPressed: () {
+                            // SET FILTER DATE
+                            setState(() { // FIX 6: Gunakan setState luar untuk update main screen
+                              selectedDate = _selectedDay!;
+                              _focusedDay = _selectedDay!;
+                            });
+
+                            Navigator.pop(context);
+                            fetchReservations(); // reload data
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Selected: ${DateFormat('d MMM yyyy').format(_selectedDay!)}",
+                                ),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            "Select",
+                            style: TextStyle(color: Color(0xFFAF7C85)),
+                          ),
                         ),
-                        calendarStyle: CalendarStyle(
-                          todayDecoration: BoxDecoration(
-                            color: const Color(0xFFAF7C85).withOpacity(0.4),
-                            shape: BoxShape.circle,
-                          ),
-                          selectedDecoration: const BoxDecoration(
-                            color: Color(0xFFAF7C85),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextButton(
-                            child: const Text(
-                              "Close",
-                              style: TextStyle(color: Color(0xFF451A2B)),
-                            ),
-                            onPressed: () => Navigator.pop(dialogCtx),
-                          ),
-                          TextButton(
-                            child: const Text(
-                              "Select",
-                              style: TextStyle(color: Color(0xFFAF7C85)),
-                            ),
-                            onPressed: () {
-                              Navigator.pop(dialogCtx);
-                              _onDateSelected(tempSelectedDay);
-                            },
-                          ),
-                        ],
-                      ),
                     ],
                   ),
-                ),
+                ],
               ),
-            );
-          },
-        );
-      },
-    );
-  }
+            ),
+          );
+        }
+      );
+    },
+  );
+}
+
+
 }

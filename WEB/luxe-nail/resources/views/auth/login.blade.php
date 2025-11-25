@@ -20,7 +20,7 @@
         <div class="text-wrapper">LUXE NAIL</div>
 
         <div class="div-wrapper">
-            <input type="text" name="name" placeholder="Username" required>
+            <input type="text" name="username" placeholder="Username" required>
         </div>
 
         <div class="div-wrapper">
