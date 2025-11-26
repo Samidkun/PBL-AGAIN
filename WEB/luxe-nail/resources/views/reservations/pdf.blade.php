@@ -1,143 +1,90 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Luxe Nail - Reservation Details</title>
+    <meta charset="utf-8">
+    <title>Invoice {{ $reservation->queue_number }}</title>
+
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
-            background-color: #fff8fb;
-            color: #333;
-            font-size: 12pt;
-            padding: 40px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header img {
-            width: 120px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
-
-        .header h1 {
-            color: #d46fa4; /* pink elegant */
-            margin: 0;
-            font-size: 26px;
-            letter-spacing: 1px;
-        }
-
-        .header p {
-            margin: 0;
-            color: #777;
-            font-size: 13px;
-        }
-
-        .divider {
-            height: 2px;
-            background: linear-gradient(to right, #f7b6d2, #ffffff, #f7b6d2);
-            margin: 20px 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-
-        th {
-            background-color: #fbe2ec;
-            color: #4b304a;
-            text-align: left;
+            font-size: 12px;
             padding: 10px;
-            font-size: 13pt;
         }
-
-        td {
-            border: 1px solid #f2bfd1;
-            padding: 10px;
-            font-size: 12pt;
-            background-color: #fff;
+        .box {
+            border: 2px dashed #d889a6;
+            padding: 20px;
+            border-radius: 10px;
         }
-
-        tr:nth-child(even) td {
-            background-color: #fff7fa;
-        }
-
-        .queue-number {
-            text-align: center;
+        .title {
+            text-align:center;
+            font-size: 18px;
             font-weight: bold;
-            font-size: 16pt;
-            color: #d46fa4;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
-
+        .sub {
+            text-align:center;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        .row { margin-bottom: 8px; }
+        .label { font-weight: bold; }
         .footer {
+            margin-top: 25px;
             text-align: center;
-            font-size: 10pt;
-            color: #999;
-            border-top: 1px solid #f2bfd1;
-            padding-top: 10px;
-        }
-
-        .footer strong {
-            color: #d46fa4;
+            font-size: 11px;
+            opacity: .7;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        {{-- Ganti path ini sesuai nama file logomu --}}
-        <img src="{{ public_path('img/luxe-nail-1.png') }}" alt="Luxe Nail Logo">
-        <h1>Luxe Nail Studio</h1> 
-        <p>Reservation Confirmation</p>
+<div class="box">
+
+    <div class="title">LUXE NAIL STUDIO</div>
+    <div class="sub">Booking Invoice / Payment Record</div>
+
+    <div class="row">
+        <span class="label">Queue Number:</span> {{ $reservation->queue_number }}
     </div>
 
-    <div class="divider"></div>
-
-    <div class="queue-number">
-        Queue Number: {{ $reservation->queue_number }}
+    <div class="row">
+        <span class="label">Name:</span> {{ $reservation->name }}
     </div>
 
-    <table>
-        <tr>
-            <th>Field</th>
-            <th>Details</th>
-        </tr>
-        <tr>
-            <td><strong>Name</strong></td>
-            <td>{{ $reservation->name }}</td>
-        </tr>
-        <tr>
-            <td><strong>Address</strong></td>
-            <td>{{ $reservation->address }}</td>
-        </tr>
-        <tr>
-            <td><strong>Phone</strong></td>
-            <td>{{ $reservation->phone }}</td>
-        </tr>
-        <tr>
-            <td><strong>Treatment Type</strong></td>
-            <td>{{ $reservation->treatment_type == 'nail_extension' ? 'Nail Extension' : 'Nail Art' }}</td>
-        </tr>
-        <tr>
-            <td><strong>Reservation Date</strong></td>
-            <td>{{ \Carbon\Carbon::parse($reservation->reservation_date)->format('F j, Y') }}</td>
-        </tr>
-        <tr>
-            <td><strong>Reservation Time</strong></td>
-            <td>{{ $reservation->reservation_time }}</td>
-        </tr>
-    </table>
+    <div class="row">
+        <span class="label">Treatment:</span> {{ ucfirst(str_replace('_',' ',$reservation->treatment_type)) }}
+    </div>
+
+    <div class="row">
+        <span class="label">Date:</span> {{ $reservation->reservation_date }}
+    </div>
+
+    <div class="row">
+        <span class="label">Time:</span> {{ $reservation->reservation_time }}
+    </div>
+
+    <div class="row">
+        <span class="label">Booking Fee:</span>
+        Rp {{ number_format($reservation->booking_fee ?? 25000,0,',','.') }}
+    </div>
+
+    <div class="row">
+        <span class="label">Service Price:</span>
+        Rp {{ number_format($reservation->total_price,0,',','.') }}
+    </div>
+
+    <div class="row">
+        <span class="label">Total:</span>
+        Rp {{ number_format(($reservation->total_price + ($reservation->booking_fee ?? 25000)),0,',','.') }}
+    </div>
+
+    <br>
 
     <div class="footer">
-        Thank you for choosing <strong>Luxe Nail</strong>
+        Show this invoice at the studio. Admin will validate your payment.
     </div>
+
+</div>
 
 </body>
 </html>

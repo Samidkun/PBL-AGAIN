@@ -2,13 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\AIController;
 use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\IncomeController; // IncomeController (non-API namespace)
+use App\Http\Controllers\Api\CalendarController;
+use App\Http\Controllers\IncomeController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,7 @@ use App\Http\Controllers\IncomeController; // IncomeController (non-API namespac
 // LOGIN
 Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 
-// Customer create reservation
+// Create reservation (customer, no token)
 Route::prefix('v1')->group(function () {
     Route::post('/reservations', [ReservationController::class, 'store']);
 });
@@ -27,14 +28,20 @@ Route::prefix('v1')->group(function () {
 // Categories (public)
 Route::get('/v1/categories', [CategoryController::class, 'index']);
 
+// ⛔ FIX: Slot harus public (web booking butuh ini)
+Route::get('/v1/calendar/slots', [CalendarController::class, 'getSlots']);
+
+// ⛔ OPTIONAL: Artists public (kalau mau dipakai web)
+Route::get('/v1/available-artists', [CalendarController::class, 'getArtists']);
+
 
 /*
 |--------------------------------------------------------------------------
-| PROTECTED ROUTES (SANCTUM & V1 PREFIX)
+| PROTECTED ROUTES (AUTH SANCTUM)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -44,31 +51,16 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::put('/reservations/{id}', [ReservationController::class, 'update']);
     Route::delete('/reservations/{id}', [ReservationController::class, 'destroy']);
 
-    // Set price
+    // Pricing
     Route::post('/reservations/{id}/set-price', [ReservationController::class, 'setPrice']);
-
-    // Increment AI generate counter
     Route::post('/reservations/{id}/increment-generate', [ReservationController::class, 'incrementGenerate']);
 
-    // Profile
+    // User
     Route::get('/user', [ProfileController::class, 'index']);
 
-    // AI GENERATE
+    // AI Generate
     Route::post('/ai/generate', [AIController::class, 'generate']);
 
-    // ==============================================================
-    // INCOME AND PAYMENT CONFIRMATION (API ROUTE)
-    // ==============================================================
+    // Income
     Route::post('/income/store', [IncomeController::class, 'store']);
-
-    // ROUTE YANG SALAH TELAH DIHAPUS DARI SINI
-    // Route::get('/dashboard/income/{income}/edit', [App\Http\Controllers\IncomeController::class, 'edit'])->name('dashboard.income.edit');
 });
-
-
-/*
-|--------------------------------------------------------------------------
-| WEB DASHBOARD ROUTES (PASTIKAN ROUTE EDIT ADA DI SINI)
-|--------------------------------------------------------------------------
-*/
-// PENTING: Pindahkan route edit yang kamu inginkan ke routes/web.php

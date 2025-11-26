@@ -10,22 +10,19 @@ class Reservation extends Model
     use HasFactory;
 
     protected $fillable = [
-    'name',
-    'address',
-    'phone',
-    'treatment_type',
-    'reservation_date',
-    'reservation_time',
-    'queue_number',
-    'status',
-    'generate_count',
-    'total_price',
-    'is_paid',
-    'paid_at',
-];
-
-
-    protected $casts = [
-        'reservation_date' => 'date',
+        'name',
+        'address',
+        'phone',
+        'treatment_type',
+        'reservation_date',
+        'reservation_time',
+        'queue_number',
+        'nail_artist_id',
+        'status',
+        'is_paid',
+        'booking_fee',
+        'total_price',
+        'payment_method',
+        'payment_proof'
     ];
 }

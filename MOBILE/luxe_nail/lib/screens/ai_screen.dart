@@ -141,117 +141,115 @@ class _AIScreenState extends State<AIScreen> {
   // 4. GENERATE IMAGE & NAVIGASI (FIXED ERROR 'token')
   // ==========================================================
   Future<void> generateImage() async {
-    if (widget.reservation == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          content: Text("Error: No active reservation found."),
-        ),
-      );
-      return;
-    }
+  if (!mounted) return; // ✔ FIX build context after async
 
-    final prompt = buildPrompt();
-    if (prompt.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select options or input prompt")),
-      );
-      return;
-    }
+  if (widget.reservation == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Colors.red,
+        content: Text("Error: No active reservation found."),
+      ),
+    );
+    return;
+  }
 
-    setState(() => _loading = true);
+  final prompt = buildPrompt();
+  if (prompt.trim().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Please select options or input prompt")),
+    );
+    return;
+  }
 
-    try {
-      final baseUrl = dotenv.env['BASE_URL'];
-      final url = Uri.parse("$baseUrl/api/v1/ai/generate");
+  setState(() => _loading = true);
 
-      final response = await http.post(
-        url,
-        headers: {
-          "Authorization": "Bearer ${widget.token}",
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true",
-        },
-        body: jsonEncode({
-          "prompt": prompt,
-          "reservation_id": widget.reservation?['id'],
-        }),
-      );
+  try {
+    final baseUrl = dotenv.env['BASE_URL'];
+    final url = Uri.parse("$baseUrl/api/v1/ai/generate");
 
-      final data = jsonDecode(response.body);
+    print("TOKEN USED: ${widget.token}");
 
-      if (response.statusCode == 200 && data['success'] == true) {
-        // --- SUKSES ---
-        String finalImageUrl = data['image_url'];
+    final response = await http.post(
+      url,
+      headers: {
+        "Authorization": "Bearer ${widget.token}",
+        "Accept": "application/json",         // ✔ FIX PALING KRITIS
+        "Content-Type": "application/json",
+        "ngrok-skip-browser-warning": "true",
+      },
+      body: jsonEncode({
+        "prompt": prompt,
+        "reservation_id": widget.reservation?['id'],
+      }),
+    );
 
-        // A. Ambil Data Item Lengkap (untuk Harga & Nama)
-        var shapeItem = findFullItem('shape', selectedShape);
-        var colorItem = findFullItem('color', selectedColor);
-        var finishItem = findFullItem('finish', selectedFinish);
-        var accessoryItem = findFullItem('accessory', selectedAccessory);
+    if (!mounted) return; // ✔ FIX context
 
-        // B. Hitung Harga Satuan
-        int pShape = int.tryParse(shapeItem?['price'].toString() ?? '0') ?? 0;
-        int pColor = int.tryParse(colorItem?['price'].toString() ?? '0') ?? 0;
-        int pFinish = int.tryParse(finishItem?['price'].toString() ?? '0') ?? 0;
-        int pAccessory =
-            int.tryParse(accessoryItem?['price'].toString() ?? '0') ?? 0;
-        int basePrice =
-            int.tryParse(widget.reservation?['price'].toString() ?? '0') ?? 0;
+    final data = jsonDecode(response.body);
 
-        // C. Hitung Total
-        int grandTotal = basePrice + pShape + pColor + pFinish + pAccessory;
+    if (response.statusCode == 200 && data['success'] == true) {
+      String finalImageUrl = data['image_url'];
 
-        setState(() => _loading = false);
+      var shapeItem = findFullItem('shape', selectedShape);
+      var colorItem = findFullItem('color', selectedColor);
+      var finishItem = findFullItem('finish', selectedFinish);
+      var accessoryItem = findFullItem('accessory', selectedAccessory);
 
-        // D. Navigasi ke Screen Result (dengan FIX: token: widget.token)
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AIResultScreen(
-              // === FIX ERROR: MENGIRIM TOKEN YANG DIBUTUHKAN ===
-              token: widget.token,
+      int pShape = int.tryParse(shapeItem?['price'].toString() ?? '0') ?? 0;
+      int pColor = int.tryParse(colorItem?['price'].toString() ?? '0') ?? 0;
+      int pFinish = int.tryParse(finishItem?['price'].toString() ?? '0') ?? 0;
+      int pAccessory =
+          int.tryParse(accessoryItem?['price'].toString() ?? '0') ?? 0;
+      int basePrice =
+          int.tryParse(widget.reservation?['price'].toString() ?? '0') ?? 0;
 
-              imageUrl: finalImageUrl,
+      int grandTotal = basePrice + pShape + pColor + pFinish + pAccessory;
 
-              // Data Pilihan User
-              shape: selectedShape,
-              color: selectedColor,
-              finish: selectedFinish,
-              accessory: selectedAccessory,
+      if (!mounted) return; // ✔ FIX context
 
-              // Data Harga
-              priceShape: pShape,
-              priceColor: pColor,
-              priceFinish: pFinish,
-              priceAccessory: pAccessory,
+      setState(() => _loading = false);
 
-              // Total & Info Reservasi
-              totalPrice: grandTotal,
-              reservation: widget.reservation,
-            ),
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AIResultScreen(
+            token: widget.token,
+            imageUrl: finalImageUrl,
+            shape: selectedShape,
+            color: selectedColor,
+            finish: selectedFinish,
+            accessory: selectedAccessory,
+            priceShape: pShape,
+            priceColor: pColor,
+            priceFinish: pFinish,
+            priceAccessory: pAccessory,
+            totalPrice: grandTotal,
+            reservation: widget.reservation,
           ),
-        );
-      } else {
-        // --- ERROR DARI BACKEND ---
-        String msg = data['message'] ?? "Unknown error occurred";
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: Colors.red, content: Text(msg)),
-        );
-        setState(() => _loading = false);
-      }
-    } catch (e) {
-      // --- ERROR KONEKSI ---
-      print("Connection Error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text("Connection failed: $e"),
         ),
+      );
+    } else {
+      String msg = data['message'] ?? "Unknown error occurred";
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.red, content: Text(msg)),
       );
       setState(() => _loading = false);
     }
+  } catch (e) {
+    print("Connection Error: $e");
+
+    if (!mounted) return; // ✔ FIX context
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.red,
+        content: Text("Connection failed: $e"),
+      ),
+    );
+    setState(() => _loading = false);
   }
+}
+
 
   // ==========================================================
   // WIDGET & UI BUILD (Biarkan sama)
