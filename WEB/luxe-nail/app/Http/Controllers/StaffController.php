@@ -5,13 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\NailArtist; 
 
 class StaffController extends Controller
 {
     public function index()
     {
         $staff = User::all();
-        return view('staff.index', compact('staff'));
+        $nailArtists = NailArtist::orderBy('name')->get();
+
+    return view('staff.index', compact('staff', 'nailArtists'));
+        
     }
 
     public function create()
@@ -68,4 +72,5 @@ class StaffController extends Controller
         User::destroy($id);
         return redirect()->route('staff.index')->with('success', 'Staff berhasil dihapus.');
     }
+
 }

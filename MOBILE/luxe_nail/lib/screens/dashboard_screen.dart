@@ -1,13 +1,15 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:table_calendar/table_calendar.dart';
 // Asumsi: Anda sudah membuat file-file ini
-import 'package:luxe_nail/screens/gallery_screen.dart'; 
+import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/login_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
+import 'package:table_calendar/table_calendar.dart';
+
 import 'ai_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -83,7 +85,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // WIDGET CARD RESERVATION (Asumsi ada, perlu diperbaiki)
   // ================================================================
   // Fungsi placeholder untuk widget card yang dipanggil di build
-  Widget _reservationCard(BuildContext context, Map<String, dynamic> res, double sW, double sH) {
+  Widget _reservationCard(
+    BuildContext context,
+    Map<String, dynamic> res,
+    double sW,
+    double sH,
+  ) {
     // Implementasi _reservationCard (Asumsi dari kode aslimu)
     return Card(
       margin: EdgeInsets.only(bottom: 15 * sH),
@@ -91,8 +98,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       elevation: 5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: ListTile(
-        title: Text(res['name'] ?? 'No Name', style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, color: Color(0xFF451A2B))),
-        subtitle: Text("${res['reservation_time'] ?? '-'} - ${res['treatment_type'] ?? 'N/A'}", style: TextStyle(fontFamily: 'Poppins', color: Color(0xFFAF7C85))),
+        title: Text(
+          res['name'] ?? 'No Name',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF451A2B),
+          ),
+        ),
+        subtitle: Text(
+          "${res['reservation_time'] ?? '-'} - ${res['treatment_type'] ?? 'N/A'}",
+          style: TextStyle(fontFamily: 'Poppins', color: Color(0xFFAF7C85)),
+        ),
         trailing: Icon(Icons.arrow_forward_ios, color: Color(0xFFAF7C85)),
         onTap: () {
           // Logic detail atau AI Screen
@@ -101,8 +118,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             MaterialPageRoute(
               // FIX 4: MENGIRIM SEMUA ARGUMENT YANG DIBUTUHKAN AISCREEN
               builder: (_) => AIScreen(
-                token: widget.token, 
-                user: widget.user, 
+                token: widget.token,
+                user: widget.user,
                 reservation: res, // Kirim data reservasi spesifik
               ),
             ),
@@ -112,7 +129,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-
   // ================================================================
   // BUILD UI
   // ================================================================
@@ -120,8 +136,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     // FIX 2: Definisikan size helpers
     final sW = MediaQuery.of(context).size.width / 414; // Perkiraan rasio lebar
-    final sH = MediaQuery.of(context).size.height / 896; // Perkiraan rasio tinggi
-    
+    final sH =
+        MediaQuery.of(context).size.height / 896; // Perkiraan rasio tinggi
+
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
@@ -139,7 +156,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   CircleAvatar(
                     radius: 30,
                     backgroundColor: const Color(0xFFFFEAEE),
-                    child: const Icon(Icons.person, size: 40, color: Color(0xFF451A2B)),
+                    child: const Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Color(0xFF451A2B),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -156,39 +177,68 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.home, color: Color(0xFF451A2B)),
-              title: const Text("Home",
-                  style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
+              title: const Text(
+                "Home",
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  color: Color(0xFF451A2B),
+                ),
+              ),
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Color(0xFF451A2B)),
-              title: const Text("Profile",
-                  style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
+              title: const Text(
+                "Profile",
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  color: Color(0xFF451A2B),
+                ),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => ProfileScreen(token: widget.token)),
+                  MaterialPageRoute(
+                    builder: (_) => ProfileScreen(token: widget.token),
+                  ),
                 );
               },
             ),
             ListTile(
               leading: const Icon(Icons.photo_album, color: Color(0xFF451A2B)),
-              title: const Text("Gallery",
-                  style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
+              title: const Text(
+                "Gallery",
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  color: Color(0xFF451A2B),
+                ),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => GalleryScreen(token: widget.token, user: widget.user)),
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        GalleryScreen(token: widget.token, user: widget.user),
+                  ),
                 );
               },
             ),
-            
+
             const Divider(color: Color(0xFFAF7C85)),
-            
+
             ListTile(
               leading: const Icon(Icons.logout, color: Color(0xFF451A2B)),
-              title: const Text("Logout",
-                  style: TextStyle(fontFamily: 'Poppins', fontSize: 14, color: Color(0xFF451A2B))),
+              title: const Text(
+                "Logout",
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  color: Color(0xFF451A2B),
+                ),
+              ),
               onTap: () {
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -217,7 +267,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 GestureDetector(
                   onTap: () => scaffoldKey.currentState!.openDrawer(),
-                  child: const Icon(Icons.menu, size: 32, color: Color(0xFF451A2B)),
+                  child: const Icon(
+                    Icons.menu,
+                    size: 32,
+                    color: Color(0xFF451A2B),
+                  ),
                 ),
                 const Text(
                   'LUXE NAIL',
@@ -252,13 +306,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 6),
                     const Text(
                       "Your customers are waiting 💅",
-                      style: TextStyle(fontFamily: 'Poppins', fontSize: 15, color: Color(0xFF451A2B)),
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 15,
+                        color: Color(0xFF451A2B),
+                      ),
                     ),
                   ],
                 ),
                 GestureDetector(
                   onTap: () => _showCalendarPopup(context),
-                  child: const Icon(Icons.calendar_month, size: 32, color: Color(0xFF451A2B)),
+                  child: const Icon(
+                    Icons.calendar_month,
+                    size: 32,
+                    color: Color(0xFF451A2B),
+                  ),
                 ),
               ],
             ),
@@ -274,7 +336,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   // FIX 3: Gunakan BorderRadius normal atau ganti dengan angka
-                  topLeft: const Radius.circular(30), 
+                  topLeft: const Radius.circular(30),
                   topRight: const Radius.circular(30),
                 ),
                 image: const DecorationImage(
@@ -288,7 +350,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   // ===== TITLE DI DALAM BOX PUTIH (TIDAK SCROLL) =====
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(26, 20, 26, 0), // FIX 3: Hapus sW/sH
+                    padding: const EdgeInsets.fromLTRB(
+                      26,
+                      20,
+                      26,
+                      0,
+                    ), // FIX 3: Hapus sW/sH
                     child: Text(
                       "Appointments on ${DateFormat('d MMM yyyy').format(selectedDate)}", // FIX 5: Tambahkan tanggal filter
                       style: const TextStyle(
@@ -305,7 +372,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   // ===== AREA SCROLL (CARD-CARD) =====
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20), // FIX 3: Hapus sW/sH
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20,
+                      ), // FIX 3: Hapus sW/sH
                       child: reservations.isEmpty
                           ? SizedBox(
                               height: MediaQuery.of(context).size.height * 0.6,
@@ -378,7 +448,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           topRight: Radius.circular(27),
         ),
         boxShadow: [
-          BoxShadow(color: Color(0x3F000000), blurRadius: 9, offset: Offset(5, -4)),
+          BoxShadow(
+            color: Color(0x3F000000),
+            blurRadius: 9,
+            offset: Offset(5, -4),
+          ),
         ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -394,7 +468,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => AIScreen(token: widget.token, user: widget.user, reservation: null),
+                builder: (_) => AIScreen(
+                  token: widget.token,
+                  user: widget.user,
+                  reservation: null,
+                ),
               ),
             );
           }),
@@ -404,7 +482,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => GalleryScreen(token: widget.token, user: widget.user),
+                builder: (_) =>
+                    GalleryScreen(token: widget.token, user: widget.user),
               ),
             );
           }),
@@ -412,7 +491,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _navItem(Icons.person, "Profile", () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ProfileScreen(token: widget.token)),
+              MaterialPageRoute(
+                builder: (_) => ProfileScreen(token: widget.token),
+              ),
             );
           }),
         ],
@@ -426,7 +507,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.home, size: 30, color: Color(0xFF975B73)), // FIX: Gunakan icon yang benar
+          const Icon(
+            Icons.home,
+            size: 30,
+            color: Color(0xFF975B73),
+          ), // FIX: Gunakan icon yang benar
           const SizedBox(height: 3),
           Text(
             label,
@@ -444,116 +529,116 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // ================================================================
   // CALENDAR POPUP
   // ================================================================
-void _showCalendarPopup(BuildContext context) {
-  _selectedDay = selectedDate;
-  _focusedDay = selectedDate;
+  void _showCalendarPopup(BuildContext context) {
+    _selectedDay = selectedDate;
+    _focusedDay = selectedDate;
 
-  showDialog(
-    context: context,
-    builder: (context) {
-      // Perlu StateBuilder untuk update _selectedDay di dalam dialog
-      return StatefulBuilder(
-        builder: (context, setStateInternal) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            backgroundColor: const Color(0xFFFFF8F9),
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    "Select Appointment Date",
-                    style: TextStyle(
-                      fontFamily: "Poppins",
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: Color(0xFF451A2B),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Calendar
-                  TableCalendar(
-                    firstDay: DateTime.utc(2024, 1, 1),
-                    lastDay: DateTime.utc(2026, 12, 31),
-                    focusedDay: _focusedDay,
-                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                    onDaySelected: (sel, focus) {
-                      // FIX 6: Gunakan setState internal untuk update tampilan kalender
-                      setStateInternal(() {
-                        _selectedDay = sel;
-                        _focusedDay = focus;
-                      });
-                    },
-                    headerStyle: const HeaderStyle(
-                      titleCentered: true,
-                      formatButtonVisible: false,
-                    ),
-                    calendarStyle: CalendarStyle(
-                      todayDecoration: BoxDecoration(
-                        color: const Color(0xFFAF7C85).withOpacity(0.4),
-                        shape: BoxShape.circle,
-                      ),
-                      selectedDecoration: const BoxDecoration(
-                        color: Color(0xFFAF7C85),
-                        shape: BoxShape.circle,
+    showDialog(
+      context: context,
+      builder: (context) {
+        // Perlu StateBuilder untuk update _selectedDay di dalam dialog
+        return StatefulBuilder(
+          builder: (context, setStateInternal) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              backgroundColor: const Color(0xFFFFF8F9),
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      "Select Appointment Date",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Color(0xFF451A2B),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 10),
 
-                  const SizedBox(height: 10),
-
-                  // Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text(
-                          "Close",
-                          style: TextStyle(color: Color(0xFF451A2B)),
+                    // Calendar
+                    TableCalendar(
+                      firstDay: DateTime.utc(2024, 1, 1),
+                      lastDay: DateTime.utc(2026, 12, 31),
+                      focusedDay: _focusedDay,
+                      selectedDayPredicate: (day) =>
+                          isSameDay(_selectedDay, day),
+                      onDaySelected: (sel, focus) {
+                        // FIX 6: Gunakan setState internal untuk update tampilan kalender
+                        setStateInternal(() {
+                          _selectedDay = sel;
+                          _focusedDay = focus;
+                        });
+                      },
+                      headerStyle: const HeaderStyle(
+                        titleCentered: true,
+                        formatButtonVisible: false,
+                      ),
+                      calendarStyle: CalendarStyle(
+                        todayDecoration: BoxDecoration(
+                          color: const Color(0xFFAF7C85).withOpacity(0.4),
+                          shape: BoxShape.circle,
+                        ),
+                        selectedDecoration: const BoxDecoration(
+                          color: Color(0xFFAF7C85),
+                          shape: BoxShape.circle,
                         ),
                       ),
+                    ),
 
-                      if (_selectedDay != null)
+                    const SizedBox(height: 10),
+
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
                         TextButton(
-                          onPressed: () {
-                            // SET FILTER DATE
-                            setState(() { // FIX 6: Gunakan setState luar untuk update main screen
-                              selectedDate = _selectedDay!;
-                              _focusedDay = _selectedDay!;
-                            });
-
-                            Navigator.pop(context);
-                            fetchReservations(); // reload data
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Selected: ${DateFormat('d MMM yyyy').format(_selectedDay!)}",
-                                ),
-                              ),
-                            );
-                          },
+                          onPressed: () => Navigator.pop(context),
                           child: const Text(
-                            "Select",
-                            style: TextStyle(color: Color(0xFFAF7C85)),
+                            "Close",
+                            style: TextStyle(color: Color(0xFF451A2B)),
                           ),
                         ),
-                    ],
-                  ),
-                ],
+
+                        if (_selectedDay != null)
+                          TextButton(
+                            onPressed: () {
+                              // SET FILTER DATE
+                              setState(() {
+                                // FIX 6: Gunakan setState luar untuk update main screen
+                                selectedDate = _selectedDay!;
+                                _focusedDay = _selectedDay!;
+                              });
+
+                              Navigator.pop(context);
+                              fetchReservations(); // reload data
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Selected: ${DateFormat('d MMM yyyy').format(_selectedDay!)}",
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Select",
+                              style: TextStyle(color: Color(0xFFAF7C85)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }
-      );
-    },
-  );
-}
-
-
+            );
+          },
+        );
+      },
+    );
+  }
 }

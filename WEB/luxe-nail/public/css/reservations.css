@@ -464,16 +464,23 @@
         margin: 5px 0;
     }
 }
-/* Fix Action Buttons Layout */
+
 .reservation-table td:last-child {
-    white-space: nowrap;
+    white-space: normal !important;
 }
 
 .actions-container {
     display: flex;
+    flex-direction: column;
     gap: 8px;
-    flex-wrap: nowrap;
+    align-items: flex-start;
     align-items: center;
+}
+
+.actions-container .btn-action {
+    width: 150px;
+    justify-content: center;
+    white-space: nowrap;
 }
 
 .btn-action {
