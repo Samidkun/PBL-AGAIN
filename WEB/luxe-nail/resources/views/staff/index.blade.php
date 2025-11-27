@@ -85,7 +85,9 @@
 
 <div class="container-fluid mt-4">
 
-    {{-- Header Card --}}
+    {{-- ============================ --}}
+    {{-- HEADER STAFF LIST --}}
+    {{-- ============================ --}}
     <div class="staff-header-card d-flex justify-content-between align-items-center">
         <div>
             <h3 class="fw-bold mb-1">
@@ -99,8 +101,10 @@
         </a>
     </div>
 
-    {{-- List Card --}}
-    <div class="staff-card">
+    {{-- ============================ --}}
+    {{-- STAFF LIST CARD --}}
+    {{-- ============================ --}}
+    <div class="staff-card mb-4">
 
         <table class="table align-middle mb-0">
             <thead>
@@ -150,6 +154,76 @@
                     </tr>
                 @endif
 
+            </tbody>
+        </table>
+    </div>
+
+
+    {{-- ============================ --}}
+    {{-- HEADER NAIL ARTIST SCHEDULE --}}
+    {{-- ============================ --}}
+    <div class="staff-header-card d-flex justify-content-between align-items-center mt-4">
+        <div>
+            <h3 class="fw-bold mb-1">
+                <i class="bi bi-brush-fill me-2"></i> Nail Artist Schedule
+            </h3>
+            <p class="mb-0" style="opacity: 0.9;">
+                List nail artist & status mereka hari ini
+            </p>
+        </div>
+    </div>
+
+    {{-- ============================ --}}
+    {{-- NAIL ARTIST LIST CARD --}}
+    {{-- ============================ --}}
+    <div class="staff-card">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Customers Today</th>
+                    <th>Working Hour</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach($nailArtists as $i => $artist)
+                    <tr>
+                        <td>{{ $i + 1 }}</td>
+                        <td>{{ $artist->name }}</td>
+
+                        {{-- STATUS BADGE --}}
+                        <td>
+                            @php
+                                $badge =
+                                    $artist->status === 'available' ? 'success' :
+                                    ($artist->status === 'busy' ? 'warning' : 'secondary');
+                            @endphp
+
+                            <span class="badge bg-{{ $badge }}">
+                                {{ ucfirst($artist->status) }}
+                            </span>
+                        </td>
+
+                        <td>{{ $artist->customers_today }}</td>
+
+                        <td>
+                            {{ \Carbon\Carbon::parse($artist->jam_kerja_start)->format('H:i') }}
+                            -
+                            {{ \Carbon\Carbon::parse($artist->jam_kerja_end)->format('H:i') }}
+                        </td>
+                    </tr>
+                @endforeach
+
+                @if($nailArtists->count() == 0)
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">
+                            No nail artist available.
+                        </td>
+                    </tr>
+                @endif
             </tbody>
         </table>
     </div>
