@@ -21,19 +21,23 @@ class PaymentController extends Controller
     // USER: MARK AS PAID (WAITING VALIDATION)
     // =================================================
     public function markPaid(Request $request, $id)
-    {
-        $reservation = Reservation::findOrFail($id);
+{
+    $reservation = Reservation::findOrFail($id);
 
-        $reservation->is_paid = 1;
-        $reservation->payment_method = "bank_transfer";
-        $reservation->status = "waiting_validation";
-        $reservation->save();
+    $reservation->is_paid = 1;
+    $reservation->payment_method = "bank_transfer";
+    $reservation->status = "waiting_validation";
+    $reservation->save();
 
-        return response()->json([
-            'success' => true,
-            'invoice_url' => route('payment.invoice', $reservation->queue_number),
-        ]);
-    }
+    return response()->json([
+        'success' => true,
+        'invoice_url' => route('payment.invoice', $reservation->queue_number),
+        'thank_you_url' => route('reservations.thank-you', [
+            'queue_number' => $reservation->queue_number
+        ]),
+    ]);
+}
+
 
     // =================================================
     // ADMIN CONFIRM PAYMENT
