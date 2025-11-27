@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use App\Models\Reservation;
+use Illuminate\Support\Facades\Log;
+
+class AIController extends Controller
+{
+    public function generate(Request $request)
+    {
+        // 0. Pastikan token valid
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated',
+                'code' => 401
+            ], 401);
+        }
+
+        // 1. Validasi input
+        $request->validate([
+            'prompt' => 'required|string|min:3',
+            'reservation_id' => 'required|integer',
+        ]);
+
+        // 2. Ambil reservasi
+        $reservation = Reservation::find($request->reservation_id);
+        if (!$reservation) {
+            return response()->json(['success' => false, 'message' => 'Reservation not found'], 404);
+        }
+
+        // 3. Cek limit generate
+        if ($reservation->generate_count >= 3) {
+            return response()->json(['success' => false, 'message' => 'Limit reached (3x).'], 403);
+        }
+
+        // 4. OpenRouter API
+        $apiKey = env('OPENROUTER_API_KEY');
+        $model = "google/gemini-2.5-flash-image";
+
+        try {
+            $response = Http::withHeaders([
+                "Authorization" => "Bearer $apiKey",
+                "Content-Type" => "application/json",
+                "HTTP-Referer" => url('/'),
+                "X-Title" => "Nail Art App",
+            ])->post("https://openrouter.ai/api/v1/chat/completions", [
+                "model" => $model,
+                "messages" => [
+                    [
+                        "role" => "user",
+                        "content" => "Generate a realistic nail art design based on: " . $request->prompt
+                    ]
+                ]
+            ]);
+
+            $json = $response->json();
+
+            if ($response->failed()) {
+                Log::error("AI Error", ['raw' => $json]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'AI Error',
+                    'raw' => $json
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error("AI Exception: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Connection failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+        // 5. Ambil URL gambar
+        $imageUrl =
+            data_get($json, 'choices.0.message.images.0.image_url.url') ??
+            data_get($json, 'choices.0.message.images.0.url') ??
+            data_get($json, 'choices.0.message.url');
+
+        if (!$imageUrl) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot parse image URL',
+                'raw_response' => $json
+            ], 500);
+        }
+
+        // 6. Update generate count
+        $reservation->increment('generate_count');
+
+        return response()->json([
+            'success' => true,
+            'generate_count' => $reservation->generate_count,
+            'image_url' => $imageUrl
+        ]);
+    }
+}

@@ -10,49 +10,80 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    // === LOGIN UNIVERSAL (Web + API) ===
+    // ======================================================
+    // LOGIN
+    // ======================================================
     public function login(Request $request)
     {
+        // 1. VALIDASI INPUT
         $request->validate([
-            'name' => 'required|string',
+            'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        $user = User::where('name', $request->name)->first();
+        $loginInput = trim($request->username);
 
-        // ====== VALIDASI USER ======
+        // 2. CARI USER BERDASARKAN USERNAME ATAU EMAIL
+        $user = User::where('username', $loginInput)
+                    ->orWhere('email', $loginInput)
+                    ->first();
+
+        // ERROR: USER / PASSWORD SALAH
         if (!$user || !Hash::check($request->password, $user->password)) {
-            if ($request->expectsJson()) {
-                return response()->json(['message' => 'Invalid credentials'], 401);
-            }
-            return back()->withErrors(['name' => 'Invalid username or password.']);
-        }
 
-        // ====== LOGIN DARI API (MOBILE) ======
-        if ($request->expectsJson()) {
-            // ❌ Larang admin login dari mobile
-            if ($user->role !== 'nail_artist') {
-                return response()->json(['message' => 'Access denied: Admins cannot log in from mobile.'], 403);
+            // Jika request API / mobile
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid credentials'
+                ], 401);
             }
 
-            $token = $user->createToken('api_token')->plainTextToken;
-
-            return response()->json([
-                'message' => 'Login successful',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'role' => $user->role,
-                ],
-                'token' => $token,
-                'token_type' => 'Bearer',
+            // Jika request web
+            return back()->withErrors([
+                'username' => 'Invalid username or password.'
             ]);
         }
 
-        // ====== LOGIN DARI WEB ======
-        // ❌ Larang nail artist login dari web
+
+        // ======================================================
+        // LOGIN MOBILE (API)
+        // ======================================================
+        if ($request->expectsJson() || $request->is('api/*')) {
+
+            // Blokir Admin di mobile
+            if ($user->role !== 'nail_artist') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Access denied. Only Nail Artists can login via mobile.'
+                ], 403);
+            }
+
+            // Bikin Token Sanctum
+            $token = $user->createToken('api_token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login successful',
+                'user' => [
+                    'id'       => $user->id,
+                    'username' => $user->username,
+                    'email'    => $user->email,
+                    'role'     => $user->role,
+                ],
+                'token' => $token,
+                'token_type' => 'Bearer'
+            ]);
+        }
+
+
+        // ======================================================
+        // LOGIN WEB (ADMIN PANEL)
+        // ======================================================
         if ($user->role !== 'admin') {
-            return back()->withErrors(['access' => 'Access denied: Only admins can log in via web.']);
+            return back()->withErrors([
+                'access' => 'Only admin can login to the dashboard.'
+            ]);
         }
 
         Auth::login($user);
@@ -61,18 +92,28 @@ class AuthController extends Controller
         return redirect()->route('dashboard')->with('success', 'Welcome back, Admin!');
     }
 
-    // === LOGOUT UNIVERSAL ===
+
+    // ======================================================
+    // LOGOUT
+    // ======================================================
     public function logout(Request $request)
     {
-        if ($request->expectsJson()) {
+        // API (mobile) logout
+        if ($request->expectsJson() || $request->is('api/*')) {
             $request->user()->tokens()->delete();
-            return response()->json(['message' => 'Logged out successfully']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Logged out successfully'
+            ]);
         }
 
+        // Web logout
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login-page')->with('success', 'You have been logged out.');
+        return redirect('/login-page')
+                ->with('success', 'Logged out successfully.');
     }
 }

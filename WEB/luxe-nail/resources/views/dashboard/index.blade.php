@@ -10,32 +10,6 @@
 
 @section('content')
 
-<!-- === FILTER TANGGAL di dashboard === -->
-<form action="{{ route('dashboard') }}" method="GET" class="mb-4">
-    <div class="row g-3 align-items-end mt-2"">
-        <div class="col-md-3">
-            <h5 class="bold" style="color:#ffffff; font-family:'Georgia', serif; margin-bottom:25px;">
-                Filter by Date
-            </h5>
-            <input type="date" name="date" class="form-control" 
-                   value="{{ request('date') }}">
-        </div>
-        <div class="col-md-2">
-            <button class="btn w-100 text-light" 
-                style="background:#f3b8c2; border-radius:10px;">
-                Apply
-            </button>
-        </div>
-        <div class="col-md-2">
-            <a href="{{ route('dashboard') }}" 
-               class="btn w-100 text-light"
-               style="background:#d87a87; border-radius:10px;">
-                Reset
-            </a>
-        </div>
-    </div>
-</form>
-
 <!-- === DASHBOARD CARDS === -->
 <div class="row g-4 mt-2">
     <div class="col-md-3 col-sm-6">
@@ -75,12 +49,34 @@
 
 <hr class="section-divider">
 
-<!-- === Recent Reservations === -->
-<div class="recent-reservations mt-2">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+<!-- === FILTER TANGGAL di dashboard === -->
+<form action="{{ route('dashboard') }}" method="GET" class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-1">
         <h3 class="bold" style="color:#ffffff; font-family:'Georgia', serif;">Recent Reservations</h3>
     </div>
+    <div class="row g-3 align-items-end mt-2"">
+        <div class="col-md-3">
+            <input type="date" name="date" class="form-control" 
+                   value="{{ request('date') }}">
+        </div>
+        <div class="col-md-2">
+            <button class="btn w-100 text-light" 
+                style="background:#f3b8c2; border-radius:10px;">
+                Apply
+            </button>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ route('dashboard') }}" 
+               class="btn w-100 text-light"
+               style="background:#d87a87; border-radius:10px;">
+                Reset
+            </a>
+        </div>
+    </div>
+</form>
 
+<!-- === Recent Reservations === -->
+<div class="recent-reservations mt-2">
     <div class="card border-0 shadow-sm p-4" 
          style="border-radius:20px; background:linear-gradient(180deg, #fff 0%, #fff5f8 100%);">
         <table class="table align-middle mb-0">

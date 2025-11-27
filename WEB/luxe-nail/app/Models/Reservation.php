@@ -17,10 +17,12 @@ class Reservation extends Model
         'reservation_date',
         'reservation_time',
         'queue_number',
-        'status'
-    ];
-
-    protected $casts = [
-        'reservation_date' => 'date',
+        'nail_artist_id',
+        'status',
+        'is_paid',
+        'booking_fee',
+        'total_price',
+        'payment_method',
+        'payment_proof'
     ];
 }

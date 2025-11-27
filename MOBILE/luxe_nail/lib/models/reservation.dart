@@ -1,6 +1,7 @@
 class Reservation {
   final int id;
   final String name;
+  final String phone;
   final String treatmentType;
   final String reservationDate;
   final String reservationTime;
@@ -10,6 +11,7 @@ class Reservation {
   Reservation({
     required this.id,
     required this.name,
+    required this.phone,
     required this.treatmentType,
     required this.reservationDate,
     required this.reservationTime,
@@ -21,6 +23,7 @@ class Reservation {
     return Reservation(
       id: json['id'],
       name: json['name'],
+      phone: json['phone'],
       treatmentType: json['treatment_type'],
       reservationDate: json['reservation_date'],
       reservationTime: json['reservation_time'],
