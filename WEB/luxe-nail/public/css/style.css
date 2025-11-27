@@ -713,7 +713,6 @@
     }
 }
         
-        /* Gallery Section Styles - FIXED */
 .gallery-section {
     padding: 100px 0;
     background-color: var(--text-light);
@@ -726,7 +725,9 @@
     padding: 0 60px;
     margin: 0 auto;
     max-width: 1400px;
+    overflow: hidden;
 }
+
 
 .gallery-track {
     display: flex;
@@ -1721,4 +1722,384 @@
         opacity: 1;
         transform: translateX(-50%) translateY(0);
     }
+}
+
+/* Form sections biar kayak card home */
+.form-section {
+    background: #fff;
+    border: 1px solid var(--soft-pink);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.05);
+}
+
+.form-section-title {
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 14px;
+    font-size: 1.1rem;
+}
+
+/* Time slot look */
+.btn-slot {
+    border: 2px solid var(--dark-pink);
+    color: var(--text-dark);
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-weight: 600;
+    transition: .2s;
+}
+.btn-slot:hover {
+    background: var(--soft-pink);
+    transform: translateY(-2px);
+}
+.btn-slot.active {
+    background: var(--dark-pink);
+    color: #fff;
+    border-color: var(--dark-pink);
+}
+
+.btn-slot-disabled {
+    border: 2px dashed #ccc;
+    color: #999;
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 10px 0;
+    font-weight: 500;
+}
+
+/* Captcha style */
+.captcha-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.captcha-text {
+    background: var(--baby-pink);
+    color: var(--text-dark);
+    font-weight: 800;
+    letter-spacing: 4px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 1.3rem;
+}
+.btn-captcha {
+    background: var(--dark-pink);
+    color: white;
+    border-radius: 8px;
+    padding: 8px 14px;
+    border: none;
+    font-weight: 600;
+}
+.btn-captcha:hover {
+    background: var(--medium-pink);
+}
+
+/* ===== PAYMENT PAGE LUXE UI ===== */
+.payment-page{
+    background: transparent;
+}
+
+.payment-card{
+    background: #fff;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid rgba(216,122,135,0.15);
+}
+
+.payment-header{
+    padding: 10px 10px 20px;
+    margin-bottom: 10px;
+}
+
+.payment-header-title{
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    color: var(--text-dark);
+    font-size: 2rem;
+    margin-bottom: 6px;
+}
+
+.payment-header-subtitle{
+    color:#777;
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* section box */
+.payment-section{
+    padding: 18px 18px;
+    background: #fff;
+    border: 1px solid var(--baby-pink);
+    border-radius: 14px;
+    margin-bottom: 16px;
+}
+
+.payment-title{
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    font-size: 1.4rem;
+}
+
+/* summary grid */
+.summary-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+}
+.summary-item{
+    display:flex;
+    flex-direction:column;
+    background: #fff5f7;
+    padding: 10px 12px;
+    border-radius: 10px;
+}
+.summary-item .label{
+    font-size: .85rem;
+    color: #777;
+    font-weight: 600;
+}
+.summary-item .value{
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* status badge */
+.status-badge{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+}
+.status-badge .status-title{ font-weight:800; }
+.status-badge .status-desc{ font-size:.9rem; opacity:.9; }
+
+.status-badge.pending{
+    background: #fff7e6;
+    border-color: #ffe1a8;
+    color:#8a5b00;
+}
+.status-badge.waiting{
+    background: #eef6ff;
+    border-color: #b9ddff;
+    color:#0b5aa7;
+}
+.status-badge.confirmed{
+    background: #ecfff2;
+    border-color: #b7f2c9;
+    color:#0c7a37;
+}
+
+/* bank card */
+.bank-card{
+    background: linear-gradient(135deg, #fff5f7, #ffe8ea);
+    border: 1px solid rgba(216,122,135,0.2);
+    border-radius: 12px;
+    padding: 14px;
+}
+.bank-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom: 10px;
+}
+.bank-icon{
+    width: 42px; height:42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--dark-pink), var(--medium-pink));
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.1rem;
+}
+.bank-title{ font-weight:800; color:var(--text-dark); }
+.bank-desc{ font-size:.9rem; color:#666; }
+
+.bank-info{
+    background:#fff;
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+.bank-row{
+    display:flex; justify-content:space-between;
+    padding: 8px 0;
+    border-bottom:1px dashed rgba(216,122,135,0.2);
+}
+.bank-row:last-child{ border-bottom:none; }
+.bank-label{ font-size:.85rem; color:#777; font-weight:600; }
+.bank-value{ font-weight:800; color:var(--text-dark); }
+
+/* price */
+.price-row{
+    display:flex; justify-content:space-between;
+    font-size:.95rem; padding: 4px 0;
+    color:#555;
+}
+.price-total{
+    margin-top: 10px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--dark-pink);
+    background: #fff5f7;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-align:center;
+}
+
+/* button */
+.btn-payment{
+    width: 100%;
+    border: none;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--dark-pink), var(--medium-pink));
+    box-shadow: 0 8px 20px rgba(216, 122, 135, 0.35);
+    transition: all .25s ease;
+}
+.btn-payment:hover{
+    transform: translateY(-2px);
+    background: var(--text-dark);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+
+/* hint & done */
+.payment-hint{
+    margin-top: 10px;
+    font-size: .9rem;
+    color:#666;
+    text-align:center;
+    background:#fff5f7;
+    padding: 8px 10px;
+    border-radius: 10px;
+}
+.payment-done{
+    margin-top:6px;
+    text-align:center;
+    font-weight:800;
+    color:#0c7a37;
+    background:#ecfff2;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+/* responsive */
+@media(max-width:576px){
+    .summary-grid{ grid-template-columns: 1fr; }
+    .payment-card{ padding: 20px; }
+    .payment-header-title{ font-size: 1.6rem; }
+}
+
+/* sticky footer fix */
+.layout-root{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 90px;
+}
+
+/* ===== THANK YOU PAGE (LUXE UI) ===== */
+.thankyou-page{
+  padding: 120px 0 80px;  /* aman sama header fixed */
+  background: var(--baby-pink);
+}
+
+.thankyou-wrap{
+  min-height: calc(100vh - 220px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thankyou-card{
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 45px 35px;
+  text-align: center;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+  border: 1px solid rgba(216,122,135,0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* garis cantik atas card */
+.thankyou-card::before{
+  content:"";
+  position:absolute;
+  top:0; left:0; right:0;
+  height:5px;
+  background: linear-gradient(90deg, var(--medium-pink), var(--dark-pink));
+}
+
+.thankyou-icon{
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: #fff5f7;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border: 2px dashed rgba(216,122,135,0.25);
+}
+
+.thankyou-icon img{
+  width: 75px;
+  height: auto;
+}
+
+.thankyou-title{
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  font-size: 2.2rem;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.thankyou-subtitle{
+  font-size: 1.05rem;
+  color: #666;
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+.thankyou-actions{
+  margin-top: 8px;
+}
+
+/* responsive */
+@media (max-width: 576px){
+  .thankyou-card{
+    padding: 32px 22px;
+    border-radius: 18px;
+  }
+  .thankyou-title{ font-size: 1.8rem; }
+  .thankyou-subtitle{ font-size: .98rem; }
+}
+.luxe-icon{
+  font-size: 52px;         
+  color: var(--dark-pink); 
+  background: #fff5f7;
+  padding: 12px;
+  border-radius: 50%;
+  box-shadow: 0 6px 18px rgba(216,122,135,0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

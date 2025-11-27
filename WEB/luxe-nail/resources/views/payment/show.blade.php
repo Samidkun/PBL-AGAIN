@@ -3,115 +3,158 @@
 @section('title', 'Payment')
 
 @section('content')
-<div class="container py-5">
+<section class="payment-page">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
 
-    <div class="text-center mb-5">
-        <h2 class="fw-bold" style="font-family: 'Playfair Display', serif;">
-            Complete Your Payment
-        </h2>
-        <p class="text-muted">Please finish your payment to confirm your booking.</p>
-    </div>
+                {{-- SEMUA MASUK KE 1 CARD PUTIH --}}
+                <div class="payment-card">
 
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
-
-            <div class="card shadow-lg border-0 p-4"
-                 style="border-radius: 20px; background: #fff5f7;">
-
-                {{-- SUMMARY --}}
-                <h4 class="fw-bold mb-3" style="font-family: 'Playfair Display', serif;">
-                    Booking Summary
-                </h4>
-
-                <div class="mb-3">
-                    <strong>Name:</strong> {{ $reservation->name }} <br>
-                    <strong>Treatment:</strong> {{ ucfirst(str_replace('_',' ',$reservation->treatment_type)) }} <br>
-                    <strong>Date:</strong> {{ $reservation->reservation_date }} <br>
-                    <strong>Time:</strong> {{ $reservation->reservation_time }} <br>
-                    <strong>Queue:</strong> {{ $reservation->queue_number }}
-                </div>
-
-                <hr>
-
-                {{-- PAYMENT STATUS --}}
-                <h5 class="fw-bold mb-2">Payment Status</h5>
-
-                @if($reservation->is_paid == 0)
-                    <div class="alert alert-warning p-2">
-                        <strong>Pending:</strong> You haven't submitted your payment.
+                    {{-- HEADER DI DALAM CARD (biar ga misah strip pink) --}}
+                    <div class="payment-header text-center">
+                        <h2 class="payment-header-title">
+                            Complete Your Payment
+                        </h2>
+                        <p class="payment-header-subtitle">
+                            Please finish your payment to confirm your booking.
+                        </p>
                     </div>
-                @elseif($reservation->status === 'waiting_validation')
-                    <div class="alert alert-info p-2">
-                        <strong>Waiting Validation:</strong> Admin will verify your payment shortly.
+
+                    {{-- SUMMARY --}}
+                    <div class="payment-section">
+                        <div class="payment-title">Booking Summary</div>
+
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span class="label">Name</span>
+                                <span class="value">{{ $reservation->name }}</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="label">Treatment</span>
+                                <span class="value">
+                                    {{ ucfirst(str_replace('_',' ',$reservation->treatment_type)) }}
+                                </span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="label">Date</span>
+                                <span class="value">{{ $reservation->reservation_date }}</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="label">Time</span>
+                                <span class="value">{{ $reservation->reservation_time }}</span>
+                            </div>
+
+                            <div class="summary-item" style="grid-column: 1 / -1;">
+                                <span class="label">Queue Number</span>
+                                <span class="value">{{ $reservation->queue_number }}</span>
+                            </div>
+                        </div>
                     </div>
-                @elseif($reservation->status === 'confirmed')
-                    <div class="alert alert-success p-2">
-                        <strong>Confirmed:</strong> Your payment is approved & booking is confirmed!
+
+                    {{-- STATUS --}}
+                    <div class="payment-section">
+                        <div class="payment-title">Payment Status</div>
+
+                        @if($reservation->is_paid == 0)
+                            <div class="status-badge pending">
+                                <div>
+                                    <div class="status-title">Pending</div>
+                                    <div class="status-desc">You haven't submitted your payment.</div>
+                                </div>
+                            </div>
+                        @elseif($reservation->status === 'waiting_validation')
+                            <div class="status-badge waiting">
+                                <div>
+                                    <div class="status-title">Waiting Validation</div>
+                                    <div class="status-desc">Admin will verify your payment shortly.</div>
+                                </div>
+                            </div>
+                        @elseif($reservation->status === 'confirmed')
+                            <div class="status-badge confirmed">
+                                <div>
+                                    <div class="status-title">Confirmed</div>
+                                    <div class="status-desc">Your payment is approved & booking is confirmed!</div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
-                @endif
 
-                <hr>
+                    {{-- PAYMENT METHOD --}}
+                    <div class="payment-section">
+                        <div class="payment-title">Payment Method</div>
 
-                {{-- PAYMENT METHOD --}}
-                <h5 class="fw-bold mb-3">Payment Method</h5>
-                <div class="p-3 bg-white rounded shadow-sm mb-3"
-                     style="border-left: 4px solid #d889a6;">
-                    <strong>Bank Transfer</strong> <br>
-                    <span class="text-muted">Transfer to the account below:</span>
+                        <div class="bank-card">
+                            <div class="bank-header">
+                                <div class="bank-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div>
+                                    <div class="bank-title">Bank Transfer</div>
+                                    <div class="bank-desc">Transfer to the account below:</div>
+                                </div>
+                            </div>
 
-                    <div class="mt-3">
-                        <div class="small text-muted">Account Number</div>
-                        <div class="fw-bold fs-5">1234 5678 9101</div>
-
-                        <div class="small text-muted mt-2">Account Name</div>
-                        <div class="fw-bold">LUXE NAIL STUDIO</div>
-
-                        <div class="small text-muted mt-2">Bank</div>
-                        <div class="fw-bold">BCA</div>
+                            <div class="bank-info">
+                                <div class="bank-row">
+                                    <span class="bank-label">Account Number</span>
+                                    <span class="bank-value">1234 5678 9101</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">Account Name</span>
+                                    <span class="bank-value">LUXE NAIL STUDIO</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">Bank</span>
+                                    <span class="bank-value">BCA</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    {{-- PRICE --}}
+                    <div class="payment-section">
+                        <div class="payment-title">Price Details</div>
+
+                        <div class="price-row">
+                            <span>Booking Fee</span>
+                            <span>Rp {{ number_format($reservation->booking_fee ?? 25000, 0, ',', '.') }}</span>
+                        </div>
+
+                        <div class="price-row">
+                            <span>Service Price</span>
+                            <span>Rp {{ number_format($reservation->total_price, 0, ',', '.') }}</span>
+                        </div>
+
+                        <div class="price-total">
+                            Total: Rp {{ number_format(($reservation->total_price + ($reservation->booking_fee ?? 25000)), 0, ',', '.') }}
+                        </div>
+                    </div>
+
+                    {{-- BUTTON --}}
+                    @if($reservation->status === 'pending')
+                        <button id="payBtn" class="btn-payment">
+                            I Have Transferred
+                        </button>
+
+                        <div class="payment-hint">
+                            After submitting, you MUST download your invoice.
+                        </div>
+                    @else
+                        <div class="payment-done">
+                            Payment already submitted.
+                        </div>
+                    @endif
+
                 </div>
-
-                <hr>
-
-                {{-- TOTAL --}}
-                <h5 class="fw-bold mb-2">Price Details</h5>
-
-                <div class="d-flex justify-content-between small mb-1">
-                    <span>Booking Fee</span>
-                    <span>Rp {{ number_format($reservation->booking_fee ?? 25000, 0, ',', '.') }}</span>
-                </div>
-
-                <div class="d-flex justify-content-between small mb-1">
-                    <span>Service Price</span>
-                    <span>Rp {{ number_format($reservation->total_price, 0, ',', '.') }}</span>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <h4 class="fw-bold m-0" style="color:#d889a6;">
-                        Total: Rp {{ number_format(($reservation->total_price + ($reservation->booking_fee ?? 25000)), 0, ',', '.') }}
-                    </h4>
-                </div>
-
-                {{-- BUTTON --}}
-                @if($reservation->status === 'pending')
-                    <button id="payBtn" class="btn w-100 py-3 fw-bold mt-4"
-                        style="background:#d889a6; color:white; border-radius:10px;">
-                        I Have Transferred
-                    </button>
-
-                    <p class="text-center text-muted mt-3 small">
-                        After submitting, you MUST download your invoice.
-                    </p>
-                @else
-                    <p class="text-center mt-4 fw-bold text-success">
-                        Payment already submitted.
-                    </p>
-                @endif
-
+                {{-- END CARD --}}
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <script>
 document.getElementById("payBtn")?.addEventListener("click", async () => {
@@ -128,7 +171,7 @@ document.getElementById("payBtn")?.addEventListener("click", async () => {
         return;
     }
 
-    // 1. Download PDF invoice
+    // download invoice
     const a = document.createElement("a");
     a.href = data.invoice_url;
     a.download = "";
@@ -136,11 +179,196 @@ document.getElementById("payBtn")?.addEventListener("click", async () => {
     a.click();
     a.remove();
 
-    // 2. Redirect ke thank-you setelah download
     setTimeout(() => {
         window.location.href = data.thank_you_url;
     }, 1500);
 });
 </script>
+@endsection
+@extends('layouts.app')
 
+@section('title', 'Payment')
+
+@section('content')
+<section class="payment-page">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+
+                {{-- SEMUA MASUK KE 1 CARD PUTIH --}}
+                <div class="payment-card">
+
+                    {{-- HEADER DI DALAM CARD (biar ga misah strip pink) --}}
+                    <div class="payment-header text-center">
+                        <h2 class="payment-header-title">
+                            Complete Your Payment
+                        </h2>
+                        <p class="payment-header-subtitle">
+                            Please finish your payment to confirm your booking.
+                        </p>
+                    </div>
+
+                    {{-- SUMMARY --}}
+                    <div class="payment-section">
+                        <div class="payment-title">Booking Summary</div>
+
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span class="label">Name</span>
+                                <span class="value">{{ $reservation->name }}</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="label">Treatment</span>
+                                <span class="value">
+                                    {{ ucfirst(str_replace('_',' ',$reservation->treatment_type)) }}
+                                </span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="label">Date</span>
+                                <span class="value">{{ $reservation->reservation_date }}</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="label">Time</span>
+                                <span class="value">{{ $reservation->reservation_time }}</span>
+                            </div>
+
+                            <div class="summary-item" style="grid-column: 1 / -1;">
+                                <span class="label">Queue Number</span>
+                                <span class="value">{{ $reservation->queue_number }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- STATUS --}}
+                    <div class="payment-section">
+                        <div class="payment-title">Payment Status</div>
+
+                        @if($reservation->is_paid == 0)
+                            <div class="status-badge pending">
+                                <div>
+                                    <div class="status-title">Pending</div>
+                                    <div class="status-desc">You haven't submitted your payment.</div>
+                                </div>
+                            </div>
+                        @elseif($reservation->status === 'waiting_validation')
+                            <div class="status-badge waiting">
+                                <div>
+                                    <div class="status-title">Waiting Validation</div>
+                                    <div class="status-desc">Admin will verify your payment shortly.</div>
+                                </div>
+                            </div>
+                        @elseif($reservation->status === 'confirmed')
+                            <div class="status-badge confirmed">
+                                <div>
+                                    <div class="status-title">Confirmed</div>
+                                    <div class="status-desc">Your payment is approved & booking is confirmed!</div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- PAYMENT METHOD --}}
+                    <div class="payment-section">
+                        <div class="payment-title">Payment Method</div>
+
+                        <div class="bank-card">
+                            <div class="bank-header">
+                                <div class="bank-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div>
+                                    <div class="bank-title">Bank Transfer</div>
+                                    <div class="bank-desc">Transfer to the account below:</div>
+                                </div>
+                            </div>
+
+                            <div class="bank-info">
+                                <div class="bank-row">
+                                    <span class="bank-label">Account Number</span>
+                                    <span class="bank-value">1234 5678 9101</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">Account Name</span>
+                                    <span class="bank-value">LUXE NAIL STUDIO</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">Bank</span>
+                                    <span class="bank-value">BCA</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- PRICE --}}
+                    <div class="payment-section">
+                        <div class="payment-title">Price Details</div>
+
+                        <div class="price-row">
+                            <span>Booking Fee</span>
+                            <span>Rp {{ number_format($reservation->booking_fee ?? 25000, 0, ',', '.') }}</span>
+                        </div>
+
+                        <div class="price-row">
+                            <span>Service Price</span>
+                            <span>Rp {{ number_format($reservation->total_price, 0, ',', '.') }}</span>
+                        </div>
+
+                        <div class="price-total">
+                            Total: Rp {{ number_format(($reservation->total_price + ($reservation->booking_fee ?? 25000)), 0, ',', '.') }}
+                        </div>
+                    </div>
+
+                    {{-- BUTTON --}}
+                    @if($reservation->status === 'pending')
+                        <button id="payBtn" class="btn-payment">
+                            I Have Transferred
+                        </button>
+
+                        <div class="payment-hint">
+                            After submitting, you MUST download your invoice.
+                        </div>
+                    @else
+                        <div class="payment-done">
+                            Payment already submitted.
+                        </div>
+                    @endif
+
+                </div>
+                {{-- END CARD --}}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.getElementById("payBtn")?.addEventListener("click", async () => {
+
+    const response = await fetch("{{ route('payment.paid', $reservation->id) }}", {
+        method: "POST",
+        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+        alert("Error submitting payment.");
+        return;
+    }
+
+    // download invoice
+    const a = document.createElement("a");
+    a.href = data.invoice_url;
+    a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    setTimeout(() => {
+        window.location.href = data.thank_you_url;
+    }, 1500);
+});
+</script>
 @endsection

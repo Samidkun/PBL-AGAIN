@@ -522,3 +522,59 @@
         </div>
     </section>
 @endsection
+
+@section('scripts')
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const track = document.querySelector(".gallery-track");
+    const prevBtn = document.querySelector(".gallery-prev");
+    const nextBtn = document.querySelector(".gallery-next");
+    const items = document.querySelectorAll(".gallery-item");
+    if (!track || items.length === 0) return;
+
+    let index = 0;
+    const gap = 25;
+
+    const getItemWidth = () => items[0].offsetWidth + gap;
+
+    function goTo(i){
+        index = (i + items.length) % items.length;
+        track.style.transform = `translateX(-${index * getItemWidth()}px)`;
+    }
+
+    nextBtn?.addEventListener("click", () => goTo(index + 1));
+    prevBtn?.addEventListener("click", () => goTo(index - 1));
+
+    // drag desktop
+    let startX = 0;
+    let isDown = false;
+
+    track.addEventListener("mousedown", (e) => {
+        isDown = true;
+        startX = e.pageX;
+        track.style.cursor = "grabbing";
+    });
+
+    track.addEventListener("mouseup", (e) => {
+        if(!isDown) return;
+        isDown = false;
+        track.style.cursor = "grab";
+        const diff = e.pageX - startX;
+        if(diff < -50) goTo(index + 1);
+        if(diff > 50) goTo(index - 1);
+    });
+
+    track.addEventListener("mouseleave", () => isDown = false);
+
+    // swipe mobile
+    track.addEventListener("touchstart", (e) => startX = e.touches[0].pageX);
+    track.addEventListener("touchend", (e) => {
+        const diff = e.changedTouches[0].pageX - startX;
+        if(diff < -50) goTo(index + 1);
+        if(diff > 50) goTo(index - 1);
+    });
+
+    window.addEventListener("resize", () => goTo(index));
+});
+</script>
+@endsection
