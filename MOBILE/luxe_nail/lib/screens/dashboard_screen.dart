@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-// Asumsi: Anda sudah membuat file-file ini
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/login_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
@@ -26,16 +25,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Consolidate variable names and initial state
-  DateTime selectedDate = DateTime.now(); // The current filter date
+  DateTime selectedDate = DateTime.now();
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay; // Calendar internal selected day (temp)
+  DateTime? _selectedDay;
 
   List<dynamic> reservations = [];
 
   @override
   void initState() {
     super.initState();
-    // FIX 1: Panggil fungsi yang benar
     fetchReservations();
   }
 
@@ -82,49 +80,178 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // ================================================================
-  // WIDGET CARD RESERVATION (Asumsi ada, perlu diperbaiki)
+  // WIDGET CARD RESERVATION
   // ================================================================
-  // Fungsi placeholder untuk widget card yang dipanggil di build
+
   Widget _reservationCard(
     BuildContext context,
     Map<String, dynamic> res,
     double sW,
     double sH,
   ) {
-    // Implementasi _reservationCard (Asumsi dari kode aslimu)
-    return Card(
-      margin: EdgeInsets.only(bottom: 15 * sH),
-      color: Color(0xFFFFF8F9),
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: ListTile(
-        title: Text(
-          res['name'] ?? 'No Name',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF451A2B),
+    final name = res['name'] ?? 'No Name';
+    final treatment = res['treatment_type'] ?? 'N/A';
+    final timeText = res['reservation_time'] ?? '-';
+
+    DateTime? resDate;
+    try {
+      if (res['reservation_date'] != null) {
+        resDate = DateTime.parse(res['reservation_date']);
+      }
+    } catch (_) {}
+
+    final dateText = DateFormat('d MMMM yyyy').format(resDate ?? selectedDate);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 16 * sH),
+      padding: EdgeInsets.all(16 * sW),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8F9), // soft bg sesuai template kamu
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x1A000000),
+            blurRadius: 8,
+            offset: Offset(0, 4),
           ),
-        ),
-        subtitle: Text(
-          "${res['reservation_time'] ?? '-'} - ${res['treatment_type'] ?? 'N/A'}",
-          style: TextStyle(fontFamily: 'Poppins', color: Color(0xFFAF7C85)),
-        ),
-        trailing: Icon(Icons.arrow_forward_ios, color: Color(0xFFAF7C85)),
-        onTap: () {
-          // Logic detail atau AI Screen
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              // FIX 4: MENGIRIM SEMUA ARGUMENT YANG DIBUTUHKAN AISCREEN
-              builder: (_) => AIScreen(
-                token: widget.token,
-                user: widget.user,
-                reservation: res, // Kirim data reservasi spesifik
+        ],
+        border: Border.all(color: const Color(0xFFFFE1E7), width: 1.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ===== Nama + Chip Treatment =====
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF451A2B),
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFEAEE),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  treatment,
+                  style: const TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFAF7C85),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 12 * sH),
+
+          // ===== Tanggal =====
+          Row(
+            children: [
+              const Icon(
+                Icons.calendar_month,
+                size: 18,
+                color: Color(0xFF975B73),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                dateText,
+                style: const TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF451A2B),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 6 * sH),
+
+          // ===== Jam =====
+          Row(
+            children: [
+              const Icon(Icons.access_time, size: 18, color: Color(0xFF975B73)),
+              const SizedBox(width: 8),
+              Text(
+                timeText,
+                style: const TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF451A2B),
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 14 * sH),
+
+          // ===== Tombol Konfirmasi =====
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AIScreen(
+                    token: widget.token,
+                    user: widget.user,
+                    reservation: res,
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 14 * sH),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                gradient: const LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [Color(0xFFAF7C85), Color(0xFF975B73)],
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x22000000),
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.check, color: Colors.white, size: 18),
+                  SizedBox(width: 8),
+                  Text(
+                    "confirm",
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
@@ -134,10 +261,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // ================================================================
   @override
   Widget build(BuildContext context) {
-    // FIX 2: Definisikan size helpers
-    final sW = MediaQuery.of(context).size.width / 414; // Perkiraan rasio lebar
-    final sH =
-        MediaQuery.of(context).size.height / 896; // Perkiraan rasio tinggi
+    final sW = MediaQuery.of(context).size.width / 414;
+    final sH = MediaQuery.of(context).size.height / 896;
 
     return Scaffold(
       key: scaffoldKey,
@@ -507,11 +632,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.home,
+          Icon(
+            icon, // <-- pake parameter icon, bukan Icons.home terus
             size: 30,
-            color: Color(0xFF975B73),
-          ), // FIX: Gunakan icon yang benar
+            color: const Color(0xFF975B73),
+          ),
           const SizedBox(height: 3),
           Text(
             label,
