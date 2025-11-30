@@ -94,10 +94,18 @@
 
                 {{-- BUTTON --}}
                 @if($reservation->status === 'pending')
-                    <button id="payBtn" class="btn w-100 py-3 fw-bold mt-4"
-                        style="background:#d889a6; color:white; border-radius:10px;">
-                        I Have Transferred
-                    </button>
+                    <form id="paymentForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="fw-bold">Upload Payment Proof</label>
+                            <input type="file" name="payment_proof" class="form-control" required accept="image/*">
+                            <small class="text-muted">Max 2MB (JPG, PNG)</small>
+                        </div>
+
+                        <button type="submit" class="btn w-100 py-3 fw-bold mt-4"
+                            style="background:#d889a6; color:white; border-radius:10px;">
+                            Confirm Payment
+                        </button>
+                    </form>
 
                     <p class="text-center text-muted mt-3 small">
                         After submitting, you MUST download your invoice.
@@ -114,11 +122,14 @@
 </div>
 
 <script>
-document.getElementById("payBtn")?.addEventListener("click", async () => {
+document.getElementById("paymentForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
 
     const response = await fetch("{{ route('payment.paid', $reservation->id) }}", {
         method: "POST",
-        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
+        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+        body: formData
     });
 
     const data = await response.json();

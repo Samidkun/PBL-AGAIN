@@ -66,11 +66,10 @@
         {{-- CAPTCHA --}}
         <div class="card p-4 mb-4">
             <h5>Security Check</h5>
-            <div class="d-flex align-items-center">
-                <span id="captcha_text" class="fw-bold fs-4 me-3"></span>
-                <button type="button" onclick="generateCaptcha()" class="btn btn-secondary btn-sm">Refresh</button>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Hitung: {{ $n1 }} + {{ $n2 }} = ?</label>
+                <input type="number" name="captcha" class="form-control" required placeholder="Jawaban...">
             </div>
-            <input id="captcha_input" type="text" class="form-control mt-3" required>
         </div>
 
         <button class="btn btn-primary w-100 py-2 fs-5">Continue</button>
@@ -85,22 +84,22 @@
 
 <script>
 let captchaText = "";
-
-function generateCaptcha() {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    captchaText = [...Array(5)].map(() => chars[Math.floor(Math.random()*chars.length)]).join("");
-    document.getElementById("captcha_text").innerText = captchaText;
-}
-generateCaptcha();
+// Server-side captcha used instead
 
 // LOAD SLOTS
-document.getElementById("reservationDate").addEventListener("change", loadSlots);
+const dateInput = document.getElementById("reservationDate");
+const treatmentInput = document.querySelector("select[name='treatment_type']");
+
+dateInput.addEventListener("change", loadSlots);
+treatmentInput.addEventListener("change", loadSlots);
 
 function loadSlots() {
-    const date = reservationDate.value;
-    if(!date) return;
+    const date = dateInput.value;
+    const treatment = treatmentInput.value;
 
-    fetch(`/api/v1/calendar/slots?date=${date}`)
+    if(!date || !treatment) return;
+
+    fetch(`/api/v1/calendar/slots?date=${date}&treatment_type=${treatment}`)
         .then(r => r.json())
         .then(res => {
             const c = document.getElementById("timeSlotContainer");
@@ -133,11 +132,7 @@ function initSlotSelectors() {
 bookingForm.addEventListener("submit", async(e)=>{
     e.preventDefault();
 
-    if(captcha_input.value.trim() !== captchaText){
-        Swal.fire("Captcha Salah","Coba lagi.", "error");
-        generateCaptcha();
-        return;
-    }
+    // Captcha validation is now server-side
 
     Swal.fire({
         title:"Booking Confirmation",
