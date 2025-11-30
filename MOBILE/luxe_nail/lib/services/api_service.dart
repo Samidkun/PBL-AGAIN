@@ -55,79 +55,45 @@ class ApiService {
   // ===========================================================================
   // GET RESERVATIONS
   // ===========================================================================
-  static Future<Map<String, dynamic>> getReservations(String token, {String? date}) async {
-    final url = Uri.parse("$baseUrl/api/v1/reservations?date=$date");
+static Future<Map<String, dynamic>> getUserProfile(String token) async {
+  final url = Uri.parse('$baseUrl/api/v1/user');
 
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          ..._headers,
-          "Authorization": "Bearer $token",
-        },
-      );
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        ..._headers,
+        "Authorization": "Bearer $token",
+      },
+    );
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      if (response.body.isNotEmpty) {
         return {
           'success': true,
-          'data': json['data'] ?? [],
+          'data': jsonDecode(response.body),
         };
       } else {
         return {
           'success': false,
-          'message': 'Failed to fetch data (${response.statusCode})',
+          'message': 'Empty response body',
         };
       }
-    } catch (e) {
+    } else {
       return {
         'success': false,
-        'message': 'Connection error: $e',
+        'message': 'Failed to load profile (${response.statusCode})',
+        'statusCode': response.statusCode,
       };
     }
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Connection error: $e',
+    };
   }
+}
 
-  // ===========================================================================
-  // GET USER PROFILE
-  // ===========================================================================
-  static Future<Map<String, dynamic>> getUserProfile(String token) async {
-    final url = Uri.parse('$baseUrl/api/user');
-
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          ..._headers,
-          "Authorization": "Bearer $token",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        if (response.body.isNotEmpty) {
-          return {
-            'success': true,
-            'data': jsonDecode(response.body),
-          };
-        } else {
-          return {
-            'success': false,
-            'message': 'Empty response body',
-          };
-        }
-      } else {
-        return {
-          'success': false,
-          'message': 'Failed to load profile (${response.statusCode})',
-          'statusCode': response.statusCode,
-        };
-      }
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'Connection error: $e',
-      };
-    }
-  }
 
   // ===========================================================================
   // GET CATEGORIES (AI)
@@ -239,4 +205,6 @@ class ApiService {
       };
     }
   }
+
+  static Future<dynamic> getReservations(String token, {required String date}) async {}
 }
