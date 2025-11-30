@@ -1,13 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart'; // PERLU PACKAGE intl
+import 'package:intl/intl.dart';
+import 'package:luxe_nail/services/api_service.dart';
+import 'package:luxe_nail/screens/thankyou_screen.dart';
 
-class AIResultScreen extends StatelessWidget {
-  // === VARIABEL TAMBAHAN UNTUK API CALL ===
-  final String token; 
-  final String imageUrl; 
+class AIResultScreen extends StatefulWidget {
+  final String token;
+  final String imageUrl;
+  final Map<String, dynamic> user;
 
   final String? shape;
   final String? color;
@@ -19,14 +18,15 @@ class AIResultScreen extends StatelessWidget {
   final int priceFinish;
   final int priceAccessory;
 
-  final int totalPrice; // Ini adalah Total Harga Addons + Base Price
+  final int totalPrice;
 
   final Map<String, dynamic>? reservation;
 
   const AIResultScreen({
     super.key,
-    required this.token, // WAJIB DIKIRIM DARI AIScreen.dart
-    required this.imageUrl, 
+    required this.token,
+    required this.imageUrl,
+    required this.user,
     required this.totalPrice,
     required this.priceShape,
     required this.priceColor,
@@ -39,10 +39,49 @@ class AIResultScreen extends StatelessWidget {
     this.reservation,
   });
 
-  // ---------- UI & API HELPERS ----------
+  @override
+  State<AIResultScreen> createState() => _AIResultScreenState();
+}
+
+class _AIResultScreenState extends State<AIResultScreen> {
+  final TextEditingController _cashController = TextEditingController();
+  int _cashAmount = 0;
+  int _changeAmount = 0;
+  String? _errorMessage;
+  String _selectedPaymentMethod = 'cash'; // 'cash' or 'transfer'
+
+  @override
+  void initState() {
+    super.initState();
+    _cashController.addListener(_calculateChange);
+  }
+
+  @override
+  void dispose() {
+    _cashController.dispose();
+    super.dispose();
+  }
+
+  void _calculateChange() {
+    String text = _cashController.text.replaceAll(RegExp(r'[^0-9]'), '');
+    int cash = int.tryParse(text) ?? 0;
+
+    setState(() {
+      _cashAmount = cash;
+      _changeAmount = cash - widget.totalPrice;
+
+      if (cash > 0 && cash < widget.totalPrice) {
+        _errorMessage = "Insufficient cash";
+      } else {
+        _errorMessage = null;
+      }
+    });
+  }
+
   String formatRupiah(dynamic price) {
     int priceInt = int.tryParse(price.toString()) ?? 0;
-    final formatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    final formatter =
+        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     return formatter.format(priceInt);
   }
 
@@ -96,68 +135,65 @@ class AIResultScreen extends StatelessWidget {
       child: child,
     );
   }
-  
-  // ==========================================================
-  // FUNGSI KONFIRMASI PEMBAYARAN (BARU)
-  // ==========================================================
-  Future<void> confirmPayment(BuildContext context) async {
-    final baseUrl = dotenv.env['BASE_URL'];
-    
-    if (reservation == null || baseUrl == null) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Error: Reservation or Base URL missing.")));
-        return;
+
+  Future<void> confirmPayment() async {
+    if (widget.reservation == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Error: Reservation missing.")));
+      return;
     }
 
-    try {
-      final response = await http.post(
-        Uri.parse("$baseUrl/api/v1/income/store"), // <-- ENDPOINT DI LARAVEL
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true",
-        },
-        body: jsonEncode({
-          // Kunci harus match dengan validasi di IncomeController.php store()
-          'reservation_id': reservation!['id'], 
-          
-          'shape': shape,
-          'color': color,
-          'finish': finish,
-          'accessory': accessory,
-          
-          'price_shape': priceShape,
-          'price_color': priceColor,
-          'price_finish': priceFinish,
-          'price_accessory': priceAccessory,
-          
-          'total_price': totalPrice, // Total harga untuk disimpan
-          
-          'ai_image_url': imageUrl, // URL gambar hasil generate
-        }),
+    if (_selectedPaymentMethod == 'cash' && _cashAmount < widget.totalPrice) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("Insufficient cash amount!")),
+      );
+      return;
+    }
+
+    final paymentData = {
+      'reservation_id': widget.reservation!['id'],
+      'shape': widget.shape,
+      'color': widget.color,
+      'finish': widget.finish,
+      'accessory': widget.accessory,
+      'price_shape': widget.priceShape,
+      'price_color': widget.priceColor,
+      'price_finish': widget.priceFinish,
+      'price_accessory': widget.priceAccessory,
+      'total_price': widget.totalPrice,
+      'ai_image_url': widget.imageUrl,
+      'payment_method': _selectedPaymentMethod,
+      'cash_amount': _selectedPaymentMethod == 'cash' ? _cashAmount : 0,
+      'change_amount': _selectedPaymentMethod == 'cash' ? _changeAmount : 0,
+    };
+
+    final result = await ApiService.confirmPayment(widget.token, paymentData);
+
+    if (!mounted) return;
+
+    if (result['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("Pembayaran berhasil dicatat!")),
       );
 
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 && data['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(backgroundColor: Colors.green, content: Text("Pembayaran berhasil dicatat!")),
-        );
-        // Kembali ke layar sebelumnya (AIScreen) atau ke dashboard utama
-        Navigator.popUntil(context, (route) => route.isFirst); 
-
-      } else {
-        String errorMsg = data['message'] ?? "Gagal mencatat pembayaran.";
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: Colors.red, content: Text("Error: $errorMsg")),
-        );
-      }
-    } catch (e) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                ThankYouScreen(token: widget.token, user: widget.user)),
+      );
+    } else {
+      String errorMsg = result['message'] ?? "Gagal mencatat pembayaran.";
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(backgroundColor: Colors.red, content: Text("Koneksi gagal: $e")),
+        SnackBar(
+            backgroundColor: Colors.red, content: Text("Error: $errorMsg")),
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -171,7 +207,7 @@ class AIResultScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "AI Result",
+          "AI Result & Payment",
           style: TextStyle(
             fontFamily: "Poppins",
             fontWeight: FontWeight.w600,
@@ -180,18 +216,15 @@ class AIResultScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-
-      // BODY
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-
-            // ---------- AI IMAGE (URL) ----------
+            // ---------- AI IMAGE ----------
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
-                imageUrl, 
+                widget.imageUrl,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
@@ -200,7 +233,8 @@ class AIResultScreen extends StatelessWidget {
                     width: double.infinity,
                     color: Colors.white,
                     child: const Center(
-                      child: CircularProgressIndicator(color: Color(0xFFAF7C85)),
+                      child:
+                          CircularProgressIndicator(color: Color(0xFFAF7C85)),
                     ),
                   );
                 },
@@ -209,7 +243,9 @@ class AIResultScreen extends StatelessWidget {
                     height: 300,
                     width: double.infinity,
                     color: Colors.grey[200],
-                    child: const Center(child: Text("Gagal memuat gambar", style: TextStyle(color: Colors.red))),
+                    child: const Center(
+                        child: Text("Gagal memuat gambar",
+                            style: TextStyle(color: Colors.red))),
                   );
                 },
               ),
@@ -222,43 +258,9 @@ class AIResultScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _sectionTitle("Customer Information"),
-                  _infoRow("Name", reservation?["name"] ?? "-"),
-                  _infoRow("Phone", reservation?["phone"] ?? "-"),
-                  _infoRow("Address", reservation?["address"] ?? "-"),
-                ],
-              ),
-            ),
-
-            // ---------- RESERVATION INFO ----------
-            _container(
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _sectionTitle("Reservation Info"),
-                  _infoRow(
-                    "Treatment Type",
-                    (reservation?["treatment_type"] == "nail_extension")
-                        ? "Nail Extension"
-                        : "Nail Art",
-                  ),
-                  _infoRow("Queue Number",
-                      reservation?["queue_number"]?.toString() ?? "-"),
-                  _infoRow("Date", reservation?["reservation_date"] ?? "-"),
-                  _infoRow("Time", reservation?["reservation_time"] ?? "-"),
-                ],
-              ),
-            ),
-
-            // ---------- DESIGN DETAILS ----------
-            _container(
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _sectionTitle("Nail Design Details"),
-                  _infoRow("Shape", shape ?? "-"),
-                  _infoRow("Color", color ?? "-"),
-                  _infoRow("Finish", finish ?? "-"),
-                  _infoRow("Accessory", accessory ?? "-"),
+                  _infoRow("Name", widget.reservation?["name"] ?? "-"),
+                  _infoRow("Phone", widget.reservation?["phone"] ?? "-"),
+                  _infoRow("Address", widget.reservation?["address"] ?? "-"),
                 ],
               ),
             ),
@@ -268,15 +270,28 @@ class AIResultScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _sectionTitle("Pricing"),
-
-                  _infoRow("Shape", priceShape > 0 ? formatRupiah(priceShape) : "-"),
-                  _infoRow("Color", priceColor > 0 ? formatRupiah(priceColor) : "-"),
-                  _infoRow("Finish", priceFinish > 0 ? formatRupiah(priceFinish) : "-"),
-                  _infoRow("Accessory", priceAccessory > 0 ? formatRupiah(priceAccessory) : "-"),
-
+                  _sectionTitle("Pricing Details"),
+                  _infoRow(
+                      "Shape (${widget.shape ?? '-'})",
+                      widget.priceShape > 0
+                          ? formatRupiah(widget.priceShape)
+                          : "-"),
+                  _infoRow(
+                      "Color (${widget.color ?? '-'})",
+                      widget.priceColor > 0
+                          ? formatRupiah(widget.priceColor)
+                          : "-"),
+                  _infoRow(
+                      "Finish (${widget.finish ?? '-'})",
+                      widget.priceFinish > 0
+                          ? formatRupiah(widget.priceFinish)
+                          : "-"),
+                  _infoRow(
+                      "Accessory (${widget.accessory ?? '-'})",
+                      widget.priceAccessory > 0
+                          ? formatRupiah(widget.priceAccessory)
+                          : "-"),
                   const Divider(height: 25),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -290,7 +305,7 @@ class AIResultScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        formatRupiah(totalPrice),
+                        formatRupiah(widget.totalPrice),
                         style: const TextStyle(
                           fontFamily: "Poppins",
                           fontWeight: FontWeight.w700,
@@ -304,24 +319,183 @@ class AIResultScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 20),
+            // ---------- PAYMENT METHOD SELECTION ----------
+            _container(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionTitle("Payment Method"),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile<String>(
+                          title: const Text("Cash",
+                              style: TextStyle(fontFamily: "Poppins")),
+                          value: 'cash',
+                          groupValue: _selectedPaymentMethod,
+                          activeColor: const Color(0xFFAF7C85),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedPaymentMethod = value!;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile<String>(
+                          title: const Text("Transfer",
+                              style: TextStyle(fontFamily: "Poppins")),
+                          value: 'transfer',
+                          groupValue: _selectedPaymentMethod,
+                          activeColor: const Color(0xFFAF7C85),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedPaymentMethod = value!;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
 
-            // ---------- KONFIRMASI BUTTON ----------
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFAF7C85),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            // ---------- CASHIER CALCULATOR (ONLY IF CASH) ----------
+            if (_selectedPaymentMethod == 'cash')
+              _container(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle("Cashier Calculator"),
+                    const SizedBox(height: 10),
+
+                    // INPUT CASH
+                    TextField(
+                      controller: _cashController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: "Cash Received (Rp)",
+                        prefixText: "Rp ",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        errorText: _errorMessage,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+
+                    // CHANGE DISPLAY
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Change (Kembalian)",
+                          style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Color(0xFF451A2B),
+                          ),
+                        ),
+                        Text(
+                          formatRupiah(_changeAmount > 0 ? _changeAmount : 0),
+                          style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                            color:
+                                _changeAmount >= 0 ? Colors.green : Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              onPressed: () => confirmPayment(context), // PANGGIL FUNGSI PAYMENT BARU
-              child: const Text(
-                "Confirm Design & Payment",
-                style: TextStyle(
-                  fontFamily: "Poppins",
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+
+            // ---------- BANK DETAILS (ONLY IF TRANSFER) ----------
+            if (_selectedPaymentMethod == 'transfer')
+              _container(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle("Bank Transfer Details"),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.account_balance,
+                                  color: Color(0xFF451A2B), size: 30),
+                              const SizedBox(width: 15),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Bank BCA",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: "Poppins")),
+                                  Text("123 456 7890",
+                                      style: TextStyle(
+                                          fontFamily: "Poppins", fontSize: 16)),
+                                  Text("a.n Luxe Nail Art",
+                                      style: TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontSize: 12,
+                                          color: Colors.grey)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Please transfer the exact amount and show the proof to the cashier.",
+                      style: TextStyle(
+                          fontFamily: "Poppins",
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic),
+                    ),
+                  ],
+                ),
+              ),
+
+            const SizedBox(height: 10),
+
+            // ---------- CONFIRM BUTTON ----------
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFAF7C85),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: (_selectedPaymentMethod == 'transfer' ||
+                        _cashAmount >= widget.totalPrice)
+                    ? confirmPayment
+                    : null,
+                child: const Text(
+                  "Confirm Payment",
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),

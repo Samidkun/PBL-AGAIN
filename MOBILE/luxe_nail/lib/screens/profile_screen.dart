@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:luxe_nail/screens/login_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:luxe_nail/services/api_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String token;
@@ -24,54 +22,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _fetchUserProfile() async {
-    try {
-      final baseUrl = dotenv.env['BASE_URL'] ?? 'http://192.168.1.67:8000';
-      final url = Uri.parse('$baseUrl/api/user');
+    final result = await ApiService.getUserProfile(widget.token);
 
-      final response = await http.get(
-        url,
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer ${widget.token}',
-          // ✅ FIX 1: Menghindari Ngrok warning page (HTML)
-          'ngrok-skip-browser-warning': 'true', 
-        },
-      );
+    if (!mounted) return;
 
-      if (response.statusCode == 200) {
-        // Cek jika response body kosong (meskipun status 200)
-        if (response.body.isNotEmpty) {
-           final data = jsonDecode(response.body);
-            setState(() {
-              user = data;
-              _isLoading = false;
-            });
-        } else {
-            // Menangani kasus 200 OK tapi tanpa body (jarang terjadi di API)
-            setState(() {
-              errorMessage = 'Failed to load profile. Empty response body.';
-              _isLoading = false;
-            });
-        }
-
-      } else if (response.statusCode == 401) {
-        setState(() {
-          errorMessage = 'Session expired. Please log in again.';
-          _isLoading = false;
-        });
+    setState(() {
+      _isLoading = false;
+      if (result['success']) {
+        user = result['data'];
       } else {
-        setState(() {
-          errorMessage =
-              'Failed to load profile. [${response.statusCode}] ${response.reasonPhrase}';
-          _isLoading = false;
-        });
+        errorMessage = result['message'];
+        if (result['statusCode'] == 401) {
+          errorMessage = 'Session expired. Please log in again.';
+        }
       }
-    } catch (e) {
-      setState(() {
-        errorMessage = 'Unexpected error: $e';
-        _isLoading = false;
-      });
-    }
+    });
   }
 
   @override

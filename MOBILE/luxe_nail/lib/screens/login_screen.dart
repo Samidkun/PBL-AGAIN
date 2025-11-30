@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'package:luxe_nail/screens/dashboard_screen.dart';
+import 'package:luxe_nail/services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,45 +17,32 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _login() async {
-  setState(() => _isLoading = true);
+    setState(() => _isLoading = true);
 
-  final baseUrl = dotenv.env['BASE_URL'] ?? 'http://192.168.1.67:8000';
-  final url = Uri.parse('$baseUrl/api/login');
-
-  try {
-    final response = await http.post(
-      url,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
-      },
-      body: jsonEncode({
-        'username': _usernameController.text.trim(), // <-- FIX DISINI
-        'password': _passwordController.text.trim(),
-      }),
+    final result = await ApiService.login(
+      _usernameController.text.trim(),
+      _passwordController.text.trim(),
     );
 
-    final data = jsonDecode(response.body);
+    setState(() => _isLoading = false);
 
-    // ROLE VALIDATION
-    if (response.statusCode == 403) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Hanya Nail Artist yang bisa login di mobile.")),
-      );
+    if (!result['success']) {
+      // Handle specific status codes if needed
+      if (result['statusCode'] == 403) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Hanya Nail Artist yang bisa login di mobile.")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'])),
+        );
+      }
       return;
     }
 
-    if (response.statusCode != 200) {
-      final message = data['message'] ?? 'Login failed';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-      return;
-    }
-
-    if (data['user']['role'] != 'nail_artist') {
+    // Role Check (Double check client side)
+    final user = result['user'];
+    if (user['role'] != 'nail_artist') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Akun ini bukan Nail Artist.")),
       );
@@ -69,23 +56,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     await Future.delayed(const Duration(milliseconds: 300));
 
+    if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => DashboardScreen(
-          token: data['token'],
-          user: data['user'],
+          token: result['token'],
+          user: user,
         ),
       ),
     );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $e')),
-    );
-  } finally {
-    setState(() => _isLoading = false);
   }
-}
 
 
 

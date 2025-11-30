@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
+import 'package:luxe_nail/services/api_service.dart';
 
 // Pastikan import file result screen-mu benar
 import 'ai_result_screen.dart';
@@ -56,26 +55,18 @@ class _AIScreenState extends State<AIScreen> {
   // ==========================================================
   // 1. FETCH CATEGORIES (Ambil data dari Laravel)
   // ==========================================================
+  // ==========================================================
+  // 1. FETCH CATEGORIES (Ambil data dari Laravel)
+  // ==========================================================
   Future<void> fetchCategories() async {
-    final baseUrl = dotenv.env['BASE_URL'];
-    try {
-      final response = await http.get(
-        Uri.parse("$baseUrl/api/v1/categories"),
-        headers: {
-          "Accept": "application/json",
-          "Authorization": "Bearer ${widget.token}",
-          "ngrok-skip-browser-warning": "true",
-        },
-      );
+    final result = await ApiService.getCategories(widget.token);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          categories = data["data"];
-        });
-      }
-    } catch (e) {
-      print("Error fetching categories: $e");
+    if (result['success']) {
+      setState(() {
+        categories = result['data'];
+      });
+    } else {
+      print("Error fetching categories: ${result['message']}");
     }
   }
 
@@ -140,55 +131,42 @@ class _AIScreenState extends State<AIScreen> {
   // ==========================================================
   // 4. GENERATE IMAGE & NAVIGASI (FIXED ERROR 'token')
   // ==========================================================
+  // ==========================================================
+  // 4. GENERATE IMAGE & NAVIGASI (FIXED ERROR 'token')
+  // ==========================================================
   Future<void> generateImage() async {
-  if (!mounted) return; // ✔ FIX build context after async
+    if (!mounted) return; // ✔ FIX build context after async
 
-  if (widget.reservation == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.red,
-        content: Text("Error: No active reservation found."),
-      ),
-    );
-    return;
-  }
+    if (widget.reservation == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("Error: No active reservation found."),
+        ),
+      );
+      return;
+    }
 
-  final prompt = buildPrompt();
-  if (prompt.trim().isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Please select options or input prompt")),
-    );
-    return;
-  }
+    final prompt = buildPrompt();
+    if (prompt.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select options or input prompt")),
+      );
+      return;
+    }
 
-  setState(() => _loading = true);
+    setState(() => _loading = true);
 
-  try {
-    final baseUrl = dotenv.env['BASE_URL'];
-    final url = Uri.parse("$baseUrl/api/v1/ai/generate");
-
-    print("TOKEN USED: ${widget.token}");
-
-    final response = await http.post(
-      url,
-      headers: {
-        "Authorization": "Bearer ${widget.token}",
-        "Accept": "application/json",         // ✔ FIX PALING KRITIS
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true",
-      },
-      body: jsonEncode({
-        "prompt": prompt,
-        "reservation_id": widget.reservation?['id'],
-      }),
+    final result = await ApiService.generateAIImage(
+      widget.token,
+      prompt,
+      widget.reservation?['id'],
     );
 
     if (!mounted) return; // ✔ FIX context
 
-    final data = jsonDecode(response.body);
-
-    if (response.statusCode == 200 && data['success'] == true) {
-      String finalImageUrl = data['image_url'];
+    if (result['success']) {
+      String finalImageUrl = result['image_url'];
 
       var shapeItem = findFullItem('shape', selectedShape);
       var colorItem = findFullItem('color', selectedColor);
@@ -214,6 +192,7 @@ class _AIScreenState extends State<AIScreen> {
         MaterialPageRoute(
           builder: (context) => AIResultScreen(
             token: widget.token,
+            user: widget.user,
             imageUrl: finalImageUrl,
             shape: selectedShape,
             color: selectedColor,
@@ -229,27 +208,13 @@ class _AIScreenState extends State<AIScreen> {
         ),
       );
     } else {
-      String msg = data['message'] ?? "Unknown error occurred";
+      String msg = result['message'] ?? "Unknown error occurred";
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(backgroundColor: Colors.red, content: Text(msg)),
       );
       setState(() => _loading = false);
     }
-  } catch (e) {
-    print("Connection Error: $e");
-
-    if (!mounted) return; // ✔ FIX context
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.red,
-        content: Text("Connection failed: $e"),
-      ),
-    );
-    setState(() => _loading = false);
   }
-}
-
 
   // ==========================================================
   // WIDGET & UI BUILD (Biarkan sama)
