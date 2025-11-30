@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:luxe_nail/screens/dashboard_screen.dart';
 import 'package:luxe_nail/services/api_service.dart';
 

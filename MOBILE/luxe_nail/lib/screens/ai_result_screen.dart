@@ -329,6 +329,7 @@ class _AIResultScreenState extends State<AIResultScreen> {
                     children: [
                       Expanded(
                         child: RadioListTile<String>(
+                          // ignore: deprecated_member_use
                           title: const Text("Cash",
                               style: TextStyle(fontFamily: "Poppins")),
                           value: 'cash',
@@ -343,6 +344,7 @@ class _AIResultScreenState extends State<AIResultScreen> {
                       ),
                       Expanded(
                         child: RadioListTile<String>(
+                          // ignore: deprecated_member_use
                           title: const Text("Transfer",
                               style: TextStyle(fontFamily: "Poppins")),
                           value: 'transfer',
