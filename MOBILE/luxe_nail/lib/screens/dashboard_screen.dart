@@ -50,7 +50,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         reservations = result['data'];
       } else {
         // Handle error silently or show snackbar
-        print("Error fetching reservations: ${result['message']}");
+        // print("Error fetching reservations: ${result['message']}");
         reservations = [];
       }
     });
@@ -350,7 +350,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
+                  color: Colors.green.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.green),
                 ),
@@ -513,7 +513,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     calendarStyle: CalendarStyle(
                       todayDecoration: BoxDecoration(
-                        color: const Color(0xFFAF7C85).withOpacity(0.4),
+                        color: const Color(0xFFAF7C85).withValues(alpha: 0.4),
                         shape: BoxShape.circle,
                       ),
                       selectedDecoration: const BoxDecoration(

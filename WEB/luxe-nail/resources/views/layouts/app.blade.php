@@ -13,7 +13,9 @@
     {{-- Custom CSS --}}
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
-<body>
+
+{{-- ✅ TAMBAH CLASS INI --}}
+<body class="layout-root">
 
 {{-- HEADER --}}
 <header class="luxe-header">
@@ -30,7 +32,6 @@
                 <a class="nav-link" href="#services">Services</a>
                 <a class="nav-link" href="#gallery">Gallery</a>
                 <a class="nav-link" href="#contact">Contact</a>
-                <a class="nav-link" href="{{ route('calendar') }}">Schedule</a>
                 <a class="btn btn-book" href="{{ route('reservations.create') }}">Book Now</a>
                 <a class="btn btn-login-nav" href="{{ route('login') }}">Login</a>
             </nav>
@@ -56,8 +57,7 @@
     </div>
 </header>
 
-{{-- MAIN PAGE CONTENT --}}
-<main>
+<main class="main-content">
     @yield('content')
 </main>
 

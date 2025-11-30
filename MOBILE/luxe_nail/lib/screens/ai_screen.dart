@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:luxe_nail/services/api_service.dart';
 
@@ -55,9 +54,6 @@ class _AIScreenState extends State<AIScreen> {
   // ==========================================================
   // 1. FETCH CATEGORIES (Ambil data dari Laravel)
   // ==========================================================
-  // ==========================================================
-  // 1. FETCH CATEGORIES (Ambil data dari Laravel)
-  // ==========================================================
   Future<void> fetchCategories() async {
     final result = await ApiService.getCategories(widget.token);
 
@@ -66,7 +62,7 @@ class _AIScreenState extends State<AIScreen> {
         categories = result['data'];
       });
     } else {
-      print("Error fetching categories: ${result['message']}");
+      // print("Error fetching categories: ${result['message']}");
     }
   }
 
@@ -91,28 +87,25 @@ class _AIScreenState extends State<AIScreen> {
   // ==========================================================
   // 3. BUILD PROMPT (VERSI NARASI)
   // ==========================================================
-  // Gantikan function buildPrompt() di AIScreen.dart dengan kode ini
-
   String buildPrompt() {
     // 1. START: Gunakan keywords yang kuat dan singkat untuk pembukaan
     String prompt = "Macro photo, professional nail art design. ";
 
     // 2. SPESIFIKASI: Gunakan format KEY: VALUE
     if (selectedShape != null) {
-      // Kita hilangkan kata "The nail shape must be strictly"
-      prompt += "Shape: ${selectedShape}. ";
+      prompt += "Shape: $selectedShape. ";
     }
 
     if (selectedColor != null) {
-      prompt += "Color: ${selectedColor}. ";
+      prompt += "Color: $selectedColor. ";
     }
 
     if (selectedFinish != null) {
-      prompt += "Finish: ${selectedFinish}. ";
+      prompt += "Finish: $selectedFinish. ";
     }
 
     if (selectedAccessory != null) {
-      prompt += "Accessory: ${selectedAccessory}. ";
+      prompt += "Accessory: $selectedAccessory. ";
     }
 
     // 3. CUSTOM PROMPT
@@ -123,19 +116,16 @@ class _AIScreenState extends State<AIScreen> {
     // 4. KUALITAS: Gunakan koma untuk mempersingkat booster
     prompt += "Photorealistic, high detail, 8k, cinematic lighting, elegant.";
 
-    print("SENDING PROMPT (Optimized): $prompt");
+    // print("SENDING PROMPT (Optimized): $prompt");
 
     return prompt;
   }
 
   // ==========================================================
-  // 4. GENERATE IMAGE & NAVIGASI (FIXED ERROR 'token')
-  // ==========================================================
-  // ==========================================================
-  // 4. GENERATE IMAGE & NAVIGASI (FIXED ERROR 'token')
+  // 4. GENERATE IMAGE & NAVIGASI
   // ==========================================================
   Future<void> generateImage() async {
-    if (!mounted) return; // ✔ FIX build context after async
+    if (!mounted) return;
 
     if (widget.reservation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -157,13 +147,14 @@ class _AIScreenState extends State<AIScreen> {
 
     setState(() => _loading = true);
 
+    // Use ApiService instead of direct HTTP call
     final result = await ApiService.generateAIImage(
       widget.token,
       prompt,
       widget.reservation?['id'],
     );
 
-    if (!mounted) return; // ✔ FIX context
+    if (!mounted) return;
 
     if (result['success']) {
       String finalImageUrl = result['image_url'];
@@ -182,8 +173,6 @@ class _AIScreenState extends State<AIScreen> {
           int.tryParse(widget.reservation?['price'].toString() ?? '0') ?? 0;
 
       int grandTotal = basePrice + pShape + pColor + pFinish + pAccessory;
-
-      if (!mounted) return; // ✔ FIX context
 
       setState(() => _loading = false);
 
@@ -217,7 +206,7 @@ class _AIScreenState extends State<AIScreen> {
   }
 
   // ==========================================================
-  // WIDGET & UI BUILD (Biarkan sama)
+  // WIDGET & UI BUILD
   // ==========================================================
   Widget optionButton(
     String label,

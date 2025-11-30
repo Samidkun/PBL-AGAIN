@@ -3,24 +3,32 @@
 @section('title', 'Thank You')
 
 @section('content')
-<div class="container py-5 text-center">
+<section class="thankyou-page">
+    <div class="container">
+        <div class="thankyou-wrap">
+            
+            <div class="thankyou-card">
+                <div class="thankyou-icon">
+                    <i class="fas fa-hand-sparkles luxe-icon"></i>
+                </div>
 
-    <img src="{{ asset('img/luxe-nail-1.png') }}" width="120" class="mb-4">
+                <h2 class="thankyou-title">
+                    Thank You for Your Booking!
+                </h2>
 
-    <h2 class="fw-bold" style="font-family: 'Playfair Display', serif;">
-        Thank You for Your Booking!
-    </h2>
+                <p class="thankyou-subtitle">
+                    Your booking request has been received.<br>
+                    We will confirm your payment soon.
+                </p>
 
-    <p class="text-muted mb-4">
-        Your booking request has been received.
-        We will confirm your payment soon.
-    </p>
+                <div class="thankyou-actions">
+                    <a href="{{ route('home') }}" class="btn btn-home">
+                        Back to Home
+                    </a>
+                </div>
+            </div>
 
-    <a href="{{ route('home') }}"
-       class="btn btn-primary px-4 py-3"
-       style="background:#d889a6; border:none; border-radius:12px;">
-       Back to Home
-    </a>
-
-</div>
+        </div>
+    </div>
+</section>
 @endsection

@@ -96,6 +96,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('kategori', CategoryController::class);
 });
 
+
 // ======================
 // ADMIN DASHBOARD (RESERVATIONS)
 // ======================

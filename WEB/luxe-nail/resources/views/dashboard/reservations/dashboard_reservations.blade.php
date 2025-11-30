@@ -63,8 +63,8 @@
     <div class="reservation-list-section">
         <div class="reservation-stats">
             <div class="stat-card">
-                <h3 id="pendingCount">0</h3>
-                <span>Pending</span>
+                <h3 id="waitingValidationCount">0</h3>
+                <span>Waiting Validation</span>
             </div>
             <div class="stat-card">
                 <h3 id="confirmedCount">0</h3>
@@ -173,6 +173,100 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initialize();
 
+    const datePickerBtn  = document.getElementById("datePickerBtn");
+const calendarPopup  = document.getElementById("calendarPopup");
+const calendarGrid   = document.getElementById("calendarGrid");
+const calendarMonth  = document.getElementById("calendarMonth");
+const prevMonthBtn   = document.getElementById("prevMonth");
+const nextMonthBtn   = document.getElementById("nextMonth");
+
+let currentMonth = new Date();
+currentMonth.setDate(1);
+
+datePickerBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    calendarPopup.classList.toggle("show");
+    renderCalendar();
+});
+
+document.addEventListener("click", (e) => {
+    if (!calendarPopup.contains(e.target) && !datePickerBtn.contains(e.target)) {
+        calendarPopup.classList.remove("show");
+    }
+});
+
+prevMonthBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    currentMonth.setMonth(currentMonth.getMonth() - 1);
+    renderCalendar();
+});
+nextMonthBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    currentMonth.setMonth(currentMonth.getMonth() + 1);
+    renderCalendar();
+});
+
+function renderCalendar() {
+    const year  = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+
+    const monthName = currentMonth.toLocaleString("default", { month: "long" });
+    calendarMonth.textContent = `${monthName} ${year}`;
+
+    calendarGrid.innerHTML = "";
+
+    const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    dayNames.forEach(d => {
+        const el = document.createElement("div");
+        el.className = "calendar-day other-month";
+        el.style.fontWeight = "700";
+        el.textContent = d;
+        calendarGrid.appendChild(el);
+    });
+
+    const firstDay = new Date(year, month, 1);
+    const startDayIndex = firstDay.getDay();
+
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+
+    for (let i = 0; i < startDayIndex; i++) {
+        const el = document.createElement("div");
+        el.className = "calendar-day other-month";
+        el.textContent = "";
+        calendarGrid.appendChild(el);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const el = document.createElement("div");
+        el.className = "calendar-day";
+        el.textContent = day;
+
+        const dateStr = formatDate(year, month + 1, day);
+
+        if (dateStr === selectedDate) {
+            el.classList.add("selected");
+        }
+
+        el.addEventListener("click", (e) => {
+            e.stopPropagation();
+            selectedDate = dateStr;
+            document.getElementById("selectedDate").textContent = selectedDate;
+            calendarPopup.classList.remove("show");
+            loadReservationsForDate(selectedDate);
+            renderCalendar();
+        });
+
+        calendarGrid.appendChild(el);
+    }
+}
+
+function formatDate(y, m, d) {
+    const mm = String(m).padStart(2, "0");
+    const dd = String(d).padStart(2, "0");
+    return `${y}-${mm}-${dd}`;
+}
+
 
     // =======================================================================================
     // LOAD RESERVATIONS
@@ -186,13 +280,33 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         fetch(`/dashboard/reservations/date/${date}`)
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    updateReservationTable(data.reservations);
-                    updateStats(data.reservations);
-                }
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+
+            const priority = {
+                waiting_validation: 1,
+                confirmed: 2,
+                completed: 4,
+                cancelled: 5
+            };
+
+            const sortedReservations = data.reservations.sort((a, b) => {
+                const pa = priority[a.status] ?? 999;
+                const pb = priority[b.status] ?? 999;
+
+                if (pa !== pb) return pa - pb;
+
+                const ta = `${a.reservation_date} ${a.reservation_time}`;
+                const tb = `${b.reservation_date} ${b.reservation_time}`;
+                return ta.localeCompare(tb);
             });
+
+            updateReservationTable(sortedReservations);
+            updateStats(sortedReservations);
+        }
+    });
+
     }
 
 
@@ -242,11 +356,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }
 
-            // confirmed
-            if (r.status === "confirmed") {
-                actions += `<button class="btn-action btn-primary" onclick="setStatus(${r.id}, 'completed', 'Mark as completed?')">Completed</button>`;
-            }
-
             // edit allowed except completed/cancel
             if (r.status !== "cancelled" && r.status !== "completed") {
                 actions += `<button class="btn-action btn-edit" onclick="editReservation(${r.id})">Edit</button>`;
@@ -260,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${r.treatment_type}</td>
                     <td>${r.reservation_date} ${r.reservation_time}</td>
                     <td>${badge(r.status)}</td>
-                    <td>${actions}</td>
+                    <td><div class="actions-container">${actions}</div></td>
                 </tr>
             `;
         }).join('');
@@ -272,8 +381,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // =======================================================================================
 
     function updateStats(data) {
-        document.getElementById('pendingCount').textContent =
-            data.filter(r => r.status === "pending").length;
+        document.getElementById('waitingValidationCount').textContent =
+        data.filter(r => r.status === "waiting_validation").length;
 
         document.getElementById('confirmedCount').textContent =
             data.filter(r => r.status === "confirmed").length;
@@ -281,8 +390,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('cancelledCount').textContent =
             data.filter(r => r.status === "cancelled").length;
 
-        document.getElementById('completedCount').textContent =
-            data.filter(r => r.status === "completed").length;
     }
 
 
