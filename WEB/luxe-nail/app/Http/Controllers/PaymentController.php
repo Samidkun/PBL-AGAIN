@@ -22,7 +22,16 @@ class PaymentController extends Controller
     // =================================================
     public function markPaid(Request $request, $id)
     {
+        $request->validate([
+            'payment_proof' => 'required|image|max:2048' // Max 2MB
+        ]);
+
         $reservation = Reservation::findOrFail($id);
+
+        if ($request->hasFile('payment_proof')) {
+            $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+            $reservation->payment_proof = $path;
+        }
 
         $reservation->is_paid = 1;
         $reservation->payment_method = "bank_transfer";
@@ -32,6 +41,7 @@ class PaymentController extends Controller
         return response()->json([
             'success' => true,
             'invoice_url' => route('payment.invoice', $reservation->queue_number),
+            'thank_you_url' => route('reservations.thank-you', ['queue_number' => $reservation->queue_number]),
         ]);
     }
 

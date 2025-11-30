@@ -22,6 +22,7 @@ class TreatmentTypeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'duration' => 'required|integer|min:1',
             'description' => 'nullable|string',
             'order' => 'nullable|integer'
         ]);
@@ -41,6 +42,7 @@ class TreatmentTypeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'duration' => 'required|integer|min:1',
             'description' => 'nullable|string',
             'order' => 'nullable|integer'
         ]);

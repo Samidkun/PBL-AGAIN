@@ -304,8 +304,8 @@ class CategoryController extends Controller
     public function ajaxDestroy(Category $category)
     {
         try {
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image);
+            if ($category->image && file_exists(public_path($category->image))) {
+                unlink(public_path($category->image));
             }
 
             $category->delete();
