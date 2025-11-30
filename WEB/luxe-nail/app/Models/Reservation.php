@@ -23,6 +23,11 @@ class Reservation extends Model
         'booking_fee',
         'total_price',
         'payment_method',
-        'payment_proof'
+        'payment_proof',
+        'end_time'
     ];
+    public function income()
+    {
+        return $this->hasOne(Income::class);
+    }
 }

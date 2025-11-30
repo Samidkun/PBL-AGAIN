@@ -9,7 +9,7 @@ class TreatmentType extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'order', 'is_active'];
+    protected $fillable = ['name', 'description', 'order', 'is_active', 'duration'];
 
     protected $casts = [
         'is_active' => 'boolean'
