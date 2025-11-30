@@ -9,22 +9,24 @@ return new class extends Migration
     public function up()
     {
         Schema::table('reservations', function (Blueprint $table) {
-
-            // payment
-            $table->decimal('total_price', 12, 2)->default(0)->after('status');
-            $table->boolean('is_paid')->default(0)->after('total_price');
-
-            // booking fee (kalau dipakai nanti)
-            $table->decimal('booking_fee', 12, 2)->default(25000)->after('is_paid');
-
-            // payment method (optional)
-            $table->string('payment_method')->nullable()->after('booking_fee');
-
-            // payment proof (optional, kalau mau upload)
-            $table->string('payment_proof')->nullable()->after('payment_method');
-
-            // receipt
-            $table->boolean('has_downloaded_receipt')->default(0)->after('payment_proof');
+            if (!Schema::hasColumn('reservations', 'total_price')) {
+                $table->decimal('total_price', 12, 2)->default(0)->after('status');
+            }
+            if (!Schema::hasColumn('reservations', 'is_paid')) {
+                $table->boolean('is_paid')->default(0)->after('total_price');
+            }
+            if (!Schema::hasColumn('reservations', 'booking_fee')) {
+                $table->decimal('booking_fee', 12, 2)->default(25000)->after('is_paid');
+            }
+            if (!Schema::hasColumn('reservations', 'payment_method')) {
+                $table->string('payment_method')->nullable()->after('booking_fee');
+            }
+            if (!Schema::hasColumn('reservations', 'payment_proof')) {
+                $table->string('payment_proof')->nullable()->after('payment_method');
+            }
+            if (!Schema::hasColumn('reservations', 'has_downloaded_receipt')) {
+                $table->boolean('has_downloaded_receipt')->default(0)->after('payment_proof');
+            }
         });
     }
 

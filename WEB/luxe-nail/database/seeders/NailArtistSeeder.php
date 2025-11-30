@@ -10,16 +10,27 @@ class NailArtistSeeder extends Seeder
     public function run()
     {
         $artists = [
-            'Nail Artist A',
-            'Nail Artist B',
-            'Nail Artist C',
-            'Nail Artist D',
+            ['name' => 'Nail Artist A', 'username' => 'artist1'],
+            ['name' => 'Nail Artist B', 'username' => 'artist2'],
+            ['name' => 'Nail Artist C', 'username' => 'artist3'],
+            ['name' => 'Nail Artist D', 'username' => 'artist4'],
         ];
 
-        foreach ($artists as $name) {
+        foreach ($artists as $data) {
+            // 1. Create User
+            $user = \App\Models\User::create([
+                'name'     => $data['name'],
+                'username' => $data['username'],
+                'email'    => $data['username'] . '@luxenail.com',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'role'     => 'nail_artist',
+            ]);
+
+            // 2. Create Nail Artist linked to User
             NailArtist::create([
-                'name' => $name,
-                'status' => 'available',
+                'user_id'         => $user->id,
+                'name'            => $data['name'],
+                'status'          => 'available',
                 'customers_today' => 0
             ]);
         }

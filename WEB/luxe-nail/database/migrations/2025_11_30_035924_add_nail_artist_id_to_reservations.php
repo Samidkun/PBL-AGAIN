@@ -6,22 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        Schema::create('nail_artists', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-
-            // available / busy / break
-            $table->enum('status', ['available', 'busy', 'break'])->default('available');
-
-            // hitungan salary harian
-            $table->integer('customers_today')->default(0);
-
-            $table->timestamps();
-        });
-
-        // Tambahkan kolom nail_artist_id ke reservations
         Schema::table('reservations', function (Blueprint $table) {
             $table->unsignedBigInteger('nail_artist_id')->nullable()->after('id');
 
@@ -32,13 +21,14 @@ return new class extends Migration
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        Schema::dropIfExists('nail_artists');
-
         Schema::table('reservations', function (Blueprint $table) {
+            $table->dropForeign(['nail_artist_id']);
             $table->dropColumn('nail_artist_id');
         });
     }
-}
-;
+};
