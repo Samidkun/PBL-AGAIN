@@ -6,7 +6,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:luxe_nail/screens/ai_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 
-
 class ProfileScreen extends StatefulWidget {
   final String token;
   const ProfileScreen({super.key, required this.token});
@@ -76,95 +75,94 @@ class _ProfileScreenState extends State<ProfileScreen> {
 // ================================================================
 // BOTTOM NAVBAR (VERSI BISA DIKLIK)
 // ================================================================
-Widget _bottomNavbar(BuildContext context) {
-  return Container(
-    height: 90,
-    decoration: const BoxDecoration(
-      color: Color(0xFFFFF8F9),
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(27),
-        topRight: Radius.circular(27),
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: Color(0x3F000000),
-          blurRadius: 9,
-          offset: Offset(5, -4),
+  Widget _bottomNavbar(BuildContext context) {
+    return Container(
+      height: 90,
+      decoration: const BoxDecoration(
+        color: Color(0xFFFFF8F9),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(27),
+          topRight: Radius.circular(27),
         ),
-      ],
-    ),
-    padding: const EdgeInsets.symmetric(horizontal: 40),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // HOME -> balik ke halaman sebelumnya (biasanya Dashboard)
-        _navItem(Icons.home, "Home", () {
-          Navigator.pop(context);
-        }),
-
-        // AI -> kirim token + user yg baru saja di-fetch di Profile
-        _navItem(Icons.auto_awesome, "AI", () {
-          if (user == null) return; // jaga2 kalau datanya belum ke-load
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => AIScreen(
-                token: widget.token,
-                user: user!,          // <-- pakai variabel user di Profile
-                reservation: null,
-              ),
-            ),
-          );
-        }),
-
-        // GALLERY
-        _navItem(Icons.photo_album, "Gallery", () {
-          if (user == null) return;
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => GalleryScreen(
-                token: widget.token,
-                user: user!,
-              ),
-            ),
-          );
-        }),
-
-        // PROFILE -> lagi di halaman ini, jadi nggak perlu ngapa2in
-        _navItem(Icons.person, "Profile", () {
-          // bisa dikosongin atau Navigator.popUntil kalau mau
-        }),
-      ],
-    ),
-  );
-}
-
-Widget _navItem(IconData icon, String label, VoidCallback onTap) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          size: 30,
-          color: const Color(0xFF975B73),
-        ),
-        const SizedBox(height: 3),
-        Text(
-          label,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 11,
-            color: Color(0xFFCEA8BC),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x3F000000),
+            blurRadius: 9,
+            offset: Offset(5, -4),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // HOME -> balik ke halaman sebelumnya (biasanya Dashboard)
+          _navItem(Icons.home, "Home", () {
+            Navigator.pop(context);
+          }),
 
+          // AI -> kirim token + user yg baru saja di-fetch di Profile
+          _navItem(Icons.auto_awesome, "AI", () {
+            if (user == null) return; // jaga2 kalau datanya belum ke-load
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AIScreen(
+                  token: widget.token,
+                  user: user!, // <-- pakai variabel user di Profile
+                  reservation: null,
+                ),
+              ),
+            );
+          }),
+
+          // GALLERY
+          _navItem(Icons.photo_album, "Gallery", () {
+            if (user == null) return;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => GalleryScreen(
+                  token: widget.token,
+                  user: user!,
+                ),
+              ),
+            );
+          }),
+
+          // PROFILE -> lagi di halaman ini, jadi nggak perlu ngapa2in
+          _navItem(Icons.person, "Profile", () {
+            // bisa dikosongin atau Navigator.popUntil kalau mau
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _navItem(IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 30,
+            color: const Color(0xFF975B73),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 11,
+              color: Color(0xFFCEA8BC),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -249,7 +247,8 @@ Widget _navItem(IconData icon, String label, VoidCallback onTap) {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFD87A87).withOpacity(0.25),
+                              color: const Color(0xFFD87A87)
+                                  .withValues(alpha: 0.25),
                               blurRadius: 40,
                               offset: const Offset(0, 10),
                             ),
@@ -280,7 +279,8 @@ Widget _navItem(IconData icon, String label, VoidCallback onTap) {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF451A2B).withOpacity(0.3),
+                                        color: const Color(0xFF451A2B)
+                                            .withValues(alpha: 0.3),
                                         blurRadius: 24,
                                         offset: const Offset(0, 8),
                                       ),
@@ -312,7 +312,8 @@ Widget _navItem(IconData icon, String label, VoidCallback onTap) {
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.15),
+                                          color: Colors.black
+                                              .withValues(alpha: 0.15),
                                           blurRadius: 12,
                                           offset: const Offset(0, 4),
                                         ),
@@ -360,7 +361,7 @@ Widget _navItem(IconData icon, String label, VoidCallback onTap) {
                                     fontSize: 15,
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w500,
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Colors.white.withValues(alpha: 0.9),
                                   ),
                                 ),
                               ],
@@ -375,7 +376,7 @@ Widget _navItem(IconData icon, String label, VoidCallback onTap) {
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -421,7 +422,8 @@ Widget _navItem(IconData icon, String label, VoidCallback onTap) {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFD87A87).withOpacity(0.15),
+                                color: const Color(0xFFD87A87)
+                                    .withValues(alpha: 0.15),
                                 blurRadius: 40,
                                 offset: const Offset(0, 10),
                               ),
@@ -449,9 +451,7 @@ Widget _navItem(IconData icon, String label, VoidCallback onTap) {
                                   ),
                                 ],
                               ),
-
                               const SizedBox(height: 24),
-
                               _buildInfoRow("Email", user?['email'] ?? "-"),
                               const SizedBox(height: 16),
                               _buildInfoRow("Role", user?['role'] ?? "-"),
@@ -481,7 +481,8 @@ Widget _navItem(IconData icon, String label, VoidCallback onTap) {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFEE9CA7).withOpacity(0.4),
+                                  color: const Color(0xFFEE9CA7)
+                                      .withValues(alpha: 0.4),
                                   blurRadius: 20,
                                   offset: const Offset(0, 8),
                                 ),

@@ -27,10 +27,13 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!result['success']) {
       // Handle specific status codes if needed
       if (result['statusCode'] == 403) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Hanya Nail Artist yang bisa login di mobile.")),
+          const SnackBar(
+              content: Text("Hanya Nail Artist yang bisa login di mobile.")),
         );
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result['message'])),
         );
@@ -41,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // Role Check (Double check client side)
     final user = result['user'];
     if (user['role'] != 'nail_artist') {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Akun ini bukan Nail Artist.")),
       );
@@ -48,6 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     // SUCCESS
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Login successful!')),
     );
@@ -66,8 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {

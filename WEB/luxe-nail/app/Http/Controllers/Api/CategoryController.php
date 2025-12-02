@@ -4,20 +4,25 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Http\Resources\CategoryResource;
 
 class CategoryController extends Controller
 {
     public function index()
     {
+        // ambil aktif lalu group by type
         $categories = Category::where('is_active', 1)
             ->orderBy('order')
             ->get()
             ->groupBy('type');
 
+        $data = $categories->map(function($items) {
+            return CategoryResource::collection($items)->toArray(request());
+        })->toArray();
+
         return response()->json([
             'success' => true,
-            'data' => $categories
+            'data'    => $data
         ]);
     }
 
@@ -37,7 +42,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $items
+            'data'    => CategoryResource::collection($items)->toArray(request())
         ]);
     }
 
@@ -54,7 +59,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $category
+            'data' => new CategoryResource($category)
         ]);
     }
 }

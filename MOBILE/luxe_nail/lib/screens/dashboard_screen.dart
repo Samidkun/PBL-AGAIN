@@ -87,6 +87,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _finishJob(int reservationId) async {
     final result = await ApiService.finishJob(widget.token, reservationId);
     if (result['success']) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Job marked as completed!")),
       );
@@ -265,7 +266,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),

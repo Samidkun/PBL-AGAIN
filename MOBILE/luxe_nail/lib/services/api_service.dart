@@ -71,15 +71,15 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
+        final data = jsonDecode(response.body);
         return {
           'success': true,
-          'data': json['data'] ?? [],
+          'data': data['data'],
         };
       } else {
         return {
           'success': false,
-          'message': 'Failed to fetch data (${response.statusCode})',
+          'message': 'Failed to load reservations (${response.statusCode})',
         };
       }
     } catch (e) {

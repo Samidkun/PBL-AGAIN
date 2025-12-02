@@ -333,8 +333,10 @@ class _AIResultScreenState extends State<AIResultScreen> {
                           title: const Text("Cash",
                               style: TextStyle(fontFamily: "Poppins")),
                           value: 'cash',
+                          // ignore: deprecated_member_use
                           groupValue: _selectedPaymentMethod,
                           activeColor: const Color(0xFFAF7C85),
+                          // ignore: deprecated_member_use
                           onChanged: (value) {
                             setState(() {
                               _selectedPaymentMethod = value!;
@@ -348,8 +350,10 @@ class _AIResultScreenState extends State<AIResultScreen> {
                           title: const Text("Transfer",
                               style: TextStyle(fontFamily: "Poppins")),
                           value: 'transfer',
+                          // ignore: deprecated_member_use
                           groupValue: _selectedPaymentMethod,
                           activeColor: const Color(0xFFAF7C85),
+                          // ignore: deprecated_member_use
                           onChanged: (value) {
                             setState(() {
                               _selectedPaymentMethod = value!;

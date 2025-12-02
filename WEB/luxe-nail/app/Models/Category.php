@@ -25,7 +25,6 @@ class Category extends Model
         'is_active' => 'boolean'
     ];
 
-    // AUTO GENERATE CODE
     protected static function boot()
     {
         parent::boot();
@@ -37,47 +36,35 @@ class Category extends Model
         });
     }
 
-    // Method untuk generate kode otomatis
-public static function generateCode($type)
-{
-    // Tentukan prefix berdasarkan type kategori
-    $prefix = match($type) {
-        'shape'     => 'SH',
-        'color'     => 'CL',
-        'finish'    => 'FN',
-        'accessory' => 'AC',
-        default     => 'CT'
-    };
+    public static function generateCode($type)
+    {
+        $prefix = match($type) {
+            'shape'     => 'SH',
+            'color'     => 'CL',
+            'finish'    => 'FN',
+            'accessory' => 'AC',
+            default     => 'CT'
+        };
 
-    // Cari kode terakhir berdasarkan prefix
-    $last = self::where('code', 'like', $prefix . '%')
-                ->orderBy('id', 'desc')
-                ->first();
+        $last = self::where('code', 'like', $prefix . '%')
+                    ->orderBy('id', 'desc')
+                    ->first();
 
-    if (!$last) {
-        $number = 1;
-    } else {
-        // Ambil angka setelah prefix, misal SH012 → 12
-        $number = intval(substr($last->code, strlen($prefix))) + 1;
+        $number = $last ? intval(substr($last->code, strlen($prefix))) + 1 : 1;
+
+        return $prefix . str_pad($number, 3, '0', STR_PAD_LEFT);
     }
 
-    return $prefix . str_pad($number, 3, '0', STR_PAD_LEFT);
-}
-
-
-    // Accessor untuk format price
     public function getFormattedPriceAttribute()
     {
         return 'Rp ' . number_format($this->price, 0, ',', '.');
     }
 
-    // Relationship
     public function treatmentType()
     {
         return $this->belongsTo(TreatmentType::class);
     }
 
-    // Scopes
     public function scopeByType($query, $type)
     {
         return $query->where('type', $type);
@@ -91,5 +78,22 @@ public static function generateCode($type)
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        // Lokasi gambar kategori yang benar
+        return asset('img/kategori/' . $this->image);
+    }
+
+    public function galleries()
+    {
+        return $this->hasMany(Gallery::class, 'category_id');
     }
 }
