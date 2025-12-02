@@ -149,6 +149,17 @@
 
                 <div class="form-group-custom">
                     <label>
+                        <i class="bi bi-person-badge"></i> Username
+                    </label>
+                    <input type="text" 
+                           name="username" 
+                           class="form-control form-control-custom" 
+                           placeholder="Enter username"
+                           required>
+                </div>
+
+                <div class="form-group-custom">
+                    <label>
                         <i class="bi bi-envelope"></i> Email Address
                     </label>
                     <input type="email" 

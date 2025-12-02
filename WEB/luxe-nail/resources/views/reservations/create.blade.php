@@ -25,29 +25,25 @@
                         @csrf
 
                         {{-- CUSTOMER --}}
-                        <div class="form-section mb-4">
-                            <h5 class="form-section-title">Customer Information</h5>
-
+                        <div class="card p-4 mb-4">
+                            <h5>Customer Information</h5>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Full Name</label>
+                                    <label>Full Name</label>
                                     <input type="text" name="name" class="form-control" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Phone Number</label>
+                                    <label>Phone Number</label>
                                     <input type="text" name="phone" class="form-control" required>
                                 </div>
                             </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Address</label>
-                                <textarea name="address" rows="3" class="form-control" required></textarea>
-                            </div>
+                            <label>Address</label>
+                            <textarea name="address" rows="2" class="form-control" required></textarea>
                         </div>
 
                         {{-- TREATMENT --}}
-                        <div class="form-section mb-4">
-                            <h5 class="form-section-title">Treatment Type</h5>
+                        <div class="card p-4 mb-4">
+                            <h5>Treatment</h5>
                             <select name="treatment_type" class="form-select" required>
                                 <option value="">Select Treatment</option>
                                 <option value="nail_extension">Nail Extension</option>
@@ -56,44 +52,33 @@
                         </div>
 
                         {{-- DATE --}}
-                        <div class="form-section mb-4">
-                            <h5 class="form-section-title">Pick a Date</h5>
-                            <input
-                                type="date"
-                                id="reservationDate"
-                                name="reservation_date"
-                                min="{{ date('Y-m-d') }}"
-                                class="form-control"
-                                required
-                            >
+                        <div class="card p-4 mb-4">
+                            <h5>Pick a Date</h5>
+                            <input type="date" id="reservationDate" name="reservation_date"
+                                min="{{ date('Y-m-d') }}" class="form-control" required>
                         </div>
 
                         {{-- SLOTS --}}
-                        <div class="form-section mb-4">
-                            <h5 class="form-section-title">Available Time Slots</h5>
+                        <div class="card p-4 mb-4">
+                            <h5>Available Time Slots</h5>
 
-                            <div id="timeSlotContainer" class="row g-2"></div>
+                            <div id="timeSlotContainer" class="row"></div>
 
-                            {{-- hidden input tetap --}}
                             <input type="hidden" id="selectedTimeInput" name="reservation_time" required>
                         </div>
 
                         {{-- CAPTCHA --}}
-                        <div class="form-section mb-4">
-                            <h5 class="form-section-title">Security Check</h5>
-
-                            <div class="captcha-box mb-3">
-                                <span id="captcha_text" class="captcha-text"></span>
-                                <button type="button" onclick="generateCaptcha()" class="btn btn-captcha">
-                                    <i class="fas fa-rotate-right me-1"></i> Refresh
-                                </button>
+                        <div class="card p-4 mb-4">
+                            <h5>Security Check</h5>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Hitung: {{ $n1 }} + {{ $n2 }} = ?</label>
+                                <input type="number" name="captcha" class="form-control" required placeholder="Jawaban...">
                             </div>
-
-                            <input id="captcha_input" type="text" class="form-control" placeholder="Type captcha here" required>
                         </div>
 
-                        <button class="btn btn-submit mt-2">Continue</button>
+                        <button class="btn btn-primary w-100 py-2 fs-5">Continue</button>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -107,22 +92,22 @@
 
 <script>
 let captchaText = "";
-
-function generateCaptcha() {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    captchaText = [...Array(5)].map(() => chars[Math.floor(Math.random()*chars.length)]).join("");
-    document.getElementById("captcha_text").innerText = captchaText;
-}
-generateCaptcha();
+// Server-side captcha used instead
 
 // LOAD SLOTS
-document.getElementById("reservationDate").addEventListener("change", loadSlots);
+const dateInput = document.getElementById("reservationDate");
+const treatmentInput = document.querySelector("select[name='treatment_type']");
+
+dateInput.addEventListener("change", loadSlots);
+treatmentInput.addEventListener("change", loadSlots);
 
 function loadSlots() {
-    const date = reservationDate.value;
-    if(!date) return;
+    const date = dateInput.value;
+    const treatment = treatmentInput.value;
 
-    fetch(`/api/v1/calendar/slots?date=${date}`)
+    if(!date || !treatment) return;
+
+    fetch(`/api/v1/calendar/slots?date=${date}&treatment_type=${treatment}`)
         .then(r => r.json())
         .then(res => {
             const c = document.getElementById("timeSlotContainer");
@@ -155,11 +140,7 @@ function initSlotSelectors() {
 bookingForm.addEventListener("submit", async(e)=>{
     e.preventDefault();
 
-    if(captcha_input.value.trim() !== captchaText){
-        Swal.fire("Captcha Salah","Coba lagi.", "error");
-        generateCaptcha();
-        return;
-    }
+    // Captcha validation is now server-side
 
     Swal.fire({
         title:"Booking Confirmation",

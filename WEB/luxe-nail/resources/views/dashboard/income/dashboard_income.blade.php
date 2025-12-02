@@ -65,7 +65,7 @@
                 <div>
                     <h4 class="payment-name">{{ $income->customer_name }}</h4>
                     <p class="payment-info">
-                        {{ $income->treatment_name }} •
+                        {{ $income->treatment_type }} •
                         {{ $income->created_at->format('d M Y') }}
                     </p>
                 </div>
@@ -143,16 +143,16 @@
                         @forelse($incomes as $income)
                         <tr class="reservation-row">
                             <td class="text-center fw-bold">{{ $income->customer_name }}</td>
-                            <td class="text-center">{{ $income->treatment_name }}</td>
+                            <td class="text-center">{{ $income->treatment_type }}</td>
                             <td class="text-center">{{ $income->created_at->format('d M Y, H:i') }}</td>
                             <td class="text-center fw-bold" style="color: #d63384;">
                                 Rp {{ number_format($income->total_price, 0, ',', '.') }}
                             </td>
                             <td class="text-center">
                                 <span class="badge rounded-pill px-3 py-2"
-                                      style="background-color:{{ $income->payment_status == 'Lunas' ? '#46b96a' : ($income->payment_status == 'Batal' ? '#dc3545' : '#fcca33') }};
+                                      style="background-color:{{ $income->payment_status == 'paid' ? '#46b96a' : ($income->payment_status == 'cancelled' ? '#dc3545' : '#fcca33') }};
                                              color:white; font-weight:500;">
-                                    {{ $income->payment_status }}
+                                    {{ ucfirst($income->payment_status) }}
                                 </span>
                             </td>
                             <td class="text-center">

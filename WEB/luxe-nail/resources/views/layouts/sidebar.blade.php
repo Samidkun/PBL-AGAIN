@@ -16,7 +16,7 @@
     <hr class="divider">
 
     <div class="menu text-start mt-4">
-        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
+        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <i class="bi bi-house-door me-2"></i> Dashboard
         </a>
         <a href="{{ route('dashboard.reservations') }}" class="{{ request()->routeIs('dashboard.reservations') ? 'active' : '' }}">

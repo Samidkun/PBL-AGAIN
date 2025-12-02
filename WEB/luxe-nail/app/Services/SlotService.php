@@ -8,34 +8,47 @@ use Carbon\Carbon;
 
 class SlotService
 {
-    public static function generateForDate($date)
+    public static function generateForDate($date, $durationMinutes = 60)
     {
         $artists = NailArtist::all();
 
-        $start = Carbon::createFromTime(8,0);
-        $end   = Carbon::createFromTime(21,0); // sampai 21.00
+        $start = Carbon::createFromTime(8, 0);
+        $end   = Carbon::createFromTime(21, 0);
 
         $slots = [];
 
-        while ($start < $end) {
+        // Interval antar slot (misal user bisa booking tiap 30 menit atau 60 menit)
+        // Kita set 30 menit biar lebih fleksibel
+        $interval = 30; 
 
-            $time = $start->format("H:i");
+        while ($start->copy()->addMinutes($durationMinutes)->lte($end)) {
 
-            // BREAK RULES
-            if ($time == "12:00") { $start->addHour(); continue; }
-            if ($time == "15:00") { $start->addMinutes(30); continue; }
-            if ($time == "18:00") { $start->addMinutes(30); continue; }
+            $timeStr = $start->format("H:i");
+            $slotStart = $start->copy();
+            $slotEnd   = $start->copy()->addMinutes($durationMinutes);
+
+            // BREAK RULES (1 Hour Breaks)
+            // Skip slots starting at 12:00, 12:30, 15:00, 15:30, 18:00, 18:30
+            if (in_array($timeStr, ["12:00", "12:30", "15:00", "15:30", "18:00", "18:30"])) {
+                $start->addMinutes($interval);
+                continue;
+            }
 
             $availableArtists = [];
 
             foreach ($artists as $artist) {
+                if (!self::artistIsWorkingAt($artist, $timeStr)) continue;
 
-                if (!self::artistIsWorkingAt($artist, $time)) continue;
-
-                // cek overlap (bukan hanya jam =)
+                // Cek Overlap
+                // Logic: (StartA < EndB) && (EndA > StartB)
                 $isOverlap = Reservation::where("nail_artist_id", $artist->id)
                     ->where("reservation_date", $date)
-                    ->where("reservation_time", $time)
+                    ->where(function ($query) use ($slotStart, $slotEnd) {
+                        $query->where(function ($q) use ($slotStart, $slotEnd) {
+                            $q->where('reservation_time', '<', $slotEnd->format('H:i:s'))
+                              ->where('end_time', '>', $slotStart->format('H:i:s'));
+                        });
+                    })
                     ->exists();
 
                 if (!$isOverlap) {
@@ -44,12 +57,12 @@ class SlotService
             }
 
             $slots[] = [
-                "time" => $time,
+                "time" => $timeStr,
                 "artists_available" => $availableArtists,
                 "available" => count($availableArtists) > 0
             ];
 
-            $start->addHour(); // tiap slot 1 jam
+            $start->addMinutes($interval);
         }
 
         return $slots;
@@ -57,7 +70,10 @@ class SlotService
 
     private static function artistIsWorkingAt($artist, $time)
     {
-        return $time >= substr($artist->jam_kerja_start,0,5)
-            && $time < substr($artist->jam_kerja_end,0,5);
+        // Pastikan jam kerja valid
+        $startWork = substr($artist->jam_kerja_start ?? '08:00', 0, 5);
+        $endWork   = substr($artist->jam_kerja_end ?? '21:00', 0, 5);
+        
+        return $time >= $startWork && $time < $endWork;
     }
 }

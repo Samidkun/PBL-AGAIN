@@ -10,7 +10,13 @@ class NailArtist extends Model
         'name',
         'status',
         'customers_today',
+        'user_id',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function reservations()
     {

@@ -34,15 +34,26 @@ class CalendarController extends Controller
         ]);
     }
 
-   public function getSlots(Request $request)
-{
-    $date = $request->date ?? Carbon::today()->format("Y-m-d");
+    public function getSlots(Request $request)
+    {
+        $date = $request->date ?? Carbon::today()->format("Y-m-d");
+        $treatmentType = $request->treatment_type; // e.g. "nail_extension"
 
-    return response()->json([
-        "success" => true,
-        "date"    => $date,
-        "data"    => SlotService::generateForDate($date)
-    ]);
-}
+        $duration = 60; // Default
+
+        if ($treatmentType) {
+            $type = \App\Models\TreatmentType::where('name', $treatmentType)->first();
+            if ($type) {
+                $duration = $type->duration;
+            }
+        }
+
+        return response()->json([
+            "success" => true,
+            "date"    => $date,
+            "duration_used" => $duration,
+            "data"    => SlotService::generateForDate($date, $duration)
+        ]);
+    }
 
 }

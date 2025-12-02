@@ -86,18 +86,14 @@ Route::middleware('auth')->group(function () {
 // CATEGORY MANAGEMENT
 // ======================
 Route::middleware('auth')->group(function () {
+    // AJAX Routes for Category
+    Route::get('/kategori/get-create-form', [CategoryController::class, 'getCreateForm'])->name('kategori.get-create-form');
+    Route::post('/kategori/ajax-store', [CategoryController::class, 'ajaxStore'])->name('kategori.ajax-store');
+    Route::get('/kategori/{category}/ajax-edit', [CategoryController::class, 'ajaxEdit'])->name('kategori.ajax-edit');
+    Route::put('/kategori/{category}/ajax-update', [CategoryController::class, 'ajaxUpdate'])->name('kategori.ajax-update');
+    Route::delete('/kategori/{category}/ajax-delete', [CategoryController::class, 'ajaxDestroy'])->name('kategori.ajax-delete');
 
     Route::resource('kategori', CategoryController::class);
-    Route::get('/kategori/get-create-form', [CategoryController::class, 'getCreateForm'])
-        ->name('kategori.get-create-form');
-    Route::post('/kategori/ajax-store', [CategoryController::class, 'ajaxStore'])
-        ->name('kategori.ajax-store');
-    Route::get('/kategori/{category}/ajax-edit', [CategoryController::class, 'ajaxEdit'])
-        ->name('kategori.ajax-edit');
-    Route::put('/kategori/{category}/ajax-update', [CategoryController::class, 'ajaxUpdate'])
-        ->name('kategori.ajax-update');
-    Route::delete('/kategori/{category}/ajax-delete', [CategoryController::class, 'ajaxDestroy'])
-        ->name('kategori.ajax-delete');
 });
 
 

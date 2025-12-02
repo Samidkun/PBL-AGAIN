@@ -17,6 +17,14 @@ class ReservationController extends Controller
     {
         $query = Reservation::query();
 
+        // === Filter by Nail Artist (My Appointments) ===
+        $user = $request->user();
+        if ($user && $user->role === 'nail_artist') {
+            if ($user->nailArtist) {
+                $query->where('nail_artist_id', $user->nailArtist->id);
+            }
+        }
+
         // === Mobile default: tampilkan confirmed hari ini ===
         if (!$request->has('status')) {
 
@@ -38,6 +46,7 @@ class ReservationController extends Controller
                     'id'              => $r->id,
                     'name'            => $r->name,
                     'phone'           => $r->phone,
+                    'address'         => $r->address,
                     'treatment_type'  => $r->treatment_type,
                     'reservation_date'=> date('Y-m-d', strtotime($r->reservation_date)),
                     'reservation_time'=> $r->reservation_time,

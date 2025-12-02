@@ -34,6 +34,7 @@ class Income extends Model
         'ai_image_url',
 
         'payment_status',
+        'payment_method',
         'reservation_date',
     ];
 

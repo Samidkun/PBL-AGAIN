@@ -2,7 +2,7 @@ name: luxe_nail
 description: "Luxe Nail Studio Management App"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.0.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -38,6 +38,7 @@ dependencies:
   table_calendar: ^3.1.2
   intl: any
   flutter_dotenv: ^6.0.0
+  lottie: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -49,7 +50,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  lottie: ^3.1.0
+
   flutter_native_splash: ^2.4.1
 
 # For information on the generic Dart part of this file, see the
@@ -57,14 +58,12 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
   assets:
     - assets/images/
-    - assets/icons/
     - assets/config/.env
     - assets/images/gallery/
     - assets/lottie/
@@ -77,10 +76,10 @@ flutter:
         - asset: assets/fonts/Poppins-Light.ttf
     - family: Georgia
       fonts:
-      - asset: assets/fonts/georgia.ttf
-      - asset: assets/fonts/georgiab.ttf
-      - asset: assets/fonts/georgiai.ttf
-      - asset: assets/fonts/georgiaz.ttf
+        - asset: assets/fonts/georgia.ttf
+        - asset: assets/fonts/georgiab.ttf
+        - asset: assets/fonts/georgiai.ttf
+        - asset: assets/fonts/georgiaz.ttf
 
 flutter_native_splash:
   color: "#FFECEF"

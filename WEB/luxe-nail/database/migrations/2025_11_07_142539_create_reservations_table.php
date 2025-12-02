@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('reservation_date');
             $table->time('reservation_time');
             $table->string('queue_number')->unique();
-            $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'waiting_validation', 'confirmed', 'in_progress', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }

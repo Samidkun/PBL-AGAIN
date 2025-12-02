@@ -15,7 +15,10 @@ class ReservationController extends Controller
     // ======================================================
     public function create()
     {
-        return view('reservations.create');
+        $n1 = rand(1, 9);
+        $n2 = rand(1, 9);
+        session(['captcha_answer' => $n1 + $n2]);
+        return view('reservations.create', compact('n1', 'n2'));
     }
 
     // ======================================================
@@ -30,31 +33,35 @@ class ReservationController extends Controller
             'treatment_type'   => 'required|in:nail_extension,nail_art',
             'reservation_date' => 'required|date',
             'reservation_time' => 'required|date_format:H:i',
+            'captcha'          => 'required|integer',
         ]);
 
-        $artists = NailArtist::all();
-
-        if ($artists->count() == 0) {
+        if (intval($request->captcha) !== session('captcha_answer')) {
             return response()->json([
                 'success' => false,
-                'message' => 'No nail artist available.'
+                'message' => 'Jawaban Captcha Salah!'
             ]);
         }
 
-        $bestArtist = null;
-        $minLoad = PHP_INT_MAX;
-
-        foreach ($artists as $artist) {
-            $busy = Reservation::where('nail_artist_id', $artist->id)
-                ->where('reservation_date', $validated['reservation_date'])
-                ->where('reservation_time', $validated['reservation_time'])
-                ->count();
-
-            if ($busy < $minLoad) {
-                $minLoad = $busy;
-                $bestArtist = $artist;
-            }
+        // 1. Hitung End Time berdasarkan durasi treatment
+        $duration = 60; // Default
+        $type = \App\Models\TreatmentType::where('name', $validated['treatment_type'])->first();
+        if ($type) {
+            $duration = $type->duration;
         }
+
+        $startTime = Carbon::createFromFormat('H:i', $validated['reservation_time']);
+        $endTime   = $startTime->copy()->addMinutes($duration);
+
+        // 2. Cari Artist yang Available (Tidak Overlap)
+        // Logic: Artist yang TIDAK punya reservasi yang overlap dengan jam ini
+        $bestArtist = NailArtist::whereDoesntHave('reservations', function ($q) use ($validated, $startTime, $endTime) {
+            $q->where('reservation_date', $validated['reservation_date'])
+              ->where(function ($query) use ($startTime, $endTime) {
+                  $query->where('reservation_time', '<', $endTime->format('H:i:s'))
+                        ->where('end_time', '>', $startTime->format('H:i:s'));
+              });
+        })->first(); // Ambil satu aja yang kosong
 
         if (!$bestArtist) {
             return response()->json([
@@ -70,12 +77,13 @@ class ReservationController extends Controller
             'treatment_type'    => $validated['treatment_type'],
             'reservation_date'  => $validated['reservation_date'],
             'reservation_time'  => $validated['reservation_time'],
+            'end_time'          => $endTime->format('H:i:s'), // Simpan End Time
             'queue_number'      => 'LX' . date('Ymd') . strtoupper(Str::random(4)),
             'nail_artist_id'    => $bestArtist->id,
             'status'            => 'pending',
             'is_paid'           => 0,
             'booking_fee'       => 25000,
-            'total_price'       => 25000,
+            'total_price'       => 25000, // Harusnya ambil dari TreatmentType->price
         ]);
 
         return response()->json([
@@ -193,6 +201,14 @@ public function calendar()
                 'message' => 'Reservation not found'
             ], 404);
         }
+
+        $request->validate([
+            'name'             => 'required|string|max:255',
+            'phone'            => 'required|string|max:20',
+            'address'          => 'required|string',
+            'treatment_type'   => 'required',
+            'reservation_time' => 'required',
+        ]);
 
         $reservation->update([
             'name'           => $request->name,

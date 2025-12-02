@@ -27,6 +27,7 @@ class IncomeController extends Controller
             'price_accessory'   => 'required|numeric|min:0',
             'total_price'       => 'required|numeric|min:0',
             'ai_image_url'      => 'nullable|string',
+            'payment_method'    => 'required|in:cash,transfer,bank_transfer',
         ]);
 
         $reservation = Reservation::find($validated['reservation_id']);
@@ -34,8 +35,11 @@ class IncomeController extends Controller
         if (!$reservation) {
             return response()->json(['success' => false, 'message' => 'Reservation not found'], 404);
         }
-        if ($reservation->is_paid == 1) {
-             return response()->json(['success' => false, 'message' => 'Reservation already paid.'], 400);
+        
+        // CHECK: If paid, ensure no duplicate income record exists.
+        // If is_paid=1 but NO income record, we allow it (case: bank transfer proof uploaded).
+        if ($reservation->is_paid == 1 && $reservation->income()->exists()) {
+             return response()->json(['success' => false, 'message' => 'Reservation already paid and recorded.'], 400);
         }
 
         $income = Income::create([
@@ -54,6 +58,7 @@ class IncomeController extends Controller
             'total_price'       => $validated['total_price'],
             'ai_image_url'      => $validated['ai_image_url'] ?? null,
             'payment_status'    => 'paid',
+            'payment_method'    => $validated['payment_method'],
             'reservation_date'  => $reservation->reservation_date,
         ]);
 
@@ -70,13 +75,7 @@ class IncomeController extends Controller
         ]);
     }
 
-    public function edit(Income $income)
-    {
-        // Untuk saat ini, kita return view kosong agar tidak crash
-        // Nanti kamu bisa implementasi logic edit di sini.
-        // Asumsi: View edit income ada di 'dashboard.income.edit'
-        return view('dashboard.income.edit', compact('income'));
-    }
+
 
     /**
      * List all income for dashboard (FIXED ALL VARIABLES)

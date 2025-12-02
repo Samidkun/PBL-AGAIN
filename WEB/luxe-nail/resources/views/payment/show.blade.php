@@ -150,18 +150,66 @@
                     @endif
 
                 </div>
-                {{-- END CARD --}}
+
+                <hr>
+
+                {{-- TOTAL --}}
+                <h5 class="fw-bold mb-2">Price Details</h5>
+
+                <div class="d-flex justify-content-between small mb-1">
+                    <span>Booking Fee</span>
+                    <span>Rp {{ number_format($reservation->booking_fee ?? 25000, 0, ',', '.') }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between small mb-1">
+                    <span>Service Price</span>
+                    <span>Rp {{ number_format($reservation->total_price, 0, ',', '.') }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <h4 class="fw-bold m-0" style="color:#d889a6;">
+                        Total: Rp {{ number_format(($reservation->total_price + ($reservation->booking_fee ?? 25000)), 0, ',', '.') }}
+                    </h4>
+                </div>
+
+                {{-- BUTTON --}}
+                @if($reservation->status === 'pending')
+                    <form id="paymentForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="fw-bold">Upload Payment Proof</label>
+                            <input type="file" name="payment_proof" class="form-control" required accept="image/*">
+                            <small class="text-muted">Max 2MB (JPG, PNG)</small>
+                        </div>
+
+                        <button type="submit" class="btn w-100 py-3 fw-bold mt-4"
+                            style="background:#d889a6; color:white; border-radius:10px;">
+                            Confirm Payment
+                        </button>
+                    </form>
+
+                    <p class="text-center text-muted mt-3 small">
+                        After submitting, you MUST download your invoice.
+                    </p>
+                @else
+                    <p class="text-center mt-4 fw-bold text-success">
+                        Payment already submitted.
+                    </p>
+                @endif
+
             </div>
         </div>
     </div>
 </section>
 
 <script>
-document.getElementById("payBtn")?.addEventListener("click", async () => {
+document.getElementById("paymentForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
 
     const response = await fetch("{{ route('payment.paid', $reservation->id) }}", {
         method: "POST",
-        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
+        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+        body: formData
     });
 
     const data = await response.json();

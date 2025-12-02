@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::table('reservations', function (Blueprint $table) {
         $table->integer('booking_fee')->default(25000);
-        $table->enum('payment_method', ['qris','transfer'])->nullable();
+        $table->string('payment_method', 50)->nullable();
         $table->string('payment_proof')->nullable();
     });
 }

@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
+import 'package:luxe_nail/services/api_service.dart';
 
 // Pastikan import file result screen-mu benar
 import 'ai_result_screen.dart';
@@ -58,25 +55,14 @@ class _AIScreenState extends State<AIScreen> {
   // 1. FETCH CATEGORIES (Ambil data dari Laravel)
   // ==========================================================
   Future<void> fetchCategories() async {
-    final baseUrl = dotenv.env['BASE_URL'];
-    try {
-      final response = await http.get(
-        Uri.parse("$baseUrl/api/v1/categories"),
-        headers: {
-          "Accept": "application/json",
-          "Authorization": "Bearer ${widget.token}",
-          "ngrok-skip-browser-warning": "true",
-        },
-      );
+    final result = await ApiService.getCategories(widget.token);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          categories = data["data"];
-        });
-      }
-    } catch (e) {
-      print("Error fetching categories: $e");
+    if (result['success']) {
+      setState(() {
+        categories = result['data'];
+      });
+    } else {
+      // print("Error fetching categories: ${result['message']}");
     }
   }
 
@@ -101,15 +87,12 @@ class _AIScreenState extends State<AIScreen> {
   // ==========================================================
   // 3. BUILD PROMPT (VERSI NARASI)
   // ==========================================================
-  // Gantikan function buildPrompt() di AIScreen.dart dengan kode ini
-
   String buildPrompt() {
     // 1. START: Gunakan keywords yang kuat dan singkat untuk pembukaan
     String prompt = "Macro photo, professional nail art design. ";
 
     // 2. SPESIFIKASI: Gunakan format KEY: VALUE
     if (selectedShape != null) {
-      // Kita hilangkan kata "The nail shape must be strictly"
       prompt += "Shape: $selectedShape. ";
     }
 
@@ -133,16 +116,16 @@ class _AIScreenState extends State<AIScreen> {
     // 4. KUALITAS: Gunakan koma untuk mempersingkat booster
     prompt += "Photorealistic, high detail, 8k, cinematic lighting, elegant.";
 
-    print("SENDING PROMPT (Optimized): $prompt");
+    // print("SENDING PROMPT (Optimized): $prompt");
 
     return prompt;
   }
 
   // ==========================================================
-  // 4. GENERATE IMAGE & NAVIGASI (FIXED ERROR 'token')
+  // 4. GENERATE IMAGE & NAVIGASI
   // ==========================================================
   Future<void> generateImage() async {
-    if (!mounted) return; // ✔ FIX build context after async
+    if (!mounted) return;
 
     if (widget.reservation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -164,95 +147,66 @@ class _AIScreenState extends State<AIScreen> {
 
     setState(() => _loading = true);
 
-    try {
-      final baseUrl = dotenv.env['BASE_URL'];
-      final url = Uri.parse("$baseUrl/api/v1/ai/generate");
+    // Use ApiService instead of direct HTTP call
+    final result = await ApiService.generateAIImage(
+      widget.token,
+      prompt,
+      widget.reservation?['id'],
+    );
 
-      print("TOKEN USED: ${widget.token}");
+    if (!mounted) return;
 
-      final response = await http.post(
-        url,
-        headers: {
-          "Authorization": "Bearer ${widget.token}",
-          "Accept": "application/json", // ✔ FIX PALING KRITIS
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true",
-        },
-        body: jsonEncode({
-          "prompt": prompt,
-          "reservation_id": widget.reservation?['id'],
-        }),
-      );
+    if (result['success']) {
+      String finalImageUrl = result['image_url'];
 
-      if (!mounted) return; // ✔ FIX context
+      var shapeItem = findFullItem('shape', selectedShape);
+      var colorItem = findFullItem('color', selectedColor);
+      var finishItem = findFullItem('finish', selectedFinish);
+      var accessoryItem = findFullItem('accessory', selectedAccessory);
 
-      final data = jsonDecode(response.body);
+      int pShape = int.tryParse(shapeItem?['price'].toString() ?? '0') ?? 0;
+      int pColor = int.tryParse(colorItem?['price'].toString() ?? '0') ?? 0;
+      int pFinish = int.tryParse(finishItem?['price'].toString() ?? '0') ?? 0;
+      int pAccessory =
+          int.tryParse(accessoryItem?['price'].toString() ?? '0') ?? 0;
+      int basePrice =
+          int.tryParse(widget.reservation?['price'].toString() ?? '0') ?? 0;
 
-      if (response.statusCode == 200 && data['success'] == true) {
-        String finalImageUrl = data['image_url'];
+      int grandTotal = basePrice + pShape + pColor + pFinish + pAccessory;
 
-        var shapeItem = findFullItem('shape', selectedShape);
-        var colorItem = findFullItem('color', selectedColor);
-        var finishItem = findFullItem('finish', selectedFinish);
-        var accessoryItem = findFullItem('accessory', selectedAccessory);
+      setState(() => _loading = false);
 
-        int pShape = int.tryParse(shapeItem?['price'].toString() ?? '0') ?? 0;
-        int pColor = int.tryParse(colorItem?['price'].toString() ?? '0') ?? 0;
-        int pFinish = int.tryParse(finishItem?['price'].toString() ?? '0') ?? 0;
-        int pAccessory =
-            int.tryParse(accessoryItem?['price'].toString() ?? '0') ?? 0;
-        int basePrice =
-            int.tryParse(widget.reservation?['price'].toString() ?? '0') ?? 0;
-
-        int grandTotal = basePrice + pShape + pColor + pFinish + pAccessory;
-
-        if (!mounted) return; // ✔ FIX context
-
-        setState(() => _loading = false);
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AIResultScreen(
-              token: widget.token,
-              imageUrl: finalImageUrl,
-              shape: selectedShape,
-              color: selectedColor,
-              finish: selectedFinish,
-              accessory: selectedAccessory,
-              priceShape: pShape,
-              priceColor: pColor,
-              priceFinish: pFinish,
-              priceAccessory: pAccessory,
-              totalPrice: grandTotal,
-              reservation: widget.reservation,
-            ),
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AIResultScreen(
+            token: widget.token,
+            user: widget.user,
+            imageUrl: finalImageUrl,
+            shape: selectedShape,
+            color: selectedColor,
+            finish: selectedFinish,
+            accessory: selectedAccessory,
+            priceShape: pShape,
+            priceColor: pColor,
+            priceFinish: pFinish,
+            priceAccessory: pAccessory,
+            totalPrice: grandTotal,
+            reservation: widget.reservation,
           ),
-        );
-      } else {
-        String msg = data['message'] ?? "Unknown error occurred";
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(backgroundColor: Colors.red, content: Text(msg)),
-        );
-        setState(() => _loading = false);
-      }
-    } catch (e) {
-      print("Connection Error: $e");
-
-      if (!mounted) return; // ✔ FIX context
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text("Connection failed: $e"),
         ),
+      );
+    } else {
+      String msg = result['message'] ?? "Unknown error occurred";
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.red, content: Text(msg)),
       );
       setState(() => _loading = false);
     }
   }
 
   // ==========================================================
-  // WIDGET & UI BUILD (Biarkan sama)
+  // WIDGET & UI BUILD
   // ==========================================================
   Widget optionButton(
     String label,

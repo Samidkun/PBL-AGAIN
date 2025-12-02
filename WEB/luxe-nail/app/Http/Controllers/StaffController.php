@@ -27,12 +27,14 @@ class StaffController extends Controller
     {
         $request->validate([
             'name'     => 'required',
+            'username' => 'required|string|unique:users,username',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6'
         ]);
 
         User::create([
             'name'     => $request->name,
+            'username' => $request->username,
             'email'    => $request->email,
             'password' => Hash::make($request->password)
         ]);
@@ -51,11 +53,13 @@ class StaffController extends Controller
         $staff = User::findOrFail($id);
 
         $request->validate([
-            'name'  => 'required',
-            'email' => 'required|email|unique:users,email,' . $id
+            'name'     => 'required',
+            'username' => 'required|string|unique:users,username,' . $id,
+            'email'    => 'required|email|unique:users,email,' . $id
         ]);
 
         $staff->name = $request->name;
+        $staff->username = $request->username;
         $staff->email = $request->email;
 
         if ($request->password) {
