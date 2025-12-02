@@ -70,6 +70,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _toggleBreak() async {
     final result = await ApiService.toggleBreak(widget.token);
+    if (!mounted) return;
     if (result['success']) {
       setState(() {
         isOnBreak = result['is_on_break'];
@@ -93,6 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
       _fetchReservations(); // Refresh list
     } else {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result['message'])),
       );

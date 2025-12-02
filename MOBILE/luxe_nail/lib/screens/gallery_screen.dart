@@ -105,8 +105,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   // NEW: Show detail popup when item clicked
   void _showItemDetail(Map<String, dynamic> item) {
-    final imageUrl =
-        item['image'] != null ? "${ApiService.baseUrl}/${item['image']}" : null;
+    final imageUrl = item['image'] != null
+        ? "${ApiService.baseUrl}/served-image/${item['image']}"
+        : null;
 
     final itemType = getItemType(item); // Get type based on name
 
@@ -656,15 +657,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
             crossAxisCount: 2,
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            childAspectRatio: 0.68,
+            childAspectRatio: 0.65,
           ),
           itemCount: filteredItems.length,
           itemBuilder: (context, index) {
             final item = filteredItems[index];
             final itemType = getItemType(item); // Get type based on name
-
             final imageUrl = item['image'] != null
-                ? "${ApiService.baseUrl}/${item['image']}"
+                ? "${ApiService.baseUrl}/served-image/${item['image']}"
                 : null;
 
             return Stack(
@@ -677,8 +677,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   shadowColor: Colors.black12,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
-                    onTap: () =>
-                        _showItemDetail(item), // NEW: Show popup on tap
+                    onTap: () => _showItemDetail(item),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

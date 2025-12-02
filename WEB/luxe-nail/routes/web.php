@@ -115,3 +115,18 @@ Route::prefix('dashboard')
         Route::get('/income', [IncomeController::class, 'index'])
             ->name('dashboard.income');
     });
+
+// ======================
+// IMAGE SERVING (CORS FIX)
+// ======================
+Route::get('/served-image/{path}', function ($path) {
+    $filePath = public_path($path);
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+    return response()->file($filePath, [
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+        'Access-Control-Allow-Headers' => '*',
+    ]);
+})->where('path', '.*');
