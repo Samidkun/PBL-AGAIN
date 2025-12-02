@@ -26,7 +26,11 @@ Route::prefix('v1')->group(function () {
 });
 
 // Categories (public)
-Route::get('/v1/categories', [CategoryController::class, 'index']);
+Route::prefix('v1')->group(function () {
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories/type/{type}', [CategoryController::class, 'getByType']);
+    Route::get('/categories/{id}', [CategoryController::class, 'show']);
+});
 
 // ⛔ FIX: Slot harus public (web booking butuh ini)
 Route::get('/v1/calendar/slots', [CalendarController::class, 'getSlots']);
