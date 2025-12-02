@@ -331,16 +331,16 @@ class CategoryController extends Controller
 
         switch($type) {
             case 'shape':
-                $folder .= 'ai_shape';
+                $folder .= 'nail_shape';
                 break;
             case 'color':
-                $folder .= 'ai_color';
+                $folder .= 'nail_color';
                 break;
             case 'finish':
-                $folder .= 'ai_finish';
+                $folder .= 'nail_type';
                 break;
             case 'accessory':
-                $folder .= 'ai_accessories';
+                $folder .= 'nail_accessoris';
                 break;
             default:
                 $folder .= 'other';

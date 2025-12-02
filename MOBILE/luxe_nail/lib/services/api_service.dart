@@ -4,7 +4,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
   // Centralized Base URL
-  static String get baseUrl => dotenv.env['BASE_URL'] ?? 'http://192.168.1.67:8000';
+  static String get baseUrl =>
+      dotenv.env['BASE_URL'] ?? 'http://192.168.1.67:8000';
 
   // Headers helper
   static Map<String, String> get _headers => {
@@ -16,7 +17,8 @@ class ApiService {
   // ===========================================================================
   // LOGIN
   // ===========================================================================
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String username, String password) async {
     final url = Uri.parse('$baseUrl/api/login');
 
     try {
@@ -55,7 +57,8 @@ class ApiService {
   // ===========================================================================
   // GET RESERVATIONS
   // ===========================================================================
-  static Future<Map<String, dynamic>> getReservations(String token, {String? date}) async {
+  static Future<Map<String, dynamic>> getReservations(String token,
+      {String? date}) async {
     final url = Uri.parse("$baseUrl/api/v1/reservations?date=$date");
 
     try {
@@ -91,7 +94,7 @@ class ApiService {
   // GET USER PROFILE
   // ===========================================================================
   static Future<Map<String, dynamic>> getUserProfile(String token) async {
-    final url = Uri.parse('$baseUrl/api/user');
+    final url = Uri.parse('$baseUrl/api/v1/user');
 
     try {
       final response = await http.get(
@@ -167,7 +170,8 @@ class ApiService {
   // ===========================================================================
   // GENERATE AI IMAGE
   // ===========================================================================
-  static Future<Map<String, dynamic>> generateAIImage(String token, String prompt, int reservationId) async {
+  static Future<Map<String, dynamic>> generateAIImage(
+      String token, String prompt, int reservationId) async {
     final url = Uri.parse("$baseUrl/api/v1/ai/generate");
 
     try {
@@ -207,7 +211,8 @@ class ApiService {
   // ===========================================================================
   // CONFIRM PAYMENT
   // ===========================================================================
-  static Future<Map<String, dynamic>> confirmPayment(String token, Map<String, dynamic> paymentData) async {
+  static Future<Map<String, dynamic>> confirmPayment(
+      String token, Map<String, dynamic> paymentData) async {
     final url = Uri.parse("$baseUrl/api/v1/income/store");
 
     try {
@@ -230,6 +235,77 @@ class ApiService {
         return {
           'success': false,
           'message': data['message'] ?? 'Payment confirmation failed',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Connection error: $e',
+      };
+    }
+  }
+
+  // ===========================================================================
+  // FINISH JOB (Mobile Staff)
+  // ===========================================================================
+  static Future<Map<String, dynamic>> finishJob(
+      String token, int reservationId) async {
+    final url = Uri.parse("$baseUrl/api/v1/reservations/$reservationId/finish");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          ..._headers,
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        return {'success': true};
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Failed to finish job',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Connection error: $e',
+      };
+    }
+  }
+
+  // ===========================================================================
+  // TOGGLE BREAK (Mobile Staff)
+  // ===========================================================================
+  static Future<Map<String, dynamic>> toggleBreak(String token) async {
+    final url = Uri.parse("$baseUrl/api/v1/artist/toggle-break");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          ..._headers,
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        return {
+          'success': true,
+          'is_on_break': data['data']['is_on_break'],
+          'message': data['message'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Failed to toggle break',
         };
       }
     } catch (e) {

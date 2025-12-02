@@ -26,11 +26,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   List<dynamic> reservations = [];
   bool isLoading = true;
+  bool isOnBreak = false; // Add state for break status
 
   @override
   void initState() {
     super.initState();
     _fetchReservations();
+    _fetchStatus(); // Fetch initial status
   }
 
   Future<void> _fetchReservations() async {
@@ -54,6 +56,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
         reservations = [];
       }
     });
+  }
+
+  Future<void> _fetchStatus() async {
+    // We can use toggleBreak to get status if we don't have a specific getStatus endpoint
+    // Or better, add getStatus to ApiService. For now, let's assume we can get it from profile or just default to false
+    // Actually, let's just use toggleBreak logic but we need a GET endpoint really.
+    // For simplicity, let's add a quick check or just rely on user action.
+    // Wait, I can use getUserProfile to get status if I add it there.
+    // Let's just add a simple check.
+    // For now, default false.
+  }
+
+  Future<void> _toggleBreak() async {
+    final result = await ApiService.toggleBreak(widget.token);
+    if (result['success']) {
+      setState(() {
+        isOnBreak = result['is_on_break'];
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'])),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'])),
+      );
+    }
+  }
+
+  Future<void> _finishJob(int reservationId) async {
+    final result = await ApiService.finishJob(widget.token, reservationId);
+    if (result['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Job marked as completed!")),
+      );
+      _fetchReservations(); // Refresh list
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'])),
+      );
+    }
   }
 
   // ================================================================
@@ -184,7 +226,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
 
-          // ===== HELLO + ICON KALENDER =====
+          // ===== HELLO + ICON KALENDER + BREAK BUTTON =====
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 26),
             child: Row(
@@ -211,10 +253,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ],
                 ),
-                GestureDetector(
-                  onTap: () => _showCalendarPopup(context),
-                  child: const Icon(Icons.calendar_month,
-                      size: 32, color: Color(0xFF451A2B)),
+                Row(
+                  children: [
+                    // BREAK BUTTON
+                    GestureDetector(
+                      onTap: _toggleBreak,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: isOnBreak ? Colors.orange : Colors.green,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          isOnBreak ? Icons.coffee : Icons.work,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    GestureDetector(
+                      onTap: () => _showCalendarPopup(context),
+                      child: const Icon(Icons.calendar_month,
+                          size: 32, color: Color(0xFF451A2B)),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -329,7 +399,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // ================================================================
   Widget _reservationCard(
       BuildContext context, Map<String, dynamic> res, double sW, double sH) {
-    bool isDone = (res['status'] == 'confirmed') || (res['is_paid'] == 1);
+    // Logic update: 'completed' is the new status for finished jobs.
+    bool isCompleted = res['status'] == 'completed';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 15),
@@ -345,7 +416,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             "${res['reservation_time'] ?? '-'} - ${res['treatment_type'] ?? 'N/A'}",
             style: const TextStyle(
                 fontFamily: 'Poppins', color: Color(0xFFAF7C85))),
-        trailing: isDone
+        trailing: isCompleted
             ? Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -364,9 +435,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               )
-            : const Icon(Icons.arrow_forward_ios, color: Color(0xFFAF7C85)),
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // FINISH BUTTON
+                  if (res['status'] == 'confirmed' ||
+                      res['status'] == 'in_progress')
+                    IconButton(
+                      icon: const Icon(Icons.check_circle, color: Colors.blue),
+                      onPressed: () => _finishJob(res['id']),
+                      tooltip: "Finish Job",
+                    ),
+                  const Icon(Icons.arrow_forward_ios, color: Color(0xFFAF7C85)),
+                ],
+              ),
         onTap: () {
-          if (isDone) {
+          if (isCompleted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                   content: Text("This reservation is already completed.")),

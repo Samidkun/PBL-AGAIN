@@ -263,4 +263,27 @@ class ReservationController extends Controller
             'generate_count' => $r->generate_count,
         ]);
     }
+    // =========================================================================
+    //  FINISH JOB (Mobile Staff)
+    // =========================================================================
+    public function finish($id)
+    {
+        $reservation = Reservation::find($id);
+
+        if (!$reservation) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Reservation not found'
+            ], 404);
+        }
+
+        $reservation->status = 'completed';
+        $reservation->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Job marked as completed.',
+            'data'    => $reservation
+        ]);
+    }
 }

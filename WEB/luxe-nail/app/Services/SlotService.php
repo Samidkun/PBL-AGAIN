@@ -34,6 +34,15 @@ class SlotService
                 continue;
             }
 
+            // PAST TIME CHECK
+            // If date is today, skip slots that have already passed
+            if (Carbon::parse($date)->isToday()) {
+                if ($start->lt(Carbon::now())) {
+                    $start->addMinutes($interval);
+                    continue;
+                }
+            }
+
             $availableArtists = [];
 
             foreach ($artists as $artist) {

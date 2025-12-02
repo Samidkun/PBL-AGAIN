@@ -63,4 +63,8 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Income
     Route::post('/income/store', [IncomeController::class, 'store']);
+
+    // Staff Actions
+    Route::post('/reservations/{id}/finish', [ReservationController::class, 'finish']);
+    Route::post('/artist/toggle-break', [App\Http\Controllers\Api\StaffController::class, 'toggleBreak']);
 });

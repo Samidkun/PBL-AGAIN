@@ -192,22 +192,25 @@
                 @foreach($nailArtists as $i => $artist)
                     <tr>
                         <td>{{ $i + 1 }}</td>
-                        <td>{{ $artist->name }}</td>
+                        <td>{{ $artist->user->name ?? $artist->name }}</td>
 
                         {{-- STATUS BADGE --}}
                         <td>
                             @php
-                                $badge =
-                                    $artist->status === 'available' ? 'success' :
-                                    ($artist->status === 'busy' ? 'warning' : 'secondary');
+                                $status = $artist->real_time_status; // Pakai Accessor
+                                $badge = 'secondary'; // Default (Break/Unknown)
+
+                                if ($status === 'available') $badge = 'success';
+                                if ($status === 'busy') $badge = 'danger'; // Merah biar keliatan sibuk
+                                if ($status === 'break') $badge = 'warning'; // Kuning buat istirahat
                             @endphp
 
                             <span class="badge bg-{{ $badge }}">
-                                {{ ucfirst($artist->status) }}
+                                {{ ucfirst($status) }}
                             </span>
                         </td>
 
-                        <td>{{ $artist->customers_today }}</td>
+                        <td>{{ $artist->customers_today_count }}</td>
 
                         <td>
                             {{ \Carbon\Carbon::parse($artist->jam_kerja_start)->format('H:i') }}
