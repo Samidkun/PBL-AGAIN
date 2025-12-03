@@ -71,6 +71,10 @@
                 <span>Confirmed</span>
             </div>
             <div class="stat-card">
+                <h3 id="waitingPaymentCount">0</h3>
+                <span>Waiting Payment</span>
+            </div>
+            <div class="stat-card">
                 <h3 id="cancelledCount">0</h3>
                 <span>Cancelled</span>
             </div>
@@ -492,6 +496,9 @@ function formatDate(y, m, d) {
 
         document.getElementById('confirmedCount').textContent =
             data.filter(r => r.status === "confirmed").length;
+
+        document.getElementById('waitingPaymentCount').textContent =
+            data.filter(r => r.status === "waiting_payment").length;
 
         document.getElementById('cancelledCount').textContent =
             data.filter(r => r.status === "cancelled").length;
