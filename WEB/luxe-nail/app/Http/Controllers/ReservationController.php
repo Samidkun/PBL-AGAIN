@@ -77,6 +77,9 @@ class ReservationController extends Controller
             'total_price'       => 25000, // Harusnya ambil dari TreatmentType->price
         ]);
 
+        // Queue cookie for 60 minutes
+        \Illuminate\Support\Facades\Cookie::queue('pending_booking', $reservation->queue_number, 60);
+
         return response()->json([
             'success'      => true,
             'redirect_url' => route('payment.show', $reservation->id)

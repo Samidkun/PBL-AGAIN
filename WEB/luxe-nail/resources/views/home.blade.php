@@ -524,6 +524,30 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@if(isset($pendingReservation) && $pendingReservation)
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        Swal.fire({
+            title: 'Incomplete Booking Found!',
+            text: "You have a pending booking for {{ $pendingReservation->treatment_type }}. Do you want to continue payment?",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#d889a6',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Resume Payment',
+            cancelButtonText: 'No, Cancel Booking'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{{ route('payment.show', $pendingReservation->id) }}";
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // Optional: You could add an AJAX call here to cancel the booking explicitly
+                // For now, we just let it expire or user can ignore it
+            }
+        });
+    });
+</script>
+@endif
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const track = document.querySelector(".gallery-track");
