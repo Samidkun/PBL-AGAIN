@@ -58,8 +58,12 @@ class ApiService {
   // GET RESERVATIONS
   // ===========================================================================
   static Future<Map<String, dynamic>> getReservations(String token,
-      {String? date}) async {
-    final url = Uri.parse("$baseUrl/api/v1/reservations?date=$date");
+      {String? date, String? status}) async {
+    String queryString = "";
+    if (date != null) queryString += "date=$date&";
+    if (status != null) queryString += "status=$status&";
+
+    final url = Uri.parse("$baseUrl/api/v1/reservations?$queryString");
 
     try {
       final response = await http.get(
@@ -306,6 +310,45 @@ class ApiService {
         return {
           'success': false,
           'message': data['message'] ?? 'Failed to toggle break',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Connection error: $e',
+      };
+    }
+  }
+
+  // ===========================================================================
+  // UPDATE RESERVATION (Add-on / Design Selection)
+  // ===========================================================================
+  static Future<Map<String, dynamic>> updateReservation(
+      String token, int id, Map<String, dynamic> data) async {
+    final url = Uri.parse("$baseUrl/api/v1/reservations/$id");
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {
+          ..._headers,
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(data),
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && responseData['success'] == true) {
+        return {
+          'success': true,
+          'message': responseData['message'],
+          'data': responseData['data'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': responseData['message'] ?? 'Failed to update reservation',
         };
       }
     } catch (e) {

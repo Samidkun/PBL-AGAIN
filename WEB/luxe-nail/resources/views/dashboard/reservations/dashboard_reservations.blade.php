@@ -421,6 +421,7 @@ function formatDate(y, m, d) {
             const color = {
                 pending: "warning",
                 waiting_validation: "info",
+                waiting_payment: "warning", // New Status
                 confirmed: "success",
                 cancelled: "danger",
                 completed: "primary"
@@ -443,18 +444,21 @@ function formatDate(y, m, d) {
 
             // waiting_validation
             if (r.status === "waiting_validation") {
-                // Calculate total price (booking fee + service price if available, or just use total_price from DB)
-                // Assuming r.total_price includes everything or logic is handled in backend
                 let amount = r.total_price ? r.total_price : 0;
-                // Add booking fee if separate? Based on controller it seems total_price is stored.
-                // Let's use r.total_price + r.booking_fee if logic requires, but controller said total_price = 25000 initially.
-                // Let's just use r.total_price for now.
-                
                 actions += `
                     <button class="btn-action btn-info text-white" 
                         onclick="viewProof(${r.id}, '${r.payment_proof}', '${r.queue_number}', '${r.name}', ${amount}, '${r.reservation_date} ${r.reservation_time}')">
                         <i class="fas fa-eye me-1"></i> Verify Payment
                     </button>
+                `;
+            }
+
+            // waiting_payment (NEW - Ready for Cashier)
+            if (r.status === "waiting_payment") {
+                actions += `
+                    <a href="/dashboard/cashier/${r.id}" class="btn-action btn-success text-white text-decoration-none">
+                        <i class="fas fa-cash-register me-1"></i> Pay / Finish
+                    </a>
                 `;
             }
 

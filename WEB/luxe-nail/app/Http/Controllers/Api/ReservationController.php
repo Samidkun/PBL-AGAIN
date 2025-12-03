@@ -277,12 +277,12 @@ class ReservationController extends Controller
             ], 404);
         }
 
-        $reservation->status = 'completed';
+        $reservation->status = 'waiting_payment';
         $reservation->save();
 
         return response()->json([
             'success' => true,
-            'message' => 'Job marked as completed.',
+            'message' => 'Job finished. Waiting for payment.',
             'data'    => $reservation
         ]);
     }

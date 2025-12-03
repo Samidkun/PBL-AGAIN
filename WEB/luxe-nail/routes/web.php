@@ -123,6 +123,12 @@ Route::prefix('dashboard')
 
         Route::get('/income', [IncomeController::class, 'index'])
             ->name('dashboard.income');
+
+        // CASHIER / POS
+        Route::get('/cashier/{id}', [ReservationController::class, 'cashier'])
+            ->name('dashboard.cashier');
+        Route::post('/cashier/{id}/process', [ReservationController::class, 'processPayment'])
+            ->name('dashboard.cashier.process');
     });
 
 // ======================

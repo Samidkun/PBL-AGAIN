@@ -242,6 +242,35 @@ public function getReservationsByDate($date)
 
 
 
+    // ======================================================
+    // ADMIN PANEL — CASHIER PAGE
+    // ======================================================
+    public function cashier($id)
+    {
+        $reservation = Reservation::findOrFail($id);
+        return view('dashboard.reservations.cashier', compact('reservation'));
+    }
+
+    public function processPayment(Request $request, $id)
+    {
+        $reservation = Reservation::findOrFail($id);
+
+        $request->validate([
+            'cash_received' => 'required|numeric|min:' . $reservation->total_price,
+        ]);
+
+        // Update Status
+        $reservation->status = 'completed';
+        $reservation->is_paid = 1;
+        $reservation->save();
+
+        // Optional: Record to Income table if you have one
+        // Income::create([...]);
+
+        return redirect()->route('dashboard.reservations')
+            ->with('success', 'Payment processed successfully! Job Completed.');
+    }
+
 }
 
 
