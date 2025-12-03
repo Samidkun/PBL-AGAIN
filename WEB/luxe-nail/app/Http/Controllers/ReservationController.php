@@ -15,10 +15,7 @@ class ReservationController extends Controller
     // ======================================================
     public function create()
     {
-        $n1 = rand(1, 9);
-        $n2 = rand(1, 9);
-        session(['captcha_answer' => $n1 + $n2]);
-        return view('reservations.create', compact('n1', 'n2'));
+        return view('reservations.create');
     }
 
     // ======================================================
@@ -33,15 +30,8 @@ class ReservationController extends Controller
             'treatment_type'   => 'required|in:nail_extension,nail_art',
             'reservation_date' => 'required|date',
             'reservation_time' => 'required|date_format:H:i',
-            'captcha'          => 'required|integer',
+            'captcha'          => 'required|captcha',
         ]);
-
-        if (intval($request->captcha) !== session('captcha_answer')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Jawaban Captcha Salah!'
-            ]);
-        }
 
         // 1. Hitung End Time berdasarkan durasi treatment
         $duration = 60; // Default

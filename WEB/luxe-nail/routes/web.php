@@ -65,6 +65,10 @@ Route::post('/admin/payment/{id}/confirm', [PaymentController::class, 'adminConf
     ->middleware('auth')
     ->name('payment.admin.confirm');
 
+
+
+Route::get('/captcha/image', [App\Http\Controllers\CaptchaController::class, 'generate'])->name('captcha.image');
+
 // ======================
 // PROFILE
 // ======================

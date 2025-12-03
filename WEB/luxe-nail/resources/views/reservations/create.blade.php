@@ -71,8 +71,14 @@
                         <div class="card p-4 mb-4">
                             <h5>Security Check</h5>
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Hitung: {{ $n1 }} + {{ $n2 }} = ?</label>
-                                <input type="number" name="captcha" class="form-control" required placeholder="Jawaban...">
+                                <label class="form-label fw-bold">Enter the code below</label>
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="{{ route('captcha.image') }}" alt="captcha" id="captcha-image">
+                                    <button type="button" class="btn btn-sm btn-secondary ms-2" id="reload-captcha">
+                                        Reload
+                                    </button>
+                                </div>
+                                <input type="text" name="captcha" class="form-control" required placeholder="Enter characters shown">
                             </div>
                         </div>
 
@@ -92,7 +98,11 @@
 
 <script>
 let captchaText = "";
-// Server-side captcha used instead
+
+// CAPTCHA RELOAD
+document.getElementById('reload-captcha').addEventListener('click', function() {
+    document.getElementById('captcha-image').src = '{{ route("captcha.image") }}' + '?' + Math.random();
+});
 
 // LOAD SLOTS
 const dateInput = document.getElementById("reservationDate");
