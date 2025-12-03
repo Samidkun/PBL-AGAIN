@@ -47,6 +47,7 @@ class ReservationController extends Controller
         // Logic: Artist yang TIDAK punya reservasi yang overlap dengan jam ini
         $bestArtist = NailArtist::whereDoesntHave('reservations', function ($q) use ($validated, $startTime, $endTime) {
             $q->where('reservation_date', $validated['reservation_date'])
+              ->where('status', '!=', 'cancelled') // Ignore cancelled reservations
               ->where(function ($query) use ($startTime, $endTime) {
                   $query->where('reservation_time', '<', $endTime->format('H:i:s'))
                         ->where('end_time', '>', $startTime->format('H:i:s'));

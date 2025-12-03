@@ -32,6 +32,7 @@
                 <a class="nav-link" href="#services">Services</a>
                 <a class="nav-link" href="#gallery">Gallery</a>
                 <a class="nav-link" href="#contact">Contact</a>
+                <a class="nav-link" href="{{ route('payment.check_invoice_form') }}">Check Booking</a>
                 <a class="btn btn-book" href="{{ route('reservations.create') }}">Book Now</a>
                 <a class="btn btn-login-nav" href="{{ route('login') }}">Login</a>
             </nav>
@@ -51,6 +52,7 @@
                 <a class="nav-link py-2" href="#services">Services</a>
                 <a class="nav-link py-2" href="#gallery">Gallery</a>
                 <a class="nav-link py-2" href="#contact">Contact</a>
+                <a class="nav-link py-2" href="{{ route('payment.check_invoice_form') }}">Check Booking</a>
                 <a class="btn btn-book mt-2" href="{{ route('reservations.create') }}">Book Now</a>
             </div>
         </div>

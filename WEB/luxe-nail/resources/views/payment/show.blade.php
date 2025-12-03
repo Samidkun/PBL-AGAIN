@@ -50,7 +50,10 @@
 
                             <div class="summary-item" style="grid-column: 1 / -1;">
                                 <span class="label">Queue Number</span>
-                                <span class="value">{{ $reservation->queue_number }}</span>
+                                <span class="value" style="font-size: 1.5rem; color: #d889a6;">{{ $reservation->queue_number }}</span>
+                                <small class="d-block text-danger mt-1" style="font-size: 0.8rem;">
+                                    <i class="fas fa-exclamation-circle"></i> SAVE THIS NUMBER! You can use it to check your booking status if you leave this page.
+                                </small>
                             </div>
                         </div>
                     </div>
