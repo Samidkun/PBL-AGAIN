@@ -15,6 +15,7 @@
         </div>
     </div>
 
+    {{-- =========================== FILTER SECTION =========================== --}}
     <div class="card-section filter-card mb-6">
         <h2 class="card-title" style="font-family: 'Georgia', serif;">Filters</h2>
         <form method="GET" action="{{ route('dashboard.income') }}">
@@ -23,9 +24,9 @@
                 <div class="filter-item">
                     <label class="filter-label-beauty">Tanggal</label>
                     <input type="date"
-                       name="date"
-                       class="filter-input-beauty"
-                       value="{{ request('date') }}">
+                           name="date"
+                           class="filter-input-beauty"
+                           value="{{ request('date') }}">
                 </div>
 
                 <div class="filter-item">
@@ -54,12 +55,11 @@
         </form>
     </div>
 
-
+    {{-- ======================== LIST DATA RINGKAS ======================== --}}
     <div class="card-section filter-card mb-6">
         <h2 class="card-title" style="font-family: 'Georgia', serif;">Reservation Customer Data</h2>
 
         <div class="payment-list">
-            {{-- Menggunakan $incomes yang sudah difilter dari controller --}}
             @forelse($incomes as $income)
             <div class="payment-item">
                 <div>
@@ -76,46 +76,37 @@
             @empty
             <p class="text-center mt-3">Belum ada data income berdasarkan filter ini.</p>
             @endforelse
-
         </div>
     </div>
 
-
-    {{-- PERBAIKAN DISINI: Blok @php yang error telah dihapus --}}
-
+    {{-- =========================== SUMMARY CARDS =========================== --}}
     <div class="summary-grid mb-6">
         <div class="summary-card">
             <p class="page-subtitle">Total Income Bulanan</p>
-            {{-- PERBAIKAN: Menggunakan variabel $totalMonthly dari Controller --}}
             <p class="value">Rp {{ number_format($totalMonthly, 0, ',', '.') }}</p>
         </div>
         <div class="summary-card">
             <p class="page-subtitle">Total Income Hari Ini</p>
-            {{-- PERBAIKAN: Menggunakan variabel $totalToday dari Controller --}}
             <p class="value">Rp {{ number_format($totalToday, 0, ',', '.') }}</p>
         </div>
         <div class="summary-card">
             <p class="page-subtitle">Total Reservation</p>
-            {{-- PERBAIKAN: Menggunakan variabel $totalReservation dari Controller --}}
             <p class="value">{{ $totalReservation }}</p>
         </div>
     </div>
 
-
+    {{-- =========================== INCOME CHART =========================== --}}
     <div class="card-section income-chart-card mb-10">
         <h2 class="card-title" style="font-family: 'Georgia', serif;">Income Chart</h2>
-        {{-- Placeholder dipercantik sedikit --}}
-        <div class="chart-placeholder" style="height: 300px; background-color: #f8f9fa; display: flex; justify-content: center; align-items: center; border-radius: 12px; border: 2px dashed #dee2e6; color: #6c757d;">
-            <p class="mb-0">(Area Chart Income - Membutuhkan implementasi JavaScript)</p>
-        </div>
+
+        <canvas id="incomeChart" style="height: 350px;"></canvas>
     </div>
 
-
+    {{-- =========================== DETAIL INCOME TABLE =========================== --}}
     <div class="detail-income mt-5">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="bold" style="color:#ffffff; font-family:'Georgia', serif;">Detail Income</h3>
-            {{-- Tombol ini me-refresh halaman ke default tanpa filter --}}
             <a href="{{ route('dashboard.income') }}" class="btn btn-sm text-light px-3 py-2"
                 style="background-color:#ee9ca7; border:none; border-radius:10px; font-family:'Georgia', serif;">
                 Reset Filter →
@@ -134,7 +125,6 @@
                             <th class="text-center">Tanggal</th>
                             <th class="text-center">Total</th>
                             <th class="text-center">Status</th>
-                            {{-- Menambahkan kolom aksi jika nanti dibutuhkan untuk Edit/Hapus --}}
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -156,10 +146,7 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                {{-- Contoh tombol aksi, sesuaikan routenya nanti --}}
-                                {{-- <a href="{{ route('dashboard.income.edit', $income->id) }}" class="btn btn-sm btn-outline-primary" style="border-radius: 8px;">
-                                    <i class="fas fa-edit"></i>
-                                </a> --}}
+                                {{-- Tambahkan aksi jika diperlukan --}}
                             </td>
                         </tr>
                         @empty
@@ -177,4 +164,48 @@
         </div>
     </div>
 </div>
+
+{{-- =========================== CHART.JS SCRIPT =========================== --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('incomeChart').getContext('2d');
+
+    const chartLabels = @json($chartLabels);
+    const chartValues = @json($chartValues);
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, "rgba(238, 156, 167, 0.7)");
+    gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                label: 'Income',
+                data: chartValues,
+                fill: true,
+                backgroundColor: gradient,
+                borderColor: "#ee9ca7",
+                borderWidth: 3,
+                tension: 0.35
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value) {
+                            return "Rp " + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+
 @endsection
