@@ -30,8 +30,7 @@ body {
 }
 
 /* =========================
-   SIDEBAR (DESKTOP DEFAULT)
-   markup sidebar lu aman
+   SIDEBAR (DESKTOP DEFAULT) markup sidebar
 ========================= */
 .sidebar {
   height: 100vh;
@@ -50,6 +49,17 @@ body {
 .sidebar-logo {
   width: 80px;
   height: 80px;
+  display: block;
+  margin: 1rem auto 1.2rem auto;   /* tengah + jarak atas/bawah */
+  border-radius: 50%;              /* biar bulat */
+  border: 3px solid var(--baby-pink);   /* ring pink muda */
+  padding: 4px;                        /* jarak antara gambar & ring */
+  box-shadow: 0 6px 15px rgba(216, 122, 135, 0.25); /* soft shadow pink */
+  object-fit: cover;                   /* logo tidak gepeng */
+  background: #fff;                    /* biar ring terlihat bersih */
+   /* shadow blur lembut kaya tombol */
+  box-shadow: 0 6px 18px rgba(216, 122, 135, 0.15);
+  object-fit: cover;
 }
 
 .sidebar h4 {
@@ -92,10 +102,8 @@ body {
 ========================= */
 .sidebar.collapsed {
   width: 80px;
-  padding: 2rem 0.5rem;
 }
 
-.sidebar.collapsed .sidebar-logo,
 .sidebar.collapsed h4,
 .sidebar.collapsed .divider,
 .sidebar.collapsed .menu a span {
@@ -114,7 +122,7 @@ body {
   color: var(--dark-pink);
 }
 
-/* tombol hamburger di sidebar lu */
+/* tombol hamburger di sidebar*/
 #toggleSidebar {
   background: #fff !important;
   border: 2px solid var(--baby-pink) !important;
@@ -154,22 +162,6 @@ body {
   color: var(--text-light);
 }
 
-/* notif icon */
-.user-info i {
-  color: var(--text-dark);
-  padding: 10px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: var(--shadow-sm);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.user-info i:hover {
-  background: var(--dark-pink);
-  color: var(--text-light);
-  box-shadow: var(--shadow-md);
-}
-
 /* =========================
    SECTION DIVIDER
 ========================= */
@@ -189,15 +181,17 @@ body {
   border: none;
   border-radius: var(--radius-md);
   padding: 1.5rem;
-  background: #fff;
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(145deg, #ffffff, #f8d7da) !important;
+  box-shadow: 0 6px 20px rgba(216, 122, 135, 0.18); /* 🔥 blur lebih lembut */
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   height: 100%;
 }
+
 .card-stat:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 28px rgba(216, 122, 135, 0.25); /* 🔥 hover lebih soft */
 }
+
 .card-stat.income-card {
   background: linear-gradient(135deg, #fff 0%, #d4edda 100%);
 }
