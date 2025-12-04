@@ -35,11 +35,11 @@ class IncomeController extends Controller
         if (!$reservation) {
             return response()->json(['success' => false, 'message' => 'Reservation not found'], 404);
         }
-        
+
         // CHECK: If paid, ensure no duplicate income record exists.
         // If is_paid=1 but NO income record, we allow it (case: bank transfer proof uploaded).
         if ($reservation->is_paid == 1 && $reservation->income()->exists()) {
-             return response()->json(['success' => false, 'message' => 'Reservation already paid and recorded.'], 400);
+            return response()->json(['success' => false, 'message' => 'Reservation already paid and recorded.'], 400);
         }
 
         $income = Income::create([
@@ -82,19 +82,42 @@ class IncomeController extends Controller
      */
     public function index()
     {
-        // 1. Ambil semua data income
+        // Ambil semua data income (untuk list)
         $incomes = Income::orderBy('created_at', 'desc')->get();
 
-        // 2. Hitung total bulanan
-        $totalMonthly = $incomes->sum('total_price');
+        // Total income bulan ini
+        $totalMonthly = Income::whereMonth('created_at', Carbon::now()->month)
+            ->sum('total_price');
 
-        // 3. Hitung total hari ini
-        $totalToday = Income::whereDate('created_at', Carbon::today())->sum('total_price');
+        // Total income hari ini
+        $totalToday = Income::whereDate('created_at', Carbon::today())
+            ->sum('total_price');
 
-        // 4. HITUNG JUMLAH RESERVASI/INCOME (FIXED $totalReservation)
+        // Total reservasi
         $totalReservation = $incomes->count();
 
-        // 5. KEMBALIKAN VIEW DENGAN SEMUA VARIABEL
-        return view('dashboard.income.dashboard_income', compact('incomes', 'totalMonthly', 'totalToday', 'totalReservation'));
+        // === DATA CHART ===
+        $incomePerMonth = Income::selectRaw('MONTH(created_at) as month, SUM(total_price) as total')
+            ->whereYear('created_at', date('Y'))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // Label bulan (Jan, Feb, Mar...)
+        $chartLabels = $incomePerMonth->pluck('month')->map(function ($month) {
+            return Carbon::create()->month($month)->format('M');
+        })->values()->toArray();  // FIX
+
+        // Data total income per bulan
+        $chartData = $incomePerMonth->pluck('total')->values()->toArray(); // FIX
+
+        return view('dashboard.income.dashboard_income', compact(
+            'incomes',
+            'totalMonthly',
+            'totalToday',
+            'totalReservation',
+            'chartLabels',
+            'chartData'
+        ));
     }
 }
