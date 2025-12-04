@@ -60,10 +60,19 @@ Route::get('/reservations/{id}/payment', [PaymentController::class, 'show'])->na
 Route::post('/reservations/{id}/paid', [PaymentController::class, 'markPaid'])->name('payment.paid');
 Route::get('/invoice/{queue}', [PaymentController::class, 'downloadInvoice'])->name('payment.invoice');
 
+// CHECK INVOICE
+Route::get('/check-invoice', [PaymentController::class, 'checkInvoiceForm'])->name('payment.check_invoice_form');
+Route::post('/check-invoice', [PaymentController::class, 'checkInvoice'])->name('payment.check_invoice');
+Route::get('/invoice-status/{queue}', [PaymentController::class, 'invoiceStatus'])->name('payment.invoice.status');
+
 // ADMIN CONFIRM PAYMENT
 Route::post('/admin/payment/{id}/confirm', [PaymentController::class, 'adminConfirm'])
     ->middleware('auth')
     ->name('payment.admin.confirm');
+
+
+
+Route::get('/captcha/image', [App\Http\Controllers\CaptchaController::class, 'generate'])->name('captcha.image');
 
 // ======================
 // PROFILE
@@ -114,6 +123,12 @@ Route::prefix('dashboard')
 
         Route::get('/income', [IncomeController::class, 'index'])
             ->name('dashboard.income');
+
+        // CASHIER / POS
+        Route::get('/cashier/{id}', [ReservationController::class, 'cashier'])
+            ->name('dashboard.cashier');
+        Route::post('/cashier/{id}/process', [ReservationController::class, 'processPayment'])
+            ->name('dashboard.cashier.process');
     });
 
 // ======================

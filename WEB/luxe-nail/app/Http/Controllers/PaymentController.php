@@ -14,6 +14,13 @@ class PaymentController extends Controller
     public function show($id)
     {
         $reservation = Reservation::findOrFail($id);
+
+        // Check Expiration
+        if ($reservation->status === 'pending' && $reservation->created_at->diffInHours(now()) >= 1) {
+            $reservation->status = 'cancelled';
+            $reservation->save();
+        }
+
         return view('payment.show', compact('reservation'));
     }
 
@@ -79,5 +86,41 @@ class PaymentController extends Controller
             ->setPaper('a5', 'portrait');
 
         return $pdf->download("Invoice_{$reservation->queue_number}.pdf");
+    }
+
+    // =================================================
+    // CHECK INVOICE FORM
+    // =================================================
+    public function checkInvoiceForm()
+    {
+        return view('payment.check_invoice');
+    }
+
+    // =================================================
+    // HANDLE CHECK INVOICE
+    // =================================================
+    public function checkInvoice(Request $request)
+    {
+        $request->validate([
+            'queue_number' => 'required|string|exists:reservations,queue_number'
+        ]);
+
+        return redirect()->route('payment.invoice.status', $request->queue_number);
+    }
+
+    // =================================================
+    // SHOW INVOICE STATUS
+    // =================================================
+    public function invoiceStatus($queue)
+    {
+        $reservation = Reservation::where('queue_number', $queue)->firstOrFail();
+
+        // Check Expiration
+        if ($reservation->status === 'pending' && $reservation->created_at->diffInHours(now()) >= 1) {
+            $reservation->status = 'cancelled';
+            $reservation->save();
+        }
+
+        return view('payment.invoice_status', compact('reservation'));
     }
 }

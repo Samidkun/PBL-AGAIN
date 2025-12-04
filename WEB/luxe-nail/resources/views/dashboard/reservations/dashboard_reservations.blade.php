@@ -71,6 +71,10 @@
                 <span>Confirmed</span>
             </div>
             <div class="stat-card">
+                <h3 id="waitingPaymentCount">0</h3>
+                <span>Waiting Payment</span>
+            </div>
+            <div class="stat-card">
                 <h3 id="cancelledCount">0</h3>
                 <span>Cancelled</span>
             </div>
@@ -139,6 +143,62 @@
     </div>
 </div>
 
+<div class="modal fade" id="proofModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Proof Verification</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-light p-4">
+                <div class="row">
+                    <div class="col-md-7 text-center border-end">
+                        <h6 class="fw-bold mb-3 text-muted">Proof of Payment</h6>
+                        <img id="proofImage" src="" class="img-fluid rounded shadow-sm" style="max-height: 400px; border: 1px solid #ddd;">
+                        <p id="noProofText" class="text-danger d-none mt-3">No proof uploaded</p>
+                    </div>
+                    <div class="col-md-5">
+                        <h6 class="fw-bold mb-3 text-muted">Reservation Details</h6>
+                        
+                        <div class="mb-3">
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Invoice Number</small>
+                            <div class="fs-5 fw-bold text-dark" id="modalQueue"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Customer Name</small>
+                            <div class="fs-6 text-dark" id="modalName"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Total Amount</small>
+                            <div class="fs-4 fw-bold text-primary" id="modalAmount"></div>
+                        </div>
+
+                        <div class="mb-4">
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Date & Time</small>
+                            <div class="fs-6 text-dark" id="modalDate"></div>
+                        </div>
+
+                        <div class="alert alert-info small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Please verify the transfer amount matches the proof.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button class="btn btn-danger px-4" id="rejectProofBtn">
+                    <i class="fas fa-times me-2"></i>Reject & Cancel
+                </button>
+                <button class="btn btn-success px-4" id="approveProofBtn">
+                    <i class="fas fa-check me-2"></i>Approve Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -151,8 +211,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
     const successModal = new bootstrap.Modal(document.getElementById('successModal'));
     const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+    const proofModal = new bootstrap.Modal(document.getElementById('proofModal'));
 
     document.getElementById('confirmActionBtn').addEventListener('click', executeConfirmedAction);
+
+    // =======================================================================================
+    // PROOF MODAL LOGIC
+    // =======================================================================================
+    window.viewProof = function(id, proofPath, queue, name, amount, date) {
+        currentReservationId = id;
+        const img = document.getElementById('proofImage');
+        const noProofText = document.getElementById('noProofText');
+
+        // Populate Details
+        document.getElementById('modalQueue').textContent = queue;
+        document.getElementById('modalName').textContent = name;
+        document.getElementById('modalAmount').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(amount);
+        document.getElementById('modalDate').textContent = date;
+
+        if (proofPath && proofPath !== 'null') {
+            // Use the served-image route with storage prefix
+            img.src = `/served-image/storage/${proofPath}`; 
+            img.classList.remove('d-none');
+            noProofText.classList.add('d-none');
+        } else {
+            img.classList.add('d-none');
+            noProofText.classList.remove('d-none');
+        }
+        proofModal.show();
+    };
+
+    document.getElementById('approveProofBtn').addEventListener('click', () => {
+        proofModal.hide();
+        approvePayment(currentReservationId);
+    });
+
+    document.getElementById('rejectProofBtn').addEventListener('click', () => {
+        proofModal.hide();
+        setStatus(currentReservationId, 'cancelled', 'Reject payment & cancel reservation?');
+    });
 
     // =======================================================================================
     // CALENDAR INIT
@@ -328,6 +425,7 @@ function formatDate(y, m, d) {
             const color = {
                 pending: "warning",
                 waiting_validation: "info",
+                waiting_payment: "warning", // New Status
                 confirmed: "success",
                 cancelled: "danger",
                 completed: "primary"
@@ -350,9 +448,21 @@ function formatDate(y, m, d) {
 
             // waiting_validation
             if (r.status === "waiting_validation") {
+                let amount = r.total_price ? r.total_price : 0;
                 actions += `
-                    <button class="btn-action btn-success" onclick="approvePayment(${r.id})">Approve Payment</button>
-                    <button class="btn-action btn-danger" onclick="setStatus(${r.id}, 'cancelled', 'Reject payment & cancel?')">Reject</button>
+                    <button class="btn-action btn-info text-white" 
+                        onclick="viewProof(${r.id}, '${r.payment_proof}', '${r.queue_number}', '${r.name}', ${amount}, '${r.reservation_date} ${r.reservation_time}')">
+                        <i class="fas fa-eye me-1"></i> Verify Payment
+                    </button>
+                `;
+            }
+
+            // waiting_payment (NEW - Ready for Cashier)
+            if (r.status === "waiting_payment") {
+                actions += `
+                    <a href="/dashboard/cashier/${r.id}" class="btn-action btn-success text-white text-decoration-none">
+                        <i class="fas fa-cash-register me-1"></i> Pay / Finish
+                    </a>
                 `;
             }
 
@@ -386,6 +496,9 @@ function formatDate(y, m, d) {
 
         document.getElementById('confirmedCount').textContent =
             data.filter(r => r.status === "confirmed").length;
+
+        document.getElementById('waitingPaymentCount').textContent =
+            data.filter(r => r.status === "waiting_payment").length;
 
         document.getElementById('cancelledCount').textContent =
             data.filter(r => r.status === "cancelled").length;
