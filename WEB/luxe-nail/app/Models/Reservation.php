@@ -30,4 +30,8 @@ class Reservation extends Model
     {
         return $this->hasOne(Income::class);
     }
+    public function nailArtist()
+    {
+        return $this->belongsTo(NailArtist::class, 'nail_artist_id');
+    }
 }
