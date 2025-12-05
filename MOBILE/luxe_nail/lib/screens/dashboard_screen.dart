@@ -46,7 +46,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         // Filter out completed and cancelled reservations
         reservations = (result['data'] as List).where((r) {
           String status = (r['status'] ?? '').toString().toLowerCase();
-          return status != 'completed' && status != 'cancelled';
+          return status != 'completed' &&
+              status != 'cancelled' &&
+              status != 'waiting_payment';
         }).toList();
       } else {
         reservations = [];
@@ -358,6 +360,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _reservationCard(Map<String, dynamic> reservation) {
     return GestureDetector(
       onTap: () async {
+        // CHECK DATE: Only allow processing for today's reservations
+        String todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        String resDate = reservation['reservation_date'] ?? '';
+
+        if (resDate != todayStr) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  "You can only process reservations scheduled for today."),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          return;
+        }
+
         // Navigate to GalleryScreen with reservation data
         final result = await Navigator.push(
           context,
@@ -379,7 +396,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         margin: const EdgeInsets.only(bottom: 20),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: (reservation['reservation_date'] ==
+                  DateFormat('yyyy-MM-dd').format(DateTime.now()))
+              ? Colors.white
+              : Colors.grey[100], // Grey out if not today
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
