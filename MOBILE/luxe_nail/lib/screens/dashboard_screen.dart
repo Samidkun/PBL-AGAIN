@@ -46,7 +46,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         // Filter out completed and cancelled reservations
         reservations = (result['data'] as List).where((r) {
           String status = (r['status'] ?? '').toString().toLowerCase();
-          return status != 'completed' && status != 'cancelled';
+          return status != 'completed' &&
+              status != 'cancelled' &&
+              status != 'waiting_payment';
         }).toList();
       } else {
         reservations = [];

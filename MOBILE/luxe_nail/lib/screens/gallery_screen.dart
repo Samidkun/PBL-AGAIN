@@ -408,7 +408,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                // Optionally refresh dashboard or reservation data here
+                // AUTO-FINISH: Navigate back to Dashboard
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/dashboard', (route) => false);
               },
               child: const Text("OK"),
             ),

@@ -251,6 +251,15 @@ public function getReservationsByDate($date)
         return view('dashboard.reservations.cashier', compact('reservation'));
     }
 
+    public function cashierQueue()
+    {
+        $reservations = Reservation::where('status', 'waiting_payment')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return view('dashboard.reservations.cashier_queue', compact('reservations'));
+    }
+
     public function processPayment(Request $request, $id)
     {
         $reservation = Reservation::findOrFail($id);

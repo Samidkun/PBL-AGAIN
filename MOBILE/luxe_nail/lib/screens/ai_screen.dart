@@ -662,8 +662,9 @@ class _CustomDesignViewState extends State<CustomDesignView> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Close dialog
-                Navigator.pop(context); // Close dialog
-                // Optionally navigate back to dashboard
+                // AUTO-FINISH: Navigate back to Dashboard
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/dashboard', (route) => false);
               },
               child: const Text("OK"),
             ),
