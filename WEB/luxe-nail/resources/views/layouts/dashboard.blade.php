@@ -39,9 +39,7 @@
             <div class="greeting">
                 @yield('greeting')
             </div>
-
             <div class="user-info d-flex align-items-center gap-2">
-                <i class="bi bi-bell fs-5 text-secondary"></i>
             </div>
         </div>
 
