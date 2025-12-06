@@ -180,7 +180,7 @@ The **Login** page allows **Admin** users to access the dashboard. Only admins c
 ## 🔄 **Customer Booking Flow**
 
 ### 1. **Book Now** 🗓️
-The **Book Now** button allows customers to easily book a service directly from the website by selecting a date, time, and service. Customers will fill out a form with the following fields:
+The **Book Now** button allows customers to easily book a service directly from the website by selecting the date, time, and service. Customers will complete a form with the following fields:
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/bb812703-035f-440b-8fa0-d4908df9e238" width="48%" />
@@ -201,5 +201,34 @@ The **Book Now** button allows customers to easily book a service directly from 
 - **Available Time Slots**: Select a time slot based on availability.
 - **Security Check**: Enter the verification code to confirm the booking.
 
-Once all the information is filled out, customers can click **Continue** to finalize the booking process and confirm their appointment.
+Once all the information is filled out, customers can click **Continue** to proceed to the next step.
+
+---
+
+### 2. **Booking Confirmation & Payment** 💳
+After customers click **Continue**, the **Booking Confirmation** page will appear, showing all booking details and the **Booking Rules**. Customers will then proceed to make a **down payment (DP)** and upload the **payment proof**.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/bb812703-035f-440b-8fa0-d4908df9e238" width="48%" />
+  <img src="https://github.com/user-attachments/assets/57079eca-4178-4ad2-a371-7cb3bc78ecae" width="48%" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b59bec92-97a0-428c-80e1-8df070c42d06" width="48%" />
+  <img src="https://github.com/user-attachments/assets/7f347c8c-a9bb-4e8b-bff4-5f2b64338e42" width="48%" />
+</p>
+
+- **Booking Summary**:
+  - Full Name
+  - Treatment
+  - Date
+  - Queue Number (unique and must be saved to check booking status)
+- **Payment Status**: Initially displayed as **Pending** until the customer uploads the payment proof.
+- **Payment Method**: Bank Transfer details will be shown for the customer to proceed with payment.
+- **Price Details**: Breakdown of the **Booking Fee** and **Service Price**.
+- **Upload Payment Proof**: Customers are required to upload the proof after making the payment.
+
+Once the **payment proof** is uploaded, customers can confirm their booking and will receive a message with their updated booking status.
+
+
 
