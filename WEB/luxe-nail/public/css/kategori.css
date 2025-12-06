@@ -4,24 +4,24 @@
     --medium-pink: #ee9ca7;
     --dark-pink: #d87a87;
     --accent-gold: #ffd700;
-    --text-dark: #451a2b;
+    --text-dark: #3a0f1f; /* Dark Maroon */
     --text-light: #ffffff;
 }
 
-/* SEMBUNYIKAN HEADER DASHBOARD DEFAULT - SAMA PERSIS KAYA RESERVASI */
+/* SEMBUNYIKAN HEADER DASHBOARD DEFAULT */
 .topbar {
     display: none !important;
 }
 
+/* MAIN CONTENT INHERITS DASHBOARD BG */
 .main-content {
     padding-top: 20px !important;
-    background: transparent !important;
+    /* Background handled by dashboard.css (Light Pink) */
 }
 
 .kategori-container {
     padding: 20px;
     min-height: calc(100vh - 80px);
-    background: transparent !important;
 }
 
 /* HEADER KATEGORI CUSTOM */
@@ -30,12 +30,13 @@
     border-radius: 20px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    box-shadow: 0 5px 20px rgba(216, 122, 135, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 2rem;
+    border: 1px solid rgba(243, 184, 194, 0.3);
 }
 
 .header-content h1 {
@@ -43,6 +44,7 @@
     font-weight: 700;
     font-size: 2.2rem;
     margin-bottom: 0.5rem;
+    font-family: "Playfair Display", serif;
 }
 
 .header-content p {
@@ -54,71 +56,151 @@
 /* FILTER DI HEADER */
 .header-filters {
     display: flex;
-    gap: 1rem;
+    gap: 12px;
     align-items: center;
     flex-wrap: wrap;
 }
 
 .filter-select {
     border: 1px solid var(--soft-pink);
-    border-radius: 8px;
-    padding: 8px 15px;
-    background: white;
+    border-radius: 10px;
+    padding: 10px 15px;
+    background-color: white;
     color: var(--text-dark);
     min-width: 180px;
     font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    /* Custom Dropdown Arrow */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23d87a87' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.filter-select:hover {
+    border-color: var(--dark-pink);
 }
 
 .filter-select:focus {
     border-color: var(--dark-pink);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(216, 122, 135, 0.2);
+    box-shadow: 0 0 0 3px rgba(216, 122, 135, 0.15);
 }
 
 .btn-reset {
-    background: var(--dark-pink);
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
+    background: white;
+    border: 1px solid var(--soft-pink);
+    color: var(--dark-pink);
+    padding: 10px 20px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s;
-    text-decoration: none;
-    display: inline-block;
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    height: 42px; /* Match select height */
 }
 
 .btn-reset:hover {
-    background: var(--medium-pink);
-    transform: translateY(-2px);
-    color: white;
+    background: var(--baby-pink);
+    color: var(--text-dark);
+    border-color: var(--dark-pink);
+    transform: translateY(-1px);
+}
+
+/* Fix for the Add Button to match height */
+.header-filters .btn-primary {
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(216, 122, 135, 0.3);
 }
 
 /* KARTU KATEGORI */
 .kategori-card {
-    transition: all 0.3s ease;
+    background: white;
     border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 .kategori-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(216, 122, 135, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(216, 122, 135, 0.15);
     border-color: var(--soft-pink);
 }
 
-.category-badge {
-    background: linear-gradient(135deg, var(--dark-pink), var(--medium-pink)) !important;
+.kategori-card .card-body {
+    padding: 1.25rem;
 }
 
+.kategori-card .card-title {
+    color: var(--text-dark);
+    font-family: "Playfair Display", serif;
+    letter-spacing: 0.5px;
+}
+
+.category-badge {
+    background: linear-gradient(
+        135deg,
+        var(--dark-pink),
+        var(--medium-pink)
+    ) !important;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* Card Image Placeholder */
+.card-img-top.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.card-img-top.bg-light i {
+    color: #dee2e6 !important;
+}
+
+/* Buttons inside card */
+.kategori-card .btn-outline-primary {
+    color: var(--dark-pink);
+    border-color: var(--dark-pink);
+}
+
+.kategori-card .btn-outline-primary:hover {
+    background-color: var(--dark-pink);
+    color: white;
+}
+
+.kategori-card .fw-bold.text-primary {
+    color: #4a90e2 !important; /* Blue price for contrast */
+}
+
+/* Section Headers */
+.text-dark-pink {
+    color: var(--text-dark) !important; /* Dark Maroon for headers */
+    font-family: "Playfair Display", serif;
+    letter-spacing: 1px;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+    color: white;
+}
+
+/* Empty State */
 .empty-state {
     opacity: 0.7;
-}
-
-.text-dark-pink {
-    color: var(--dark-pink) !important;
-}
-
-.empty-state i {
-    font-size: 4rem;
+    color: #666;
 }
 
 /* Responsive */
@@ -127,12 +209,12 @@
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .header-filters {
         width: 100%;
         margin-top: 1rem;
     }
-    
+
     .filter-select {
         flex: 1;
         min-width: auto;

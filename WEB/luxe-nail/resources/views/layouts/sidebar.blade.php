@@ -17,32 +17,32 @@
 
     <div class="menu text-start mt-4">
         <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="bi bi-house-door me-2"></i> Dashboard
+            <i class="bi bi-house-door me-2"></i> <span>Dashboard</span>
         </a>
         <a href="{{ route('dashboard.reservations') }}" class="{{ request()->routeIs('dashboard.reservations') ? 'active' : '' }}">
-            <i class="bi bi-calendar-check me-2"></i> Reservations
+            <i class="bi bi-calendar-check me-2"></i> <span>Reservations</span>
         </a>
         <a href="{{ route('staff.index') }}" class="{{ request()->routeIs('staff.index') ? 'active' : '' }}">
-            <i class="bi bi-people me-2"></i> Staff
+            <i class="bi bi-people me-2"></i> <span>Staff</span>
         </a>
         <a href="{{ route('dashboard.income') }}" class="{{ request()->routeIs('dashboard.income') ? 'active' : '' }}">
-            <i class="bi bi-cash-stack me-2"></i> Income
+            <i class="bi bi-cash-stack me-2"></i> <span>Income</span>
         </a>
         <a href="{{ route('dashboard.cashier.queue') }}" class="{{ request()->routeIs('dashboard.cashier.queue') ? 'active' : '' }}">
-            <i class="bi bi-wallet2 me-2"></i> Cashier
+            <i class="bi bi-wallet2 me-2"></i> <span>Cashier</span>
         </a>
         <a href="{{ route('profile.index') }}" class="{{ request()->routeIs('profile.index') ? 'active' : '' }}">
-            <i class="bi bi-person me-2"></i> Profile
+            <i class="bi bi-person me-2"></i> <span>Profile</span>
         </a>
 
         <a href="{{ route('kategori.index') }}" class="{{ request()->routeIs('kategori.*') ? 'active' : '' }}">
-            <i class="bi bi-tags me-2"></i> Kategori
+            <i class="bi bi-tags me-2"></i> <span>Categories</span>
         </a>
 
         <hr class="divider">
 
         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-danger fw-semibold" style="text-decoration:none;">
-            <i class="bi bi-box-arrow-right me-2"></i> Logout
+            <i class="bi bi-box-arrow-right me-2"></i> <span>Logout</span>
         </a>
 
         <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">

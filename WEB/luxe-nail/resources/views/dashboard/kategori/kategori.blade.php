@@ -1,22 +1,22 @@
 @extends('layouts.dashboard')
 
-@section('styles')
+@push('styles')
 <link rel="stylesheet" href="{{ asset('css/kategori.css') }}">
-@endsection
+@endpush
 
 @section('content')
 <div class="kategori-container">
     <!-- HEADER -->
     <div class="kategori-header">
         <div class="header-content">
-            <h1 class="mb-1 fw-bold">Management Kategori</h1>
-            <p class="mb-0 opacity-75">Kelola treatment types dan kategori-kategorinya</p>
+            <h1 class="mb-1 fw-bold">Category Management</h1>
+            <p class="mb-0 opacity-75">Manage treatment types and their categories</p>
         </div>
         
         <!-- FILTER & TOMBOL DI HEADER -->
         <div class="header-filters">
             <select name="treatment_type" class="filter-select" onchange="submitFilter()">
-                <option value="">Semua Treatment</option>
+                <option value="">All Treatments</option>
                 @foreach($allTreatmentTypes as $treatment)
                 <option value="{{ $treatment->id }}" {{ $selectedTreatmentType == $treatment->id ? 'selected' : '' }}>
                     {{ $treatment->name }}
@@ -25,7 +25,7 @@
             </select>
             
             <select name="category_type" class="filter-select" onchange="submitFilter()">
-                <option value="">Semua Kategori</option>
+                <option value="">All Categories</option>
                 @foreach($categoryTypes as $key => $name)
                 <option value="{{ $key }}" {{ $selectedCategoryType == $key ? 'selected' : '' }}>
                     {{ $name }}
@@ -38,7 +38,7 @@
             </a>
             
             <button class="btn btn-primary" onclick="showCategoryModal()">
-                <i class="bi bi-plus-circle me-2"></i>Tambah Kategori
+                <i class="bi bi-plus-circle me-2"></i>Add Category
             </button>
         </div>
     </div>
@@ -72,7 +72,7 @@
                 </div>
                 <div>
                     <span class="badge bg-light text-dark">
-                        {{ $treatmentType->categories->count() }} Kategori
+                        {{ $treatmentType->categories->count() }} Categories
                     </span>
                 </div>
             </div>
@@ -137,15 +137,15 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTitle">Tambah Kategori</h5>
+                <h5 class="modal-title" id="modalTitle">Add Category</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="modalBody">
                 <!-- Form akan di-load via AJAX -->
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary" onclick="submitCategoryForm()">Simpan</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitCategoryForm()">Save</button>
             </div>
         </div>
     </div>
@@ -157,7 +157,7 @@
         <div class="modal-content">
             <div class="modal-body text-center p-5">
                 <i class="bi bi-check-circle-fill text-success display-4"></i>
-                <h4 class="text-success mt-3" id="successMessage">Berhasil!</h4>
+                <h4 class="text-success mt-3" id="successMessage">Success!</h4>
                 <button type="button" class="btn btn-success mt-3" data-bs-dismiss="modal">OK</button>
             </div>
         </div>
@@ -190,7 +190,7 @@ function initModals() {
 function showCategoryModal() {
     initModals();
     currentCategoryId = null;
-    document.getElementById('modalTitle').textContent = 'Tambah Kategori';
+    document.getElementById('modalTitle').textContent = 'Add Category';
     document.getElementById('modalBody').innerHTML = '<div class="text-center"><div class="spinner-border"></div><p>Loading...</p></div>';
     
     // ✅ PERBAIKAN: Panggil route baru untuk partial form
@@ -217,7 +217,7 @@ function editCategory(categoryId) {
     initModals();
     console.log('Editing category:', categoryId);
     currentCategoryId = categoryId;
-    document.getElementById('modalTitle').textContent = 'Edit Kategori';
+    document.getElementById('modalTitle').textContent = 'Edit Category';
     document.getElementById('modalBody').innerHTML = '<div class="text-center"><div class="spinner-border"></div><p>Loading...</p></div>';
     
     // Load form edit via AJAX
@@ -256,7 +256,7 @@ function submitCategoryForm() {
     
     // Disable button dan show loading
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...';
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
     
     let url, method;
     
@@ -318,12 +318,12 @@ function submitCategoryForm() {
     .finally(() => {
         // Reset button
         submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Simpan';
+        submitBtn.innerHTML = 'Save';
     });
 }
 
 function deleteCategory(categoryId, categoryName) {
-    if (confirm(`Yakin ingin menghapus kategori "${categoryName}"?`)) {
+    if (confirm(`Are you sure you want to delete category "${categoryName}"?`)) {
         fetch(`/kategori/${categoryId}/ajax-delete`, {
             method: 'DELETE',
             headers: {

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:luxe_nail/services/api_service.dart';
 import 'package:luxe_nail/screens/dashboard_screen.dart';
+import 'package:luxe_nail/screens/history_screen.dart';
 import 'package:luxe_nail/screens/login_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
-import 'package:luxe_nail/screens/ai_screen.dart'; // kalau masih butuh nanti
-import 'package:luxe_nail/services/api_service.dart';
 
 class GalleryScreen extends StatefulWidget {
   final String token;
@@ -24,7 +23,6 @@ class GalleryScreen extends StatefulWidget {
 }
 
 class _GalleryScreenState extends State<GalleryScreen> {
-  // === dari katalog lama ===
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool _isLoading = true;
@@ -43,11 +41,13 @@ class _GalleryScreenState extends State<GalleryScreen> {
     // Shape
     'coffin (ballerina)', 'stiletto', 'almond', 'russian almond',
     // Color
-    'royal gold', 'platinum silver', 'black emerald', 'burgendy wine', 'burgundy wine', 'rose gold', 'rolse gold',
+    'royal gold', 'platinum silver', 'black emerald', 'burgendy wine',
+    'burgundy wine', 'rose gold', 'rolse gold',
     // Finish
     'holographic', 'holograpic', 'chrome powder', 'cat eye 9d', 'velvet touch',
     // Accessories
-    'swarovski crystals', '3d acrylic flower', 'gold foil flakes', 'genuine pearls', 'encapsulated art',
+    'swarovski crystals', '3d acrylic flower', 'gold foil flakes',
+    'genuine pearls', 'encapsulated art',
   };
 
   // Mapping untuk Nail Art items
@@ -61,16 +61,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
     // Accessories
     'simple glitter', 'minimalist line', 'small sticker',
   };
-  // === end katalog lama ===
 
   @override
   void initState() {
     super.initState();
-    // panggil fetch catalog (dari katalog lama)
     _fetchCatalog();
   }
 
-  // ================== JOB FINISH (dari Gallery baru) ==================
+  // ================== JOB FINISH ==================
   Future<void> _finishJob() async {
     if (widget.reservation == null) return;
 
@@ -108,7 +106,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
-  // ================== FETCH CATALOG (dari katalog lama) ==================
+  // ================== FETCH CATALOG ==================
   Future<void> _fetchCatalog() async {
     try {
       final result = await ApiService.getCategories(widget.token);
@@ -121,7 +119,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
           categories = result['data'] ?? categories;
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to load catalog: ${result['message']}")),
+            SnackBar(
+                content: Text("Failed to load catalog: ${result['message']}")),
           );
         }
       });
@@ -136,7 +135,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
-  // ================== HELPERS (gabungan: formatRupiah & show detail) ==================
+  // ================== HELPERS ==================
   String formatRupiah(dynamic price) {
     int priceInt = int.tryParse(price.toString()) ?? 0;
     return NumberFormat.currency(
@@ -146,7 +145,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
     ).format(priceInt);
   }
 
-  // Helper function to determine item type based on name (dari katalog lama)
   String getItemType(Map<String, dynamic> item) {
     final itemName = (item['name'] ?? '').toString().toLowerCase().trim();
 
@@ -156,17 +154,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
       return 'Nail Art';
     }
 
-    // Fallback: gunakan type dari backend jika ada
     return item['type'] ?? 'Unknown';
   }
 
-  // Show detail popup (dari katalog lama)
   void _showItemDetail(Map<String, dynamic> item) {
-    final imageUrl = item['image'] != null
-        ? "${ApiService.baseUrl}/${item['image']}"
-        : null;
+    final imageUrl =
+        item['image'] != null ? "${ApiService.baseUrl}/${item['image']}" : null;
 
-    final itemType = getItemType(item); // Get type based on name
+    final itemType = getItemType(item);
 
     showDialog(
       context: context,
@@ -197,9 +192,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: const [
-                                Icon(Icons.broken_image, size: 80, color: Colors.grey),
+                                Icon(Icons.broken_image,
+                                    size: 80, color: Colors.grey),
                                 SizedBox(height: 8),
-                                Text('Failed to load image', style: TextStyle(color: Colors.grey)),
+                                Text('Failed to load image',
+                                    style: TextStyle(color: Colors.grey)),
                               ],
                             ),
                           );
@@ -212,9 +209,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             color: Colors.grey[100],
                             child: CircularProgressIndicator(
                               value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
                                   : null,
-                              color: Color(0xFFAF7C85),
+                              color: const Color(0xFFAF7C85),
                             ),
                           );
                         },
@@ -235,7 +233,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   children: [
                     // Type Badge
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: itemType == 'Nail Extension'
                             ? Colors.blueAccent
@@ -333,11 +332,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
-  // ================== BUILD (appBar + tabs) ==================
+  // ================== BUILD ==================
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2, // Templates + Custom Design (di sini kita tampilkan katalog lama)
+      length: 2,
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: const Color(0xFFFFF1F3),
@@ -391,10 +390,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
         ),
         body: TabBarView(
           children: [
-            // TAB 1: existing Templates tab (tetap utuh)
             _buildTemplatesTab(),
-
-            // TAB 2: Custom Design -> kita masukkan katalog lama di sini
             _buildCustomDesignCatalogTab(),
           ],
         ),
@@ -402,7 +398,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
-  // ================== DRAWER (ambil dari salah satu versi, tetap sama) ==================
+  // ================== DRAWER ==================
   Widget _buildDrawer() {
     return Drawer(
       backgroundColor: const Color(0xFFFFF8F9),
@@ -411,20 +407,23 @@ class _GalleryScreenState extends State<GalleryScreen> {
         children: [
           DrawerHeader(
             decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Color(0xFFAF7C85), Color(0xFF975B73)])),
+              gradient: LinearGradient(
+                colors: [Color(0xFFAF7C85), Color(0xFF975B73)],
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Color(0xFFFFEAEE),
-                    child:
-                        Icon(Icons.person, size: 40, color: Color(0xFF451A2B))),
+                  radius: 30,
+                  backgroundColor: Color(0xFFFFEAEE),
+                  child: Icon(Icons.person, size: 40, color: Color(0xFF451A2B)),
+                ),
                 const SizedBox(height: 12),
                 Text('Welcome,',
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.9), fontSize: 14)),
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 14)),
                 Text(widget.user['username'] ?? '',
                     style: const TextStyle(
                         color: Colors.white,
@@ -438,16 +437,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
             title: const Text("Home",
                 style:
                     TextStyle(fontFamily: 'Poppins', color: Color(0xFF451A2B))),
-            onTap: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => DashboardScreen(
-                        token: widget.token, user: widget.user))),
+            onTap: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => DashboardScreen(
+                          token: widget.token, user: widget.user)));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.photo_library_rounded,
                 color: Color(0xFFAF7C85)),
-            title: const Text("Gallery",
+            title: const Text("Catalog",
                 style: TextStyle(
                     fontFamily: 'Poppins',
                     color: Color(0xFFAF7C85),
@@ -456,15 +457,30 @@ class _GalleryScreenState extends State<GalleryScreen> {
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
+            leading:
+                const Icon(Icons.history_rounded, color: Color(0xFF451A2B)),
+            title: const Text("History",
+                style:
+                    TextStyle(fontFamily: 'Poppins', color: Color(0xFF451A2B))),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => HistoryScreen(
+                          token: widget.token, user: widget.user)));
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.person_rounded, color: Color(0xFF451A2B)),
             title: const Text("Profile",
                 style:
                     TextStyle(fontFamily: 'Poppins', color: Color(0xFF451A2B))),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => ProfileScreen(token: widget.token)));
+                      builder: (_) => ProfileScreen(
+                          token: widget.token, user: widget.user)));
             },
           ),
           const Divider(color: Color(0xFFE5C1C8), thickness: 1),
@@ -485,9 +501,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
-  // ================== TEMPLATES TAB (tetap seperti kode baru) ==================
+  // ================== TEMPLATES TAB ==================
   Widget _buildTemplatesTab() {
-    // Dummy Data for Templates
     final List<Map<String, dynamic>> templates = [
       {
         'image': 'assets/images/gallery/nail1.jpg',
@@ -608,7 +623,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Colors.black.withOpacity(0.7),
+                              Colors.black.withValues(alpha: 0.7),
                               Colors.transparent
                             ],
                           ),
@@ -645,7 +660,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
-  // helper untuk show template details (dipakai di templates tab)
   void _showTemplateDetails(Map<String, dynamic> template) {
     showModalBottomSheet(
       context: context,
@@ -736,7 +750,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     elevation: 5,
-                    shadowColor: const Color(0xFF975B73).withOpacity(0.4),
+                    shadowColor: const Color(0xFF975B73).withValues(alpha: 0.4),
                   ),
                   child: const Text(
                     "Select This Design",
@@ -757,7 +771,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
-  // dipakai saat user pilih template (mengupdate reservation)
   Future<void> _confirmSelection(Map<String, dynamic> template) async {
     if (widget.reservation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -834,9 +847,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
-  // ================== CUSTOM DESIGN TAB: katalog lama dimasukkan di sini ==================
+  // ================== CUSTOM DESIGN TAB ==================
   Widget _buildCustomDesignCatalogTab() {
-    // This replicates the body from katalog lama (type toggle, filter bar, sections)
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -852,7 +864,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTypeToggle(), // All / Nail Art / Nail Extension
+                  _buildTypeToggle(),
                   const SizedBox(height: 16),
                   _buildFilterBar(),
                   const SizedBox(height: 20),
@@ -863,73 +875,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
-  // ================== WIDGET-HELPERS dari katalog lama ==================
-  Widget _buildHeader() {
-    final bool canPop = Navigator.of(context).canPop();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 26),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // back/menu icon
-          GestureDetector(
-            onTap: () {
-              if (canPop) {
-                Navigator.pop(context);
-              } else {
-                _scaffoldKey.currentState!.openDrawer();
-              }
-            },
-            child: Icon(
-              canPop ? Icons.arrow_back_ios_new_rounded : Icons.menu,
-              size: 25,
-              color: const Color(0xFF451A2B),
-            ),
-          ),
-          const Text(
-            'LUXE NAIL',
-            style: TextStyle(
-              color: Color(0xFF975B73),
-              fontSize: 22,
-              fontFamily: 'Georgia',
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTitle() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 26),
-      child: Text(
-        "Nail Art Catalog & Pricing",
-        style: TextStyle(
-          color: Color(0xFF451A2B),
-          fontSize: 24,
-          fontFamily: 'Poppins',
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
   Widget _buildTypeToggle() {
     return Row(
       children: [
-        Expanded(
-          child: _buildTypeButton("All", "all"),
-        ),
+        Expanded(child: _buildTypeButton("All", "all")),
         const SizedBox(width: 12),
-        Expanded(
-          child: _buildTypeButton("Nail Art", "Nail Art"),
-        ),
+        Expanded(child: _buildTypeButton("Nail Art", "Nail Art")),
         const SizedBox(width: 12),
-        Expanded(
-          child: _buildTypeButton("Nail Extension", "Nail Extension"),
-        ),
+        Expanded(child: _buildTypeButton("Nail Extension", "Nail Extension")),
       ],
     );
   }
@@ -960,7 +913,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFFAF7C85).withOpacity(0.3),
+                    color: const Color(0xFFAF7C85).withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   )
@@ -989,7 +942,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 5,
             offset: const Offset(0, 2),
           )
@@ -998,7 +951,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: selectedCategoryFilter,
-          hint: const Text("Filter by category", style: TextStyle(fontSize: 14)),
+          hint:
+              const Text("Filter by category", style: TextStyle(fontSize: 14)),
           items: const [
             DropdownMenuItem(value: "all", child: Text("All Categories")),
             DropdownMenuItem(value: "shape", child: Text("Shape")),
@@ -1012,7 +966,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
             });
           },
           isExpanded: true,
-          style: const TextStyle(color: Color(0xFF451A2B), fontFamily: 'Poppins'),
+          style:
+              const TextStyle(color: Color(0xFF451A2B), fontFamily: 'Poppins'),
           icon: const Icon(Icons.keyboard_arrow_down_rounded),
         ),
       ),
@@ -1064,7 +1019,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
             ),
           ),
         ),
-
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -1077,7 +1031,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
           itemCount: filteredItems.length,
           itemBuilder: (context, index) {
             final item = filteredItems[index];
-            final itemType = getItemType(item); // Get type based on name
+            final itemType = getItemType(item);
 
             final imageUrl = item['image'] != null
                 ? "${ApiService.baseUrl}/${item['image']}"
@@ -1093,7 +1047,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   shadowColor: Colors.black12,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
-                    onTap: () => _showItemDetail(item), // Show popup on tap
+                    onTap: () => _showItemDetail(item),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1114,25 +1068,36 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                         alignment: Alignment.center,
                                         color: Colors.grey[200],
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: const [
-                                            Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                                            Icon(Icons.broken_image,
+                                                size: 40, color: Colors.grey),
                                             SizedBox(height: 4),
-                                            Text('Image Error', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                            Text('Image Error',
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.grey)),
                                           ],
                                         ),
                                       );
                                     },
-                                    loadingBuilder: (context, child, loadingProgress) {
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
                                       if (loadingProgress == null) return child;
                                       return Container(
                                         alignment: Alignment.center,
                                         color: Colors.grey[100],
                                         child: CircularProgressIndicator(
-                                          value: loadingProgress.expectedTotalBytes != null
-                                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
                                               : null,
-                                          color: Color(0xFFAF7C85),
+                                          color: const Color(0xFFAF7C85),
                                         ),
                                       );
                                     },
@@ -1145,7 +1110,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                   ),
                           ),
                         ),
-
                         Padding(
                           padding: const EdgeInsets.all(12),
                           child: Column(
@@ -1191,12 +1155,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     ),
                   ),
                 ),
-
                 Positioned(
                   top: 8,
                   right: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: itemType == 'Nail Extension'
                           ? Colors.blueAccent
@@ -1217,13 +1181,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
             );
           },
         ),
-
         const SizedBox(height: 20),
       ],
     );
   }
 
-  // small helper row for template details bottom sheet
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),

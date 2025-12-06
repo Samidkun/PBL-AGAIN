@@ -9,7 +9,7 @@ class FinishingScreen extends StatelessWidget {
   final String token;
   final Map<String, dynamic> user;
 
-   FinishingScreen({
+  FinishingScreen({
     super.key,
     required this.token,
     required this.user,
@@ -159,31 +159,49 @@ class FinishingScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                _posText(sW(115), sH(41), "Luxe Nail", 16, true),
-                                _posText(sW(102), sH(65),
-                                    "DD/MM/YYYY 00:00 PM", 9, false),
-                                _posText(sW(62), sH(79),
-                                    "Street. Fill with Address No.1/ABC Malang",
+                                _posText(
+                                    sW(115), sH(41), "Luxe Nail", 16, true),
+                                _posText(sW(102), sH(65), "DD/MM/YYYY 00:00 PM",
                                     9, false),
+                                _posText(
+                                    sW(62),
+                                    sH(79),
+                                    "Street. Fill with Address No.1/ABC Malang",
+                                    9,
+                                    false),
                                 _posText(sW(84), sH(93),
                                     "Phone Number : 087723456781", 9, false),
 
-                                _posText(sW(24), sH(131), "Category Nails :", 10, false),
-                                _posText(sW(24), sH(164), "Type Nails :", 10, false),
-                                _posText(sW(24), sH(197), "Color Nails :", 10, false),
-                                _posText(sW(24), sH(228), "Accessories Nails :", 10, false),
-                                _posText(sW(118), sH(276), "Total :", 10, false),
+                                _posText(sW(24), sH(131), "Category Nails :",
+                                    10, false),
+                                _posText(
+                                    sW(24), sH(164), "Type Nails :", 10, false),
+                                _posText(sW(24), sH(197), "Color Nails :", 10,
+                                    false),
+                                _posText(sW(24), sH(228), "Accessories Nails :",
+                                    10, false),
+                                _posText(
+                                    sW(118), sH(276), "Total :", 10, false),
 
-                                _posText(sW(83), sH(144), "xxxxxxx Nails", 10, false),
-                                _posText(sW(83), sH(177), "xxxxxxx Nails", 10, false),
-                                _posText(sW(83), sH(210), "xxxxxxx Nails", 10, false),
-                                _posText(sW(83), sH(243), "xxxxxxx Nails", 10, false),
+                                _posText(sW(83), sH(144), "xxxxxxx Nails", 10,
+                                    false),
+                                _posText(sW(83), sH(177), "xxxxxxx Nails", 10,
+                                    false),
+                                _posText(sW(83), sH(210), "xxxxxxx Nails", 10,
+                                    false),
+                                _posText(sW(83), sH(243), "xxxxxxx Nails", 10,
+                                    false),
 
-                                _posText(sW(225), sH(144), "Rp. 20.000,-", 10, false),
-                                _posText(sW(225), sH(177), "Rp. 20.000,-", 10, false),
-                                _posText(sW(225), sH(210), "Rp. 20.000,-", 10, false),
-                                _posText(sW(225), sH(243), "Rp. 20.000,-", 10, false),
-                                _posText(sW(225), sH(276), "Rp. 20.000,-", 10, false),
+                                _posText(sW(225), sH(144), "Rp. 20.000,-", 10,
+                                    false),
+                                _posText(sW(225), sH(177), "Rp. 20.000,-", 10,
+                                    false),
+                                _posText(sW(225), sH(210), "Rp. 20.000,-", 10,
+                                    false),
+                                _posText(sW(225), sH(243), "Rp. 20.000,-", 10,
+                                    false),
+                                _posText(sW(225), sH(276), "Rp. 20.000,-", 10,
+                                    false),
                               ],
                             ),
                           ),
@@ -377,7 +395,7 @@ class FinishingScreen extends StatelessWidget {
               () => Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ProfileScreen(token: token),
+                  builder: (_) => ProfileScreen(token: token, user: user),
                 ),
                 (route) => false,
               ),

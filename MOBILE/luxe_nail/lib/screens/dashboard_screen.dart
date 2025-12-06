@@ -167,7 +167,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 12),
                 Text('Welcome,',
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.9), fontSize: 14)),
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 14)),
                 Text(widget.user['username'] ?? '',
                     style: const TextStyle(
                         color: Colors.white,
@@ -223,7 +224,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (_) => ProfileScreen(token: widget.token)));
+                      builder: (_) => ProfileScreen(
+                          token: widget.token, user: widget.user)));
             },
           ),
           ListTile(
@@ -327,7 +329,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4))
                   ]),
@@ -403,7 +405,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFAF7C85).withOpacity(0.15),
+              color: const Color(0xFFAF7C85).withValues(alpha: 0.15),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),

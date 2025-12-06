@@ -9,7 +9,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String token;
-  const ProfileScreen({super.key, required this.token});
+  final Map<String, dynamic>
+      user; // Added user parameter to match other screens
+
+  const ProfileScreen({super.key, required this.token, required this.user});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -24,7 +27,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchUserProfile();
+    // Use user data passed from widget if available, otherwise fetch
+    if (widget.user.isNotEmpty) {
+      user = widget.user;
+      _isLoading = false;
+    } else {
+      _fetchUserProfile();
+    }
   }
 
   Future<void> _fetchUserProfile() async {
@@ -44,33 +53,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (response.statusCode == 200) {
         if (response.body.isNotEmpty) {
           final data = jsonDecode(response.body);
-          setState(() {
-            user = data;
-            _isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              user = data;
+              _isLoading = false;
+            });
+          }
         } else {
+          if (mounted) {
+            setState(() {
+              errorMessage = 'Failed to load profile. Empty response body.';
+              _isLoading = false;
+            });
+          }
+        }
+      } else if (response.statusCode == 401) {
+        if (mounted) {
           setState(() {
-            errorMessage = 'Failed to load profile. Empty response body.';
+            errorMessage = 'Session expired. Please log in again.';
             _isLoading = false;
           });
         }
-      } else if (response.statusCode == 401) {
-        setState(() {
-          errorMessage = 'Session expired. Please log in again.';
-          _isLoading = false;
-        });
       } else {
+        if (mounted) {
+          setState(() {
+            errorMessage =
+                'Failed to load profile. [${response.statusCode}] ${response.reasonPhrase}';
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         setState(() {
-          errorMessage =
-              'Failed to load profile. [${response.statusCode}] ${response.reasonPhrase}';
+          errorMessage = 'Unexpected error: $e';
           _isLoading = false;
         });
       }
-    } catch (e) {
-      setState(() {
-        errorMessage = 'Unexpected error: $e';
-        _isLoading = false;
-      });
     }
   }
 
@@ -165,7 +184,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFD87A87).withOpacity(0.25),
+                              color: const Color(0xFFD87A87)
+                                  .withValues(alpha: 0.25),
                               blurRadius: 40,
                               offset: const Offset(0, 10),
                             ),
@@ -197,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     boxShadow: [
                                       BoxShadow(
                                         color: const Color(0xFF451A2B)
-                                            .withOpacity(0.3),
+                                            .withValues(alpha: 0.3),
                                         blurRadius: 24,
                                         offset: const Offset(0, 8),
                                       ),
@@ -205,10 +225,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      (user?['name'] ?? 'U')
-                                          .toString()
-                                          .substring(0, 2)
-                                          .toUpperCase(),
+                                      () {
+                                        final name =
+                                            (user?['name'] ?? 'U').toString();
+                                        return name.length >= 2
+                                            ? name.substring(0, 2).toUpperCase()
+                                            : name.toUpperCase();
+                                      }(),
                                       style: const TextStyle(
                                         fontSize: 48,
                                         fontFamily: 'Poppins',
@@ -229,7 +252,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.15),
+                                          color: Colors.black
+                                              .withValues(alpha: 0.15),
                                           blurRadius: 12,
                                           offset: const Offset(0, 4),
                                         ),
@@ -277,7 +301,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     fontSize: 15,
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w500,
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Colors.white.withValues(alpha: 0.9),
                                   ),
                                 ),
                               ],
@@ -292,7 +316,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
+                                color: Colors.white.withValues(alpha: 0.3),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -338,8 +362,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color:
-                                    const Color(0xFFD87A87).withOpacity(0.15),
+                                color: const Color(0xFFD87A87)
+                                    .withValues(alpha: 0.15),
                                 blurRadius: 40,
                                 offset: const Offset(0, 10),
                               ),
@@ -397,8 +421,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color:
-                                      const Color(0xFFEE9CA7).withOpacity(0.4),
+                                  color: const Color(0xFFEE9CA7)
+                                      .withValues(alpha: 0.4),
                                   blurRadius: 20,
                                   offset: const Offset(0, 8),
                                 ),
@@ -476,7 +500,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 Text('Welcome,',
                     style: TextStyle(
-                        color: Colors.white.withOpacity(0.9), fontSize: 14)),
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 14)),
                 Text(user?['username'] ?? '',
                     style: const TextStyle(
                         color: Colors.white,

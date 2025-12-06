@@ -168,7 +168,7 @@
                 <i class="bi bi-brush-fill me-2"></i> Nail Artist Schedule
             </h3>
             <p class="mb-0" style="opacity: 0.9;">
-                List nail artist & status mereka hari ini
+                List of nail artists & their status today
             </p>
         </div>
     </div>

@@ -635,7 +635,8 @@ class _DesignScreenState extends State<DesignScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ProfileScreen(token: widget.token),
+                  builder: (_) =>
+                      ProfileScreen(token: widget.token, user: widget.user),
                 ),
               );
             },

@@ -297,7 +297,7 @@ class AccessorisScreen extends StatelessWidget {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ProfileScreen(token: token),
+                        builder: (_) => ProfileScreen(token: token, user: user),
                       ),
                       (route) => false,
                     );

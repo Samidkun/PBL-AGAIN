@@ -331,7 +331,7 @@ class _CustomDesignViewState extends State<CustomDesignView> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
+                                color: Colors.black.withValues(alpha: 0.05),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -422,12 +422,6 @@ class _CustomDesignViewState extends State<CustomDesignView> {
     int pFinish = int.tryParse(finishItem?['price'].toString() ?? '0') ?? 0;
     int pAccessory =
         int.tryParse(accessoryItem?['price'].toString() ?? '0') ?? 0;
-    int basePrice =
-        int.tryParse(widget.reservation?['total_price'].toString() ?? '') ??
-            int.tryParse(widget.reservation?['price'].toString() ?? '0') ??
-            0;
-
-    int grandTotal = basePrice + pShape + pColor + pFinish + pAccessory;
 
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -479,7 +473,7 @@ class _CustomDesignViewState extends State<CustomDesignView> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -519,7 +513,7 @@ class _CustomDesignViewState extends State<CustomDesignView> {
                     ? []
                     : [
                         BoxShadow(
-                          color: const Color(0xFF975B73).withOpacity(0.3),
+                          color: const Color(0xFF975B73).withValues(alpha: 0.3),
                           blurRadius: 12,
                           offset: const Offset(0, 6),
                         ),

@@ -14,10 +14,10 @@
                     <div id="bookingRules" class="d-none">
                         <h4 class="mb-3">Booking Rules</h4>
                         <ul>
-                            <li>Jika tidak hadir → uang booking hangus.</li>
-                            <li>Wajib download struk booking untuk mendapatkan nomor antrian.</li>
-                            <li>Metode pembayaran: Transfer.</li>
-                            <li>Booking on-site tersedia tetapi slot terbatas.</li>
+                            <li>If you do not attend → booking fee is forfeited.</li>
+                            <li>Must download the booking receipt to get a queue number.</li>
+                            <li>Payment method: Transfer.</li>
+                            <li>On-site booking is available but slots are limited.</li>
                         </ul>
                     </div>
 
@@ -141,7 +141,7 @@ function initSlotSelectors() {
         btn.onclick = () => {
             document.querySelectorAll(".slotBtn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            selectedTimeInput.value = btn.dataset.time;
+            document.getElementById('selectedTimeInput').value = btn.dataset.time;
         };
     });
 }
@@ -154,11 +154,11 @@ bookingForm.addEventListener("submit", async(e)=>{
 
     Swal.fire({
         title:"Booking Confirmation",
-        html: bookingRules.innerHTML,
+        html: document.getElementById('bookingRules').innerHTML,
         icon:"info",
         showCancelButton:true,
-        confirmButtonText:"Lanjut",
-        cancelButtonText:"Batal"
+        confirmButtonText:"Continue",
+        cancelButtonText:"Cancel"
     }).then(async(r)=>{
         if(!r.isConfirmed) return;
 
