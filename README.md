@@ -235,5 +235,25 @@ After customers click **Continue**, the **Booking Confirmation** page will appea
 
 Once the **payment proof** is uploaded, customers can confirm their booking and will receive a message with their updated booking status.
 
+---
 
+### 3. **Check Booking Status** 📋
+
+Customers can check the status of their booking by entering their **Queue Number**. The system will display whether the booking has been **confirmed** by the admin or if it is still **pending**.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8457f474-1316-49a4-9b43-2c2cef552cc7" width="48%" />
+  <img src="https://github.com/user-attachments/assets/279c36cb-77e2-4068-bf5c-2a7b7156857e" width="48%" />
+  <img src="https://github.com/user-attachments/assets/cde85c4f-0dae-4160-80a7-20db05f9eae5" width="48%" />
+</p>
+
+- **Enter Queue Number**: 
+  - The user will be prompted to enter the **Queue Number** they received after booking.
+- **Click "Check Status"**: 
+  - Once the Queue Number is entered, the user clicks **Check Status** to submit the request.
+- **Booking Status**: 
+  - If the booking is confirmed, the status will show **Confirmed** with booking details.
+  - If the booking is pending, the status will show **Waiting Validation** with a note indicating it is awaiting confirmation.
+
+---
 
