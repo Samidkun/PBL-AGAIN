@@ -177,6 +177,128 @@ The **Login** page allows **Admin** users to access the dashboard. Only admins c
 
 ---
 
+# Admin Flow 🚀
+
+This guide outlines the admin flow for managing the **Luxe Nail** website, including all key sections that an admin can interact with.
+
+## **1. Login as Admin 🔐**
+
+To access the admin section, the admin must first log in using their **email** and **password**.
+
+- **Admin Email**: admin@luxenail.com
+- **Password**: [Admin's Password]
+
+Upon successful login, the admin will be redirected to the **Dashboard** page.
+
+---
+
+## **2. Dashboard 📊**
+
+The **Dashboard** provides an overview of key data and statistics for the **Luxe Nail** business.
+
+- **Total Reservations**: Displays the number of reservations for the current month.
+- **Total Nail Art**: Shows the total number of nail art treatments booked.
+- **Total Nail Extension**: Displays the total number of nail extension treatments booked.
+- **Total Income**: A summary of the total income generated.
+
+### **Income Trend Graph**:
+- A graph that tracks the income generated over the course of the month, helping the admin monitor performance.
+
+- **Recent Reservations**: A table showing recent bookings with customer details, service type, artist, and booking status.
+
+<p align="center">
+  <img src="/mnt/data/4ee52fe4-910f-49e6-a33e-f339e433cd8c.png" width="80%" />
+</p>
+
+---
+
+## **3. Reservations 📅**
+
+The **Reservations** section allows the admin to view, edit, and manage customer bookings.
+
+- **Customer Name**: Displays the name of the customer.
+- **Service**: Indicates the service booked (Nail Art, Nail Extension, etc.).
+- **Artist**: Shows the artist assigned to the customer.
+- **Date & Time**: Shows the reservation's scheduled time.
+- **Status**: Displays the status of the booking (e.g., Confirmed, Pending, or Waiting for Validation).
+
+<p align="center">
+  <img src="/mnt/data/530674ff-c4bf-43f8-92c3-fca9c4c4652e.png" width="80%" />
+</p>
+
+---
+
+## **4. Staff 👩‍🔧**
+
+The **Staff** section allows the admin to manage all staff accounts.
+
+- **Staff List**: Displays the list of all staff members with their names and emails.
+- **Nail Artist Schedule**: Shows the status and schedule of each nail artist (e.g., Available, Busy, or Break).
+
+<p align="center">
+  <img src="/mnt/data/467002c7-613b-447c-b245-3784ba1c6f24.png" width="80%" />
+</p>
+
+---
+
+## **5. Income 💰**
+
+The **Income** section provides an overview of the income generated through reservations.
+
+- **Filters**: Admin can filter income by date and service type.
+- **Reservation Customer Data**: Lists the reservations along with the amount charged to each customer.
+- **Total Monthly Income**: Displays the total income generated in the selected period.
+
+<p align="center">
+  <img src="/mnt/data/3d9e78a1-45ff-4105-b239-2302d1595921.png" width="80%" />
+</p>
+
+---
+
+## **6. Cashier 💳**
+
+The **Cashier Queue** allows the admin to manage pending payments.
+
+- **Queue Number**: Displays the unique number for each pending transaction.
+- **Customer**: Shows the customer's name.
+- **Treatment**: Lists the service the customer is paying for.
+- **Total Bill**: Displays the amount the customer needs to pay.
+- **Time Finished**: Shows the time when the treatment was completed.
+
+<p align="center">
+  <img src="/mnt/data/b291380b-3acf-4d6e-aa39-f80e34eb6e4d.png" width="80%" />
+</p>
+
+---
+
+## **7. Profile 👤**
+
+The **Profile** section allows the admin to view and update personal information.
+
+- **Full Name**: Admin’s name.
+- **Email Address**: Admin’s email address.
+- **Password**: Admin can update their password.
+
+<p align="center">
+  <img src="/mnt/data/467002c7-613b-447c-b245-3784ba1c6f24.png" width="80%" />
+</p>
+
+---
+
+## **8. Categories 📂**
+
+The **Categories** section allows the admin to manage the types of services offered.
+
+- **Add New Category**: Admin can add new categories for different services.
+- **Edit or Delete Categories**: Admin can manage existing service categories.
+
+---
+
+## **9. Logout 🚪**
+
+The **Logout** button is available at the bottom of the sidebar to securely log out of the admin panel.
+
+---
 ## 🔄 **Customer Booking Flow**
 
 ### 1. **Book Now** 🗓️
@@ -209,13 +331,18 @@ Once all the information is filled out, customers can click **Continue** to proc
 After customers click **Continue**, the **Booking Confirmation** page will appear, showing all booking details and the **Booking Rules**. Customers will then proceed to make a **down payment (DP)** and upload the **payment proof**.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/bb812703-035f-440b-8fa0-d4908df9e238" width="48%" />
-  <img src="https://github.com/user-attachments/assets/57079eca-4178-4ad2-a371-7cb3bc78ecae" width="48%" />
+  <img src="https://github.com/user-attachments/assets/09472fb5-da21-47bf-bfda-2785e52611b3" width="48%" />
+  <img src="https://github.com/user-attachments/assets/f3b8ea84-98b3-44ee-8a47-d652c58b1ed1" width="48%" />
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/b59bec92-97a0-428c-80e1-8df070c42d06" width="48%" />
-  <img src="https://github.com/user-attachments/assets/7f347c8c-a9bb-4e8b-bff4-5f2b64338e42" width="48%" />
+  <img src="https://github.com/user-attachments/assets/aae9cc34-aabd-4a20-a34e-ac174f188efe" width="48%" />
+  <img src="https://github.com/user-attachments/assets/28f3c398-08ec-4698-8a8c-4156efaf665a" width="48%" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/cde85c4f-0dae-4160-80a7-20db05f9eae5" width="48%" />
+  <img src="https://github.com/user-attachments/assets/85804427-4fdb-4045-9fed-c6b8111290fe" width="48%" />
 </p>
 
 - **Booking Summary**:
@@ -230,5 +357,27 @@ After customers click **Continue**, the **Booking Confirmation** page will appea
 
 Once the **payment proof** is uploaded, customers can confirm their booking and will receive a message with their updated booking status.
 
+---
 
+### 3. **Check Booking Status** 📋
+
+Customers can check the status of their booking by entering their **Queue Number**. The system will display whether the booking has been **confirmed** by the admin or if it is still **pending**.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8457f474-1316-49a4-9b43-2c2cef552cc7" width="48%" />
+  <img src="https://github.com/user-attachments/assets/279c36cb-77e2-4068-bf5c-2a7b7156857e" width="48%" />
+  <img src="https://github.com/user-attachments/assets/f71e5d8a-b77c-49c4-9791-467c7d847652" width="48%" />
+  <img src="https://github.com/user-attachments/assets/c1855f4c-a2b2-44c7-a1a5-2c9af0594651" width="48%" />
+</p>
+
+- **Enter Queue Number**: 
+  - The user will be prompted to enter the **Queue Number** they received after booking.
+- **Click "Check Status"**: 
+  - Once the Queue Number is entered, the user clicks **Check Status** to submit the request.
+- **Booking Status**: 
+  - If the booking is confirmed, the status will show **Confirmed** with booking details.
+  - If the booking is pending, the status will show **Waiting Validation** with a note indicating it is awaiting confirmation.
+  - If the booking status is **Expired / Cancelled**, this usually happens because the payment was not completed within the specified time or the payment proof was unclear or missing.
+
+---
 
