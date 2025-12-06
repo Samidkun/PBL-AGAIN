@@ -175,3 +175,31 @@ The **Login** page allows **Admin** users to access the dashboard. Only admins c
 - **Admin Dashboard**: Only accessible by admins to manage all aspects of the platform.
 - **Manage Customer Data & Bookings**: Admins can view, update, and manage customer data and booking statuses.
 
+---
+
+## 🔄 **Customer Booking Flow**
+
+### 1. **Book Now** 🗓️
+The **Book Now** button allows customers to easily book a service directly from the website by selecting a date, time, and service. Customers will fill out a form with the following fields:
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/bb812703-035f-440b-8fa0-d4908df9e238" width="48%" />
+  <img src="https://github.com/user-attachments/assets/57079eca-4178-4ad2-a371-7cb3bc78ecae" width="48%" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b59bec92-97a0-428c-80e1-8df070c42d06" width="48%" />
+  <img src="https://github.com/user-attachments/assets/7f347c8c-a9bb-4e8b-bff4-5f2b64338e42" width="48%" />
+</p>
+
+- **Customer Information**:
+  - Full Name
+  - Phone Number
+  - Address
+- **Treatment**: Select the service.
+- **Pick a Date**: Choose the preferred date for the appointment.
+- **Available Time Slots**: Select a time slot based on availability.
+- **Security Check**: Enter the verification code to confirm the booking.
+
+Once all the information is filled out, customers can click **Continue** to finalize the booking process and confirm their appointment.
+
