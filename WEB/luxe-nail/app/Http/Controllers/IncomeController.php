@@ -5,13 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Income;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
-use Carbon\Carbon; // WAJIB: Import Carbon
+use Carbon\Carbon;
 
 class IncomeController extends Controller
 {
     /**
-     * Store income after nail artist submits payment screen (API LOGIC)
-     * (Fungsi ini biarkan sama dengan yang sudah diperbaiki sebelumnya)
+     * Store income after payment (API logic)
      */
     public function store(Request $request)
     {
@@ -35,11 +34,9 @@ class IncomeController extends Controller
         if (!$reservation) {
             return response()->json(['success' => false, 'message' => 'Reservation not found'], 404);
         }
-        
-        // CHECK: If paid, ensure no duplicate income record exists.
-        // If is_paid=1 but NO income record, we allow it (case: bank transfer proof uploaded).
+
         if ($reservation->is_paid == 1 && $reservation->income()->exists()) {
-             return response()->json(['success' => false, 'message' => 'Reservation already paid and recorded.'], 400);
+            return response()->json(['success' => false, 'message' => 'Reservation already paid and recorded.'], 400);
         }
 
         $income = Income::create([
@@ -75,26 +72,40 @@ class IncomeController extends Controller
         ]);
     }
 
-
-
     /**
-     * List all income for dashboard (FIXED ALL VARIABLES)
+     * Dashboard Income Page
      */
     public function index()
     {
-        // 1. Ambil semua data income
+        // Semua income
         $incomes = Income::orderBy('created_at', 'desc')->get();
 
-        // 2. Hitung total bulanan
+        // Total bulanan
         $totalMonthly = $incomes->sum('total_price');
 
-        // 3. Hitung total hari ini
+        // Total hari ini
         $totalToday = Income::whereDate('created_at', Carbon::today())->sum('total_price');
 
-        // 4. HITUNG JUMLAH RESERVASI/INCOME (FIXED $totalReservation)
+        // Jumlah transaksi
         $totalReservation = $incomes->count();
 
-        // 5. KEMBALIKAN VIEW DENGAN SEMUA VARIABEL
-        return view('dashboard.income.dashboard_income', compact('incomes', 'totalMonthly', 'totalToday', 'totalReservation'));
+        // === CHART DATA (30 hari terakhir) ===
+        $chartData = Income::selectRaw('DATE(created_at) as date, SUM(total_price) as total')
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->limit(30)
+            ->get();
+
+        $chartLabels = $chartData->pluck('date');
+        $chartValues = $chartData->pluck('total');
+
+        return view('dashboard.income.dashboard_income', [
+            'incomes'          => $incomes,
+            'totalMonthly'     => $totalMonthly,
+            'totalToday'       => $totalToday,
+            'totalReservation' => $totalReservation,
+            'chartLabels'      => $chartLabels,
+            'chartValues'      => $chartValues,
+        ]);
     }
 }
