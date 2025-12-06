@@ -244,7 +244,8 @@ Customers can check the status of their booking by entering their **Queue Number
 <p align="center">
   <img src="https://github.com/user-attachments/assets/8457f474-1316-49a4-9b43-2c2cef552cc7" width="48%" />
   <img src="https://github.com/user-attachments/assets/279c36cb-77e2-4068-bf5c-2a7b7156857e" width="48%" />
-  <img src="https://github.com/user-attachments/assets/cde85c4f-0dae-4160-80a7-20db05f9eae5" width="48%" />
+  <img src="https://github.com/user-attachments/assets/f71e5d8a-b77c-49c4-9791-467c7d847652" width="48%" />
+  <img src="https://github.com/user-attachments/assets/c1855f4c-a2b2-44c7-a1a5-2c9af0594651" width="48%" />
 </p>
 
 - **Enter Queue Number**: 
@@ -254,6 +255,7 @@ Customers can check the status of their booking by entering their **Queue Number
 - **Booking Status**: 
   - If the booking is confirmed, the status will show **Confirmed** with booking details.
   - If the booking is pending, the status will show **Waiting Validation** with a note indicating it is awaiting confirmation.
+  - If the booking status is **Expired / Cancelled**, this usually happens because the payment was not completed within the specified time or the payment proof was unclear or missing.
 
 ---
 
