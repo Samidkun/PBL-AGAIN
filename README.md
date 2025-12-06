@@ -97,7 +97,7 @@ The **Home** page serves as the welcome screen, giving users an overview of Luxe
 The **About** page provides information about Luxe Nail, its values, mission, and the services it offers. It’s where customers can learn about the company and its vision.
 
 <p align="center">
-  <img width="100%" height="auto" alt="About Page Image" src="URL_GAMBAR_ABOUT" />
+  <img width="100%" height="auto" alt="About Page Image" src="https://github.com/user-attachments/assets/a5a7296c-a154-4955-a9df-0a43f23dfe5c" />
 </p>
 
 - **Company Info**: Learn about the mission and vision of Luxe Nail.
@@ -109,7 +109,7 @@ The **About** page provides information about Luxe Nail, its values, mission, an
 The **Services** page showcases all the nail care services offered at Luxe Nail, such as **Nail Art**, **Nail Extensions**, and **Manicure/Pedicure**.
 
 <p align="center">
-  <img width="100%" height="auto" alt="Services Page Image" src="URL_GAMBAR_SERVICES" />
+  <img width="100%" height="auto" alt="Services Page Image" src="https://github.com/user-attachments/assets/17aab51f-9c18-43b8-ac57-c149592bbbce" />
 </p>
 
 - **Available Services**:
@@ -146,7 +146,7 @@ The **Contact & Services** page allows customers to contact Luxe Nail for inquir
 The **Check Booking** feature allows customers to view the status of their bookings and make any necessary changes.
 
 <p align="center">
-  <img width="100%" height="auto" alt="Check Booking Status Page" src="URL_GAMBAR_CHECK_BOOKING" />
+  <img width="100%" height="auto" alt="Check Booking Status Page" src="https://github.com/user-attachments/assets/8acb965c-37cf-49ac-8ea7-ee99c98d7d31" />
 </p>
 
 - **Booking Status**: View and track upcoming appointments.
@@ -158,7 +158,7 @@ The **Check Booking** feature allows customers to view the status of their booki
 The **Book Now** button enables customers to book their chosen service directly through the website by selecting a date, time, and service.
 
 <p align="center">
-  <img width="100%" height="auto" alt="Book Now Page Image" src="URL_GAMBAR_BOOK_NOW" />
+  <img width="100%" height="auto" alt="Book Now Page Image" src="https://github.com/user-attachments/assets/c19a6a9c-5f9b-4242-9285-1baa017e7b5a" />
 </p>
 
 - **Quick Booking**: Select your desired service and schedule your appointment in just a few steps!
@@ -169,7 +169,7 @@ The **Book Now** button enables customers to book their chosen service directly 
 The **Login** page allows **Admin** users to access the dashboard. Only admins can log in here to manage customer data, bookings, services, and other administrative tasks.
 
 <p align="center">
-  <img width="100%" height="auto" alt="Admin Login Page Image" src="URL_GAMBAR_LOGIN" />
+  <img width="100%" height="auto" alt="Admin Login Page Image" src="https://github.com/user-attachments/assets/f75fdeef-3f23-4e88-83ce-283588475e5b" />
 </p>
 
 - **Admin Dashboard**: Only accessible by admins to manage all aspects of the platform.
