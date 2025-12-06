@@ -209,13 +209,18 @@ Once all the information is filled out, customers can click **Continue** to proc
 After customers click **Continue**, the **Booking Confirmation** page will appear, showing all booking details and the **Booking Rules**. Customers will then proceed to make a **down payment (DP)** and upload the **payment proof**.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/bb812703-035f-440b-8fa0-d4908df9e238" width="48%" />
-  <img src="https://github.com/user-attachments/assets/57079eca-4178-4ad2-a371-7cb3bc78ecae" width="48%" />
+  <img src="https://github.com/user-attachments/assets/09472fb5-da21-47bf-bfda-2785e52611b3" width="48%" />
+  <img src="https://github.com/user-attachments/assets/f3b8ea84-98b3-44ee-8a47-d652c58b1ed1" width="48%" />
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/b59bec92-97a0-428c-80e1-8df070c42d06" width="48%" />
-  <img src="https://github.com/user-attachments/assets/7f347c8c-a9bb-4e8b-bff4-5f2b64338e42" width="48%" />
+  <img src="https://github.com/user-attachments/assets/aae9cc34-aabd-4a20-a34e-ac174f188efe" width="48%" />
+  <img src="https://github.com/user-attachments/assets/28f3c398-08ec-4698-8a8c-4156efaf665a" width="48%" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/cde85c4f-0dae-4160-80a7-20db05f9eae5" width="48%" />
+  <img src="https://github.com/user-attachments/assets/85804427-4fdb-4045-9fed-c6b8111290fe" width="48%" />
 </p>
 
 - **Booking Summary**:
