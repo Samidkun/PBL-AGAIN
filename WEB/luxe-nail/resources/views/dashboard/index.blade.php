@@ -429,6 +429,11 @@ document.addEventListener('DOMContentLoaded', function() {
             options: { responsive: true, maintainAspectRatio: false }
         });
     }
+
+    // Auto-refresh every 10 seconds
+    setInterval(function() {
+        location.reload();
+    }, 10000);
 });
 </script>
 @endpush

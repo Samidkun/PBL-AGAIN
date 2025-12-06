@@ -1,11 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import removed: unused dotenv
+import 'package:flutter/foundation.dart';
 
 class ApiService {
   // Centralized Base URL
-  static String get baseUrl =>
-      dotenv.env['BASE_URL'] ?? 'http://192.168.1.67:8000';
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://127.0.0.1:8000'; // Localhost for Web
+    }
+    return 'http://10.0.2.2:8000'; // Android Emulator
+  }
 
   // Headers helper
   static Map<String, String> get _headers => {
@@ -252,6 +257,41 @@ class ApiService {
   // ===========================================================================
   // FINISH JOB (Mobile Staff)
   // ===========================================================================
+  // ===========================================================================
+  // INCREMENT GENERATE COUNT
+  // ===========================================================================
+  static Future<Map<String, dynamic>> incrementGenerate(
+      String token, int reservationId) async {
+    final url = Uri.parse(
+        "$baseUrl/api/v1/reservations/$reservationId/increment-generate");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          ..._headers,
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        return {'success': true};
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Failed to increment count',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Connection error: $e',
+      };
+    }
+  }
+
   static Future<Map<String, dynamic>> finishJob(
       String token, int reservationId) async {
     final url = Uri.parse("$baseUrl/api/v1/reservations/$reservationId/finish");

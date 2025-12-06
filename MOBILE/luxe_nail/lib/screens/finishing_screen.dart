@@ -1,26 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:luxe_nail/screens/dashboard_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
-import 'login_screen.dart';
+import 'package:luxe_nail/widgets/finishing/finishing_drawer.dart';
 
 class FinishingScreen extends StatelessWidget {
   final String token;
   final Map<String, dynamic> user;
+  final Map<String, dynamic>? selectedShape;
+  final Map<String, dynamic>? selectedType;
+  final Map<String, dynamic>? selectedColor;
+  final Map<String, dynamic>? selectedAccessory;
 
   FinishingScreen({
     super.key,
     required this.token,
     required this.user,
+    this.selectedShape,
+    this.selectedType,
+    this.selectedColor,
+    this.selectedAccessory,
   });
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  String formatRupiah(dynamic price) {
+    int priceInt = int.tryParse(price.toString()) ?? 0;
+    return NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp. ',
+      decimalDigits: 0,
+    ).format(priceInt);
+  }
 
   @override
   Widget build(BuildContext context) {
     double sW(num v) => Responsive.sW(context, v);
     double sH(num v) => Responsive.sH(context, v);
+
+    // Calculate Total
+    int total = 0;
+    total += int.tryParse(selectedShape?['price']?.toString() ?? '0') ?? 0;
+    total += int.tryParse(selectedType?['price']?.toString() ?? '0') ?? 0;
+    total += int.tryParse(selectedColor?['price']?.toString() ?? '0') ?? 0;
+    total += int.tryParse(selectedAccessory?['price']?.toString() ?? '0') ?? 0;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -161,8 +186,13 @@ class FinishingScreen extends StatelessWidget {
                                 ),
                                 _posText(
                                     sW(115), sH(41), "Luxe Nail", 16, true),
-                                _posText(sW(102), sH(65), "DD/MM/YYYY 00:00 PM",
-                                    9, false),
+                                _posText(
+                                    sW(102),
+                                    sH(65),
+                                    DateFormat('dd/MM/yyyy HH:mm')
+                                        .format(DateTime.now()),
+                                    9,
+                                    false),
                                 _posText(
                                     sW(62),
                                     sH(79),
@@ -172,36 +202,57 @@ class FinishingScreen extends StatelessWidget {
                                 _posText(sW(84), sH(93),
                                     "Phone Number : 087723456781", 9, false),
 
-                                _posText(sW(24), sH(131), "Category Nails :",
-                                    10, false),
+                                _posText(sW(24), sH(131), "Shape :", 10, false),
+                                _posText(sW(24), sH(164), "Type :", 10, false),
+                                _posText(sW(24), sH(197), "Color :", 10, false),
                                 _posText(
-                                    sW(24), sH(164), "Type Nails :", 10, false),
-                                _posText(sW(24), sH(197), "Color Nails :", 10,
-                                    false),
-                                _posText(sW(24), sH(228), "Accessories Nails :",
-                                    10, false),
+                                    sW(24), sH(228), "Accessory :", 10, false),
+                                _posText(sW(118), sH(276), "Total :", 10, true),
+
+                                // Values
+                                _posText(sW(83), sH(131),
+                                    selectedShape?['name'] ?? '-', 10, false),
+                                _posText(sW(83), sH(164),
+                                    selectedType?['name'] ?? '-', 10, false),
+                                _posText(sW(83), sH(197),
+                                    selectedColor?['name'] ?? '-', 10, false),
                                 _posText(
-                                    sW(118), sH(276), "Total :", 10, false),
-
-                                _posText(sW(83), sH(144), "xxxxxxx Nails", 10,
-                                    false),
-                                _posText(sW(83), sH(177), "xxxxxxx Nails", 10,
-                                    false),
-                                _posText(sW(83), sH(210), "xxxxxxx Nails", 10,
-                                    false),
-                                _posText(sW(83), sH(243), "xxxxxxx Nails", 10,
+                                    sW(83),
+                                    sH(228),
+                                    selectedAccessory?['name'] ?? '-',
+                                    10,
                                     false),
 
-                                _posText(sW(225), sH(144), "Rp. 20.000,-", 10,
+                                // Prices
+                                _posText(
+                                    sW(225),
+                                    sH(131),
+                                    formatRupiah(selectedShape?['price'] ?? 0),
+                                    10,
                                     false),
-                                _posText(sW(225), sH(177), "Rp. 20.000,-", 10,
+                                _posText(
+                                    sW(225),
+                                    sH(164),
+                                    formatRupiah(selectedType?['price'] ?? 0),
+                                    10,
                                     false),
-                                _posText(sW(225), sH(210), "Rp. 20.000,-", 10,
+                                _posText(
+                                    sW(225),
+                                    sH(197),
+                                    formatRupiah(selectedColor?['price'] ?? 0),
+                                    10,
                                     false),
-                                _posText(sW(225), sH(243), "Rp. 20.000,-", 10,
+                                _posText(
+                                    sW(225),
+                                    sH(228),
+                                    formatRupiah(
+                                        selectedAccessory?['price'] ?? 0),
+                                    10,
                                     false),
-                                _posText(sW(225), sH(276), "Rp. 20.000,-", 10,
-                                    false),
+
+                                // Total Price
+                                _posText(sW(225), sH(276), formatRupiah(total),
+                                    10, true),
                               ],
                             ),
                           ),
@@ -211,6 +262,8 @@ class FinishingScreen extends StatelessWidget {
                           // ======== CONFIRM BUTTON ========
                           GestureDetector(
                             onTap: () {
+                              // Here we should probably save the reservation or something?
+                              // But for now, just navigate back to dashboard as per original code.
                               Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
@@ -231,7 +284,7 @@ class FinishingScreen extends StatelessWidget {
                               ),
                               child: Center(
                                 child: Text(
-                                  "Confirm",
+                                  "Confirm Order",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: sW(16),
@@ -262,65 +315,9 @@ class FinishingScreen extends StatelessWidget {
   // DRAWER
   // ============================================================
   Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      backgroundColor: const Color(0xFFFFF8F9),
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(color: Color(0xFFAF7C85)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: Responsive.sW(context, 30),
-                  backgroundColor: const Color(0xFFFFEAEE),
-                  child: const Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Color(0xFF451A2B),
-                  ),
-                ),
-                SizedBox(height: Responsive.sH(context, 10)),
-                Text(
-                  'Welcome, ${user['name']}!',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.home, color: Color(0xFF451A2B)),
-            title: const Text("Home"),
-            onTap: () => Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => DashboardScreen(token: token, user: user),
-              ),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.brush, color: Color(0xFF451A2B)),
-            title: const Text("Design"),
-            onTap: () => Navigator.pop(context),
-          ),
-          const Divider(color: Color(0xFFAF7C85)),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Color(0xFF451A2B)),
-            title: const Text("Logout"),
-            onTap: () => Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const LoginScreen()),
-              (route) => false,
-            ),
-          ),
-        ],
-      ),
+    return FinishingDrawer(
+      token: token,
+      user: user,
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:luxe_nail/services/api_service.dart';
+import 'package:luxe_nail/screens/processing_screen.dart';
 
 class AIResultScreen extends StatefulWidget {
   final String token;
@@ -298,45 +299,23 @@ class _AIResultScreenState extends State<AIResultScreen> {
 
     if (result['success']) {
       // AUTO-FINISH: Mark as waiting_payment immediately
-      await ApiService.finishJob(widget.token, widget.reservation!['id']);
+      // await ApiService.finishJob(widget.token, widget.reservation!['id']);
 
-      if (!mounted) return;
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: const Text("Design Added & Finished!"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                  "The design has been added and the job is marked as finished."),
-              const SizedBox(height: 10),
-              const Divider(),
-              Text(
-                "New Total Bill: ${formatRupiah(newTotal)}",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 5),
-              const Text(
-                "Please proceed to payment at the cashier.",
-                style: TextStyle(color: Colors.orange, fontSize: 12),
-              ),
-            ],
+      // Navigate to Processing Screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ProcessingScreen(
+            token: widget.token,
+            user: widget.user,
+            reservation: widget.reservation!,
+            totalPrice: newTotal,
+            imageUrl: widget.imageUrl,
+            shape: widget.shape,
+            color: widget.color,
+            finish: widget.finish,
+            accessory: widget.accessory,
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-                // Navigate back to Dashboard and remove all previous routes
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil('/dashboard', (route) => false);
-              },
-              child: const Text("OK"),
-            ),
-          ],
         ),
       );
     } else {

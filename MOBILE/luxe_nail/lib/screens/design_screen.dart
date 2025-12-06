@@ -2,14 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:luxe_nail/screens/accessoris_screen.dart';
 import 'package:luxe_nail/screens/dashboard_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
-
-import 'login_screen.dart';
+import 'package:luxe_nail/widgets/design/design_drawer.dart';
+import 'package:luxe_nail/widgets/design/design_category_card.dart';
 
 class DesignScreen extends StatefulWidget {
   final String token;
@@ -112,60 +111,10 @@ class _DesignScreenState extends State<DesignScreen> {
       backgroundColor: const Color(0xFFFFEAEE),
 
       // ================== DRAWER ==================
-      drawer: Drawer(
-        backgroundColor: const Color(0xFFFFF8F9),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFFAF7C85)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: sW(30),
-                    backgroundColor: const Color(0xFFFFEAEE),
-                    child: const Icon(
-                      Icons.person,
-                      size: 40,
-                      color: Color(0xFF451A2B),
-                    ),
-                  ),
-                  SizedBox(height: sH(10)),
-                  Text(
-                    'Welcome, ${widget.user['name']}!',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            _drawerItem(context, Icons.home, "Home", () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      DashboardScreen(token: widget.token, user: widget.user),
-                ),
-              );
-            }),
-            _drawerItem(context, Icons.brush, "Jenis Treatment", () {
-              Navigator.pop(context);
-            }),
-            const Divider(color: Color(0xFFAF7C85)),
-            _drawerItem(context, Icons.logout, "Logout", () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (route) => false,
-              );
-            }),
-          ],
-        ),
+      drawer: DesignDrawer(
+        token: widget.token,
+        user: widget.user,
+        sW: sW,
       ),
 
       // ================== BODY ==================
@@ -443,128 +392,17 @@ class _DesignScreenState extends State<DesignScreen> {
     );
   }
 
-  /// Card 1 kategori (desain figma: price bar -> image box -> name box)
   Widget _categoryCard(
     BuildContext context,
     Map<String, dynamic> item,
     bool isSelected,
     void Function(int id) onSelected,
   ) {
-    final int price = (item['price'] ?? 0) as int;
-    final String name = (item['name'] ?? '').toString();
-    final String imagePath = (item['image'] ?? '').toString();
-    final String imageUrl = imagePath.isEmpty ? '' : '$_baseUrl/$imagePath';
-
-    final priceText = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: 'Rp ',
-      decimalDigits: 0,
-    ).format(price);
-
-    final cardWidth = Responsive.sW(context, 120);
-
-    return GestureDetector(
-      onTap: () => onSelected(item['id'] as int),
-      child: Container(
-        width: cardWidth,
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 11),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF9E6475) : const Color(0xFFAF7C85),
-          borderRadius: BorderRadius.circular(12),
-          border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x33000000),
-              blurRadius: 6,
-              offset: Offset(3, 3),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            // PRICE BAR (atas)
-            Container(
-              width: double.infinity,
-              height: Responsive.sH(context, 22),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFEAEE),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                child: Text(
-                  priceText,
-                  style: const TextStyle(
-                    color: Color(0xFF451A2B),
-                    fontSize: 12,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w400,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 6),
-
-            // BOX PUTIH UNTUK GAMBAR (tengah) – wadah doang
-            Container(
-              width: double.infinity,
-              height: Responsive.sH(context, 78),
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFEAEE),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: imageUrl.isNotEmpty
-                  ? Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Center(
-                        child: Icon(
-                          Icons.image_not_supported,
-                          size: 24,
-                          color: Color(0xFFB97A8B),
-                        ),
-                      ),
-                    )
-                  : const Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 24,
-                        color: Color(0xFFB97A8B),
-                      ),
-                    ),
-            ),
-
-            const SizedBox(height: 6),
-
-            // BOX PUTIH UNTUK NAMA (bawah)
-            Container(
-              width: double.infinity,
-              height: Responsive.sH(context, 22),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFEAEE),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Center(
-                child: Text(
-                  name,
-                  style: const TextStyle(
-                    color: Color(0xFF451A2B),
-                    fontSize: 12,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w400,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return DesignCategoryCard(
+      item: item,
+      isSelected: isSelected,
+      onSelected: onSelected,
+      baseUrl: _baseUrl,
     );
   }
 

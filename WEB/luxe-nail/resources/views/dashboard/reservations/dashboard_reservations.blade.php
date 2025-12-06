@@ -569,6 +569,11 @@ function formatDate(y, m, d) {
     };
 
 });
+
+// Auto-refresh every 10 seconds
+setInterval(function() {
+    location.reload();
+}, 10000);
 </script>
 
 @endsection

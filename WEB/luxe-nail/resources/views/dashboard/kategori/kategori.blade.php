@@ -378,5 +378,10 @@ window.submitCategoryForm = submitCategoryForm;
 window.deleteCategory = deleteCategory;
 window.submitFilter = submitFilter;
 window.initModals = initModals;
+
+// Auto-refresh every 10 seconds
+setInterval(function() {
+    location.reload();
+}, 10000);
 </script>
 @endsection

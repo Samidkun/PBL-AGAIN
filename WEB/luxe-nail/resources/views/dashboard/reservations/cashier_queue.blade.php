@@ -61,4 +61,13 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    // Auto-refresh every 5 seconds
+    setInterval(function() {
+        location.reload();
+    }, 5000);
+</script>
+@endpush
 @endsection

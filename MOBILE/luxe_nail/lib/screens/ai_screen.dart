@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:luxe_nail/services/api_service.dart';
 import 'ai_result_screen.dart';
+import 'package:luxe_nail/widgets/ai/design_step_page.dart';
 
 class CustomDesignView extends StatefulWidget {
   final String token;
@@ -89,14 +90,14 @@ class _CustomDesignViewState extends State<CustomDesignView> {
   // 3. BUILD PROMPT (VERSI NARASI)
   // ==========================================================
   String buildPrompt() {
-    String prompt = "Macro photo, professional nail art design. ";
+    String prompt = "Simple nail art photo showing: ";
 
-    if (selectedShape != null) prompt += "Shape: $selectedShape. ";
-    if (selectedColor != null) prompt += "Color: $selectedColor. ";
-    if (selectedFinish != null) prompt += "Finish: $selectedFinish. ";
-    if (selectedAccessory != null) prompt += "Accessory: $selectedAccessory. ";
+    if (selectedShape != null) prompt += "$selectedShape shape, ";
+    if (selectedColor != null) prompt += "$selectedColor color, ";
+    if (selectedFinish != null) prompt += "$selectedFinish finish, ";
+    if (selectedAccessory != null) prompt += "$selectedAccessory accessory, ";
 
-    prompt += "Photorealistic, high detail, 8k, cinematic lighting, elegant.";
+    prompt += "realistic and clear";
     return prompt;
   }
 
@@ -244,170 +245,15 @@ class _CustomDesignViewState extends State<CustomDesignView> {
     VoidCallback? onSkip,
     bool disabled = false,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontFamily: "Poppins",
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF451A2B),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontFamily: "Poppins",
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-              if (onSkip != null)
-                TextButton(
-                  onPressed: onSkip,
-                  child: const Text(
-                    "Skip",
-                    style: TextStyle(
-                      fontFamily: "Poppins",
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF975B73),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: items.isEmpty
-              ? const Center(child: Text("No items available"))
-              : GridView.builder(
-                  padding: const EdgeInsets.all(20),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 0.75,
-                  ),
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    final isSelected = item['name'] == selectedValue;
-                    final imageUrl = item['image'] != null
-                        ? "${ApiService.baseUrl}/served-image/${item['image']}"
-                        : null;
-
-                    return GestureDetector(
-                      onTap: disabled
-                          ? null
-                          : () {
-                              onSelect(item['name']);
-                              _nextPage();
-                            },
-                      child: Opacity(
-                        opacity: disabled ? 0.5 : 1.0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isSelected
-                                  ? const Color(0xFF975B73)
-                                  : Colors.transparent,
-                              width: 3,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(17)),
-                                  child: imageUrl != null
-                                      ? Image.network(
-                                          imageUrl,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Container(
-                                              color: Colors.grey[100],
-                                              child: const Icon(
-                                                  Icons.broken_image,
-                                                  color: Colors.grey),
-                                            );
-                                          },
-                                        )
-                                      : Container(
-                                          color: Colors.grey[100],
-                                          child: const Center(
-                                            child: Icon(Icons.image,
-                                                color: Colors.grey, size: 40),
-                                          ),
-                                        ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item['name'] ?? '-',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 14,
-                                        color: isSelected
-                                            ? const Color(0xFF975B73)
-                                            : const Color(0xFF451A2B),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      formatRupiah(item['price']),
-                                      style: const TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontSize: 13,
-                                        color: Color(0xFFAF7C85),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
+    return DesignStepPage(
+      title: title,
+      subtitle: subtitle,
+      items: items,
+      selectedValue: selectedValue,
+      onSelect: onSelect,
+      onNext: _nextPage,
+      onSkip: onSkip,
+      disabled: disabled,
     );
   }
 

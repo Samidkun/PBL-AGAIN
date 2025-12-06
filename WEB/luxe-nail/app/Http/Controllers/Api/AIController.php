@@ -56,7 +56,7 @@ class AIController extends Controller
                 "messages" => [
                     [
                         "role" => "user",
-                        "content" => "Generate a realistic nail art design based on: " . $request->prompt
+                        "content" => "Create a simple, realistic photo of nail art on a hand. Requirements: " . $request->prompt . ". The image should be a clear, straightforward product photo showing the nails from a natural angle. No artistic effects, no dramatic lighting, no fancy backgrounds. Just a clean, realistic representation of the nail design as it would look in real life."
                     ]
                 ]
             ]);

@@ -231,13 +231,9 @@ class ReservationController extends Controller
     // =========================================================================
     //  AI GENERATION FLAG (Limit 3x)
     // =========================================================================
-    public function incrementGenerate(Request $request)
+    public function incrementGenerate($id)
     {
-        $request->validate([
-            'reservation_id' => 'required|integer',
-        ]);
-
-        $r = Reservation::find($request->reservation_id);
+        $r = Reservation::find($id);
 
         if (!$r) {
             return response()->json([

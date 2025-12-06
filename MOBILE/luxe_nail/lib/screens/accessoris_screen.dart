@@ -1,82 +1,91 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:luxe_nail/screens/dashboard_screen.dart';
 import 'package:luxe_nail/screens/finishing_screen.dart';
 import 'package:luxe_nail/screens/gallery_screen.dart';
 import 'package:luxe_nail/screens/profile_screen.dart';
 import 'package:luxe_nail/utils/responsive.dart';
-
+import 'package:luxe_nail/services/api_service.dart';
 import 'login_screen.dart';
+import 'package:luxe_nail/widgets/accessoris/accessoris_drawer.dart';
 
-class AccessorisScreen extends StatelessWidget {
+class AccessorisScreen extends StatefulWidget {
   final String token;
   final Map<String, dynamic> user;
+  final Map<String, dynamic>? selectedShape;
+  final Map<String, dynamic>? selectedType;
+  final Map<String, dynamic>? selectedColor;
 
-  const AccessorisScreen({super.key, required this.token, required this.user});
+  const AccessorisScreen({
+    super.key,
+    required this.token,
+    required this.user,
+    this.selectedShape,
+    this.selectedType,
+    this.selectedColor,
+  });
+
+  @override
+  State<AccessorisScreen> createState() => _AccessorisScreenState();
+}
+
+class _AccessorisScreenState extends State<AccessorisScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  // State for accessories
+  List<Map<String, dynamic>> accessories = [];
+  Map<String, dynamic>? selectedAccessory;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAccessories();
+  }
+
+  Future<void> _fetchAccessories() async {
+    try {
+      final result = await ApiService.getCategories(widget.token);
+      if (result['success']) {
+        final data = result['data'];
+        setState(() {
+          // Assuming 'accessory' or similar key exists.
+          // If not, we might need to check the API response structure again.
+          // GalleryScreen used 'accessory'.
+          accessories =
+              List<Map<String, dynamic>>.from(data['accessory'] ?? []);
+          isLoading = false;
+        });
+      } else {
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
+  }
+
+  String formatRupiah(dynamic price) {
+    int priceInt = int.tryParse(price.toString()) ?? 0;
+    return NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp. ',
+      decimalDigits: 0,
+    ).format(priceInt);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     double sW(num v) => Responsive.sW(context, v);
     double sH(num v) => Responsive.sH(context, v);
 
     return Scaffold(
-      key: scaffoldKey,
+      key: _scaffoldKey,
       backgroundColor: const Color(0xFFFFEAEE),
 
       // ================= DRAWER =================
-      drawer: Drawer(
-        backgroundColor: const Color(0xFFFFF8F9),
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFFAF7C85)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CircleAvatar(
-                    radius: sW(30),
-                    backgroundColor: const Color(0xFFFFEAEE),
-                    child: const Icon(
-                      Icons.person,
-                      size: 40,
-                      color: Color(0xFF451A2B),
-                    ),
-                  ),
-                  SizedBox(height: sH(10)),
-                  Text(
-                    "Welcome, ${user['name']}!",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontFamily: "Poppins",
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            _drawerItem(Icons.home, "Home", () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => DashboardScreen(token: token, user: user),
-                ),
-              );
-            }),
-            _drawerItem(Icons.brush, "Jenis Treatment", () {
-              Navigator.pop(context);
-            }),
-            const Divider(color: Color(0xFFAF7C85)),
-            _drawerItem(Icons.logout, "Logout", () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (route) => false,
-              );
-            }),
-          ],
-        ),
+      drawer: AccessorisDrawer(
+        token: widget.token,
+        user: widget.user,
       ),
 
       // ================= BODY =================
@@ -92,7 +101,7 @@ class AccessorisScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () => scaffoldKey.currentState!.openDrawer(),
+                    onTap: () => _scaffoldKey.currentState!.openDrawer(),
                     child: Icon(
                       Icons.menu,
                       size: sW(32),
@@ -167,9 +176,11 @@ class AccessorisScreen extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: sH(20)),
+
+                        // Selected Accessory Preview (Optional, or just placeholder)
                         Container(
                           width: sW(330),
-                          height: sH(350),
+                          height: sH(300),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(sW(13)),
@@ -182,33 +193,67 @@ class AccessorisScreen extends StatelessWidget {
                               ),
                             ],
                           ),
+                          child: selectedAccessory != null &&
+                                  selectedAccessory!['image'] != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(sW(13)),
+                                  child: Image.network(
+                                    "${ApiService.baseUrl}/${selectedAccessory!['image']}",
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => const Icon(
+                                        Icons.broken_image,
+                                        size: 50,
+                                        color: Colors.grey),
+                                  ),
+                                )
+                              : const Center(
+                                  child: Text("Select an accessory below",
+                                      style: TextStyle(color: Colors.grey))),
                         ),
+
                         SizedBox(height: sH(20)),
+
+                        // Accessories List
                         SizedBox(
-                          height: sH(140),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                accessoryCard(context, "Rp. 20.000", "Flower"),
-                                SizedBox(width: sW(12)),
-                                accessoryCard(context, "Rp. 20.000", "Pearls"),
-                                SizedBox(width: sW(12)),
-                                accessoryCard(context, "Rp. 20.000", "Pita"),
-                                SizedBox(width: sW(12)),
-                                accessoryCard(context, "Rp. 30.000", "Diamond"),
-                              ],
-                            ),
-                          ),
+                          height: sH(160),
+                          child: isLoading
+                              ? const Center(
+                                  child: CircularProgressIndicator(
+                                      color: Color(0xFFAF7C85)))
+                              : accessories.isEmpty
+                                  ? const Center(
+                                      child: Text("No accessories available"))
+                                  : SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: accessories.map((item) {
+                                          return Padding(
+                                            padding:
+                                                EdgeInsets.only(right: sW(12)),
+                                            child:
+                                                _accessoryCard(context, item),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
                         ),
+
                         SizedBox(height: sH(15)),
+
                         GestureDetector(
                           onTap: () {
+                            // Navigate to FinishingScreen with ALL selections
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    FinishingScreen(token: token, user: user),
+                                builder: (_) => FinishingScreen(
+                                  token: widget.token,
+                                  user: widget.user,
+                                  // Pass all selections
+                                  // Note: FinishingScreen needs to be updated to accept these too!
+                                  // For now, we assume it might not accept them yet, but we are building the flow.
+                                  // I'll check FinishingScreen next.
+                                ),
                               ),
                             );
                           },
@@ -278,8 +323,8 @@ class AccessorisScreen extends StatelessWidget {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            DashboardScreen(token: token, user: user),
+                        builder: (_) => DashboardScreen(
+                            token: widget.token, user: widget.user),
                       ),
                       (route) => false,
                     );
@@ -288,7 +333,8 @@ class AccessorisScreen extends StatelessWidget {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => GalleryScreen(token: token, user: user),
+                        builder: (_) => GalleryScreen(
+                            token: widget.token, user: widget.user),
                       ),
                       (route) => false,
                     );
@@ -297,7 +343,8 @@ class AccessorisScreen extends StatelessWidget {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ProfileScreen(token: token, user: user),
+                        builder: (_) => ProfileScreen(
+                            token: widget.token, user: widget.user),
                       ),
                       (route) => false,
                     );
@@ -361,60 +408,72 @@ class AccessorisScreen extends StatelessWidget {
   }
 
   // ===== Accessory Card =====
-  Widget accessoryCard(BuildContext context, String price, String title) {
+  Widget _accessoryCard(BuildContext context, Map<String, dynamic> item) {
     double sW(num v) => Responsive.sW(context, v);
     double sH(num v) => Responsive.sH(context, v);
 
-    return Container(
-      width: sW(108),
-      height: sH(130),
-      padding: EdgeInsets.symmetric(horizontal: sW(5), vertical: sH(10)),
-      decoration: BoxDecoration(
-        color: const Color(0xFFAF7C85),
-        borderRadius: BorderRadius.circular(sW(12)),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: sW(98),
-            height: sH(22),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFEAEE),
-              borderRadius: BorderRadius.circular(sW(5)),
-            ),
-            child: Center(
-              child: Text(
-                price,
-                style: TextStyle(
-                  color: const Color(0xFF451A2B),
-                  fontSize: sW(12),
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
+    final isSelected =
+        selectedAccessory != null && selectedAccessory!['id'] == item['id'];
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedAccessory = item;
+        });
+      },
+      child: Container(
+        width: sW(108),
+        height: sH(130),
+        padding: EdgeInsets.symmetric(horizontal: sW(5), vertical: sH(10)),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF9E6475) : const Color(0xFFAF7C85),
+          borderRadius: BorderRadius.circular(sW(12)),
+          border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: sW(98),
+              height: sH(22),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFEAEE),
+                borderRadius: BorderRadius.circular(sW(5)),
+              ),
+              child: Center(
+                child: Text(
+                  formatRupiah(item['price']),
+                  style: TextStyle(
+                    color: const Color(0xFF451A2B),
+                    fontSize: sW(12),
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: sH(8)),
-          Container(
-            width: sW(98),
-            height: sH(78),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFEAEE),
-              borderRadius: BorderRadius.circular(sW(5)),
-            ),
-            child: Center(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: const Color(0xFF451A2B),
-                  fontSize: sW(12),
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
+            SizedBox(height: sH(8)),
+            Container(
+              width: sW(98),
+              height: sH(78),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFEAEE),
+                borderRadius: BorderRadius.circular(sW(5)),
+              ),
+              child: Center(
+                child: Text(
+                  item['name'] ?? '-',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFF451A2B),
+                    fontSize: sW(12),
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

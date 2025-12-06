@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment variables - JANGAN UPLOAD KE GITHUB!
+assets/config/.env
+.env
+*.env
