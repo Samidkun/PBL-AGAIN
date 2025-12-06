@@ -70,3 +70,15 @@ Feedback and suggestions are always welcome.
 
 ## 📄 License
 This project is developed for salon service management and can be adapted as needed.
+
+## UI Preview
+
+Berikut adalah tampilan antarmuka dari aplikasi Luxe Nail, terdiri dari Website (Admin dan Customer) serta Mobile App untuk nail artist.
+
+---
+
+### 🌐 Landing Page
+<p align="center">
+  <img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/76751fc6-351e-417a-ae44-a9b9b211f396" />
+</p>
+
