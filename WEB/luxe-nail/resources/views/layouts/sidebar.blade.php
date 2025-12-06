@@ -28,6 +28,9 @@
         <a href="{{ route('dashboard.income') }}" class="{{ request()->routeIs('dashboard.income') ? 'active' : '' }}">
             <i class="bi bi-cash-stack me-2"></i> Income
         </a>
+        <a href="{{ route('dashboard.cashier.queue') }}" class="{{ request()->routeIs('dashboard.cashier.queue') ? 'active' : '' }}">
+            <i class="bi bi-wallet2 me-2"></i> Cashier
+        </a>
         <a href="{{ route('profile.index') }}" class="{{ request()->routeIs('profile.index') ? 'active' : '' }}">
             <i class="bi bi-person me-2"></i> Profile
         </a>

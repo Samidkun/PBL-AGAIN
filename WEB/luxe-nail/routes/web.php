@@ -129,6 +129,9 @@ Route::prefix('dashboard')
             ->name('dashboard.cashier');
         Route::post('/cashier/{id}/process', [ReservationController::class, 'processPayment'])
             ->name('dashboard.cashier.process');
+
+        Route::get('/cashier-queue', [ReservationController::class, 'cashierQueue'])
+            ->name('dashboard.cashier.queue');
     });
 
 // ======================

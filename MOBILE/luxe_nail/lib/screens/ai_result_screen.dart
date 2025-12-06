@@ -297,20 +297,32 @@ class _AIResultScreenState extends State<AIResultScreen> {
     Navigator.pop(context); // Close loading
 
     if (result['success']) {
+      // AUTO-FINISH: Mark as waiting_payment immediately
+      await ApiService.finishJob(widget.token, widget.reservation!['id']);
+
+      if (!mounted) return;
+
       showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (context) => AlertDialog(
-          title: const Text("Design Added!"),
+          title: const Text("Design Added & Finished!"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("The design has been added to the bill."),
+              const Text(
+                  "The design has been added and the job is marked as finished."),
               const SizedBox(height: 10),
               const Divider(),
               Text(
                 "New Total Bill: ${formatRupiah(newTotal)}",
                 style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 5),
+              const Text(
+                "Please proceed to payment at the cashier.",
+                style: TextStyle(color: Colors.orange, fontSize: 12),
               ),
             ],
           ),
@@ -318,7 +330,9 @@ class _AIResultScreenState extends State<AIResultScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Close dialog
-                Navigator.pop(context); // Back to Custom Design / Dashboard
+                // Navigate back to Dashboard and remove all previous routes
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/dashboard', (route) => false);
               },
               child: const Text("OK"),
             ),
