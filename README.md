@@ -182,8 +182,11 @@ The **Login** page allows **Admin** users to access the dashboard. Only admins c
 This guide outlines the admin flow for managing the **Luxe Nail** website, including all key sections that an admin can interact with.
 
 ## **1. Login as Admin 🔐**
-
 To access the admin section, the admin must first log in using their **email** and **password**.
+
+<p align="center">
+   <img width="100%" height="auto" alt="Admin Login Page Image" src="https://github.com/user-attachments/assets/f75fdeef-3f23-4e88-83ce-283588475e5b" />
+</p>
 
 - **Admin Email**: admin@luxenail.com
 - **Password**: [Admin's Password]
@@ -193,8 +196,12 @@ Upon successful login, the admin will be redirected to the **Dashboard** page.
 ---
 
 ## **2. Dashboard 📊**
-
 The **Dashboard** provides an overview of key data and statistics for the **Luxe Nail** business.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5209df49-4fa0-4ecb-aa40-1ae2cd2e0142" width="48%" />
+  <img src="https://github.com/user-attachments/assets/66fb9bfb-712b-43c6-b9fb-8c5e7d3a8e83" width="48%" />
+</p>
 
 - **Total Reservations**: Displays the number of reservations for the current month.
 - **Total Nail Art**: Shows the total number of nail art treatments booked.
@@ -203,12 +210,7 @@ The **Dashboard** provides an overview of key data and statistics for the **Luxe
 
 ### **Income Trend Graph**:
 - A graph that tracks the income generated over the course of the month, helping the admin monitor performance.
-
 - **Recent Reservations**: A table showing recent bookings with customer details, service type, artist, and booking status.
-
-<p align="center">
-  <img src="/mnt/data/4ee52fe4-910f-49e6-a33e-f339e433cd8c.png" width="80%" />
-</p>
 
 ---
 
