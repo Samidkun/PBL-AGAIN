@@ -80,5 +80,9 @@ Berikut adalah tampilan antarmuka dari aplikasi Luxe Nail, terdiri dari Website 
 ### 🌐 Landing Page
 <p align="center">
   <img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/76751fc6-351e-417a-ae44-a9b9b211f396" />
+  <img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/94223f63-4ebb-400b-89b0-7cfbc3100fae" />
+  <img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/0440f10c-8672-454b-8f42-448ecd4ab454" />
+  <img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/ac9fd4c5-d6c4-46d5-baf3-caf79b12c6e8" />
+  <img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/b75cca84-a969-4c6b-9c89-c43ec2cdfcbc" />
 </p>
 
