@@ -13,7 +13,7 @@ use App\Http\Controllers\IncomeController;
 
 /*
 |--------------------------------------------------------------------------
-| PUBLIC ROUTES
+| PUBLIC ROUTEs
 |--------------------------------------------------------------------------
 */
 
@@ -72,3 +72,31 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/reservations/{id}/finish', [ReservationController::class, 'finish']);
     Route::post('/artist/toggle-break', [App\Http\Controllers\Api\StaffController::class, 'toggleBreak']);
 });
+
+Route::get('/debug/categories', function () {
+
+    try {
+        return \App\Models\Category::limit(5)->get();
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTrace()[0] ?? null,
+        ], 500);
+    }
+});
+
+Route::get('/debug/categories-full', function () {
+    try {
+        $categories = \App\Models\Category::where('is_active', 1)
+            ->orderBy('order')
+            ->get();
+
+        return $categories;
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTrace()[0] ?? null,
+        ], 500);
+    }
+});
+

@@ -44,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer ${widget.token}',
-          'ngrok-skip-browser-warning': 'true',
+          'Content-Type': 'application/json',
         },
       );
 
