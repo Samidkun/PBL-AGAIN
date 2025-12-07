@@ -69,6 +69,7 @@ class _DesignScreenState extends State<DesignScreen> {
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer ${widget.token}',
+          'Content-Type': 'application/json',
         },
       );
 

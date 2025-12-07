@@ -32,7 +32,7 @@ class CaptchaController extends Controller
 
             // 6. Add Text
             $image->text($code, 80, 25, function ($font) {
-                $font->file('C:\Windows\Fonts\arial.ttf'); 
+                $font->file(resource_path('fonts/ARIAL.TTF')); 
                 $font->size(32);
                 $font->color('#333333');
                 $font->align('center');
