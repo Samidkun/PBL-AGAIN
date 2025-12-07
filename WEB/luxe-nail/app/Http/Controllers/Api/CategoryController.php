@@ -10,21 +10,28 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        // ambil aktif lalu group by type
-        $categories = Category::where('is_active', 1)
-            ->orderBy('order')
-            ->get()
-            ->groupBy('type');
+        try {
 
-        $data = $categories->map(function($items) {
-            return CategoryResource::collection($items)->toArray(request());
-        })->toArray();
+            $categories = Category::where('is_active', 1)
+                ->orderBy('order')
+                ->get()
+                ->groupBy('type');
 
-        return response()->json([
-            'success' => true,
-            'data'    => $data
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $categories
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTrace()[0] ?? null,
+            ], 500);
+
+        }
     }
+
 
     public function getByType($type)
     {
@@ -42,7 +49,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'data'    => CategoryResource::collection($items)->toArray(request())
+            'data' => CategoryResource::collection($items)->toArray(request())
         ]);
     }
 

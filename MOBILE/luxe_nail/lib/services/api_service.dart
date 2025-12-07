@@ -7,9 +7,9 @@ class ApiService {
   // Centralized Base URL
   static String get baseUrl {
     if (kIsWeb) {
-      return 'http://127.0.0.1:8000'; // Localhost for Web
+      return 'https://web-luxe-nail-main-jfcax3.laravel.cloud'; // Localhost for Web
     }
-    return 'http://10.0.2.2:8000'; // Android Emulator
+    return 'https://web-luxe-nail-main-jfcax3.laravel.cloud'; // Android Emulator
   }
 
   // Headers helper
