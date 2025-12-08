@@ -22,7 +22,7 @@
             <div class="filter-grid-beauty">
 
                 <div class="filter-item">
-                    <label class="filter-label-beauty">Tanggal</label>
+                    <label class="filter-label-beauty">Date</label>
                     <input type="date"
                            name="date"
                            class="filter-input-beauty"
@@ -32,7 +32,7 @@
                 <div class="filter-item">
                     <label class="filter-label-beauty">Service</label>
                     <select name="treatment" class="filter-input-beauty">
-                        <option value="">Semua Service</option>
+                        <option value="">All Services</option>
                         <option value="Nail Art" {{ request('treatment')=='Nail Art' ? 'selected' : '' }}>Nail Art</option>
                         <option value="Nail Extension" {{ request('treatment')=='Nail Extension' ? 'selected' : '' }}>Nail Extension</option>
                     </select>
@@ -41,8 +41,8 @@
                 <div class="filter-item">
                     <label class="filter-label-beauty">Status</label>
                     <select name="status" class="filter-input-beauty">
-                        <option value="">Semua</option>
-                        <option value="Lunas" {{ request('status')=='Lunas' ? 'selected' : '' }}>Lunas</option>
+                        <option value="">All</option>
+                        <option value="Lunas" {{ request('status')=='Lunas' ? 'selected' : '' }}>Paid</option>
                         <option value="Pending" {{ request('status')=='Pending' ? 'selected' : '' }}>Pending</option>
                     </select>
                 </div>
@@ -74,7 +74,7 @@
                 </h4>
             </div>
             @empty
-            <p class="text-center mt-3">Belum ada data income berdasarkan filter ini.</p>
+            <p class="text-center mt-3">No income data found based on this filter.</p>
             @endforelse
         </div>
     </div>
@@ -82,15 +82,15 @@
     {{-- =========================== SUMMARY CARDS =========================== --}}
     <div class="summary-grid mb-6">
         <div class="summary-card">
-            <p class="page-subtitle">Total Income Bulanan</p>
+            <p class="page-subtitle">Total Monthly Income</p>
             <p class="value">Rp {{ number_format($totalMonthly, 0, ',', '.') }}</p>
         </div>
         <div class="summary-card">
-            <p class="page-subtitle">Total Income Hari Ini</p>
+            <p class="page-subtitle">Total Income Today</p>
             <p class="value">Rp {{ number_format($totalToday, 0, ',', '.') }}</p>
         </div>
         <div class="summary-card">
-            <p class="page-subtitle">Total Reservation</p>
+            <p class="page-subtitle">Total Reservations</p>
             <p class="value">{{ $totalReservation }}</p>
         </div>
     </div>
@@ -121,11 +121,11 @@
                     <thead style="background-color:#ffe6ef;">
                         <tr style="color:#451a2b; font-family:'Georgia', serif; font-weight:600;">
                             <th class="text-center">Customer</th>
-                            <th class="text-center">Reservasi</th>
-                            <th class="text-center">Tanggal</th>
+                            <th class="text-center">Reservation</th>
+                            <th class="text-center">Date</th>
                             <th class="text-center">Total</th>
                             <th class="text-center">Status</th>
-                            <th class="text-center">Aksi</th>
+                            <th class="text-center">Action</th>
                         </tr>
                     </thead>
 
@@ -146,14 +146,14 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                {{-- Tambahkan aksi jika diperlukan --}}
+                                {{-- Add action buttons if needed --}}
                             </td>
                         </tr>
                         @empty
                         <tr>
                             <td colspan="6" class="text-center py-5 text-muted">
                                 <i class="fas fa-inbox fa-3x mb-3" style="color: #e2e6ea;"></i>
-                                <p>Belum ada data transaksi yang ditemukan.</p>
+                                <p>No transaction data found.</p>
                             </td>
                         </tr>
                         @endforelse
