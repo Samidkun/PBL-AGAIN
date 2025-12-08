@@ -33,7 +33,7 @@ class _DesignScreenState extends State<DesignScreen> {
 
   // ================== API CONFIG ==================
   static const String _baseUrl =
-      'https://unglorifying-rutha-insincerely.ngrok-free.dev';
+      "https://web-luxe-nail-main-jfcax3.laravel.cloud";
 
   // ================== STATE DATA ==================
   List<Map<String, dynamic>> nailShapes = []; // type: nail_shape
