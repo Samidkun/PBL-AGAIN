@@ -24,13 +24,13 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'             => 'required|string|max:255',
-            'address'          => 'required|string|max:500',
-            'phone'            => 'required|string|max:20',
-            'treatment_type'   => 'required|in:nail_extension,nail_art',
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:500',
+            'phone' => 'required|string|max:20',
+            'treatment_type' => 'required|in:nail_extension,nail_art',
             'reservation_date' => 'required|date',
             'reservation_time' => 'required|date_format:H:i',
-            'captcha'          => 'required|captcha',
+            'captcha' => 'required|captcha',
         ]);
 
         // 1. Hitung End Time berdasarkan durasi treatment
@@ -41,17 +41,17 @@ class ReservationController extends Controller
         }
 
         $startTime = Carbon::createFromFormat('H:i', $validated['reservation_time']);
-        $endTime   = $startTime->copy()->addMinutes($duration);
+        $endTime = $startTime->copy()->addMinutes($duration);
 
         // 2. Cari Artist yang Available (Tidak Overlap)
         // Logic: Artist yang TIDAK punya reservasi yang overlap dengan jam ini
         $bestArtist = NailArtist::whereDoesntHave('reservations', function ($q) use ($validated, $startTime, $endTime) {
             $q->where('reservation_date', $validated['reservation_date'])
-              ->where('status', '!=', 'cancelled') // Ignore cancelled reservations
-              ->where(function ($query) use ($startTime, $endTime) {
-                  $query->where('reservation_time', '<', $endTime->format('H:i:s'))
+                ->where('status', '!=', 'cancelled') // Ignore cancelled reservations
+                ->where(function ($query) use ($startTime, $endTime) {
+                    $query->where('reservation_time', '<', $endTime->format('H:i:s'))
                         ->where('end_time', '>', $startTime->format('H:i:s'));
-              });
+                });
         })->first(); // Ambil satu aja yang kosong
 
         if (!$bestArtist) {
@@ -62,26 +62,26 @@ class ReservationController extends Controller
         }
 
         $reservation = Reservation::create([
-            'name'              => $validated['name'],
-            'address'           => $validated['address'],
-            'phone'             => $validated['phone'],
-            'treatment_type'    => $validated['treatment_type'],
-            'reservation_date'  => $validated['reservation_date'],
-            'reservation_time'  => $validated['reservation_time'],
-            'end_time'          => $endTime->format('H:i:s'), // Simpan End Time
-            'queue_number'      => 'LX' . date('Ymd') . strtoupper(Str::random(4)),
-            'nail_artist_id'    => $bestArtist->id,
-            'status'            => 'pending',
-            'is_paid'           => 0,
-            'booking_fee'       => 25000,
-            'total_price'       => 25000, // Harusnya ambil dari TreatmentType->price
+            'name' => $validated['name'],
+            'address' => $validated['address'],
+            'phone' => $validated['phone'],
+            'treatment_type' => $validated['treatment_type'],
+            'reservation_date' => $validated['reservation_date'],
+            'reservation_time' => $validated['reservation_time'],
+            'end_time' => $endTime->format('H:i:s'), // Simpan End Time
+            'queue_number' => 'LX' . date('Ymd') . strtoupper(Str::random(4)),
+            'nail_artist_id' => $bestArtist->id,
+            'status' => 'pending',
+            'is_paid' => 0,
+            'booking_fee' => 25000,
+            'total_price' => 25000, // Harusnya ambil dari TreatmentType->price
         ]);
 
         // Queue cookie for 60 minutes
         \Illuminate\Support\Facades\Cookie::queue('pending_booking', $reservation->queue_number, 60);
 
         return response()->json([
-            'success'      => true,
+            'success' => true,
             'redirect_url' => route('payment.show', $reservation->id)
         ]);
     }
@@ -176,10 +176,10 @@ class ReservationController extends Controller
         ]);
     }
 
-public function calendar()
-{
-    return view('calendar.index'); // atau view lain yg lo pakai
-}
+    public function calendar()
+    {
+        return view('calendar.index'); // atau view lain yg lo pakai
+    }
 
 
     // ======================================================
@@ -197,17 +197,17 @@ public function calendar()
         }
 
         $request->validate([
-            'name'             => 'required|string|max:255',
-            'phone'            => 'required|string|max:20',
-            'address'          => 'required|string',
-            'treatment_type'   => 'required',
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+            'treatment_type' => 'required',
             'reservation_time' => 'required',
         ]);
 
         $reservation->update([
-            'name'           => $request->name,
-            'phone'          => $request->phone,
-            'address'        => $request->address,
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'address' => $request->address,
             'treatment_type' => $request->treatment_type,
             'reservation_time' => $request->reservation_time,
         ]);
@@ -218,25 +218,25 @@ public function calendar()
 
     }
 
-public function getReservationsByDate($date)
-{
-    try {
-        $reservations = Reservation::whereDate('reservation_date', $date)
-            ->orderBy('reservation_time', 'asc')
-            ->get();
+    public function getReservationsByDate($date)
+    {
+        try {
+            $reservations = Reservation::whereDate('reservation_date', $date)
+                ->orderBy('reservation_time', 'asc')
+                ->get();
 
-        return response()->json([
-            'success' => true,
-            'reservations' => $reservations
-        ]);
+            return response()->json([
+                'success' => true,
+                'reservations' => $reservations
+            ]);
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
-}
 
 
 
@@ -271,10 +271,29 @@ public function getReservationsByDate($date)
         // Update Status
         $reservation->status = 'completed';
         $reservation->is_paid = 1;
+        $reservation->payment_method = 'cash'; // Cashier payment is always cash
         $reservation->save();
 
-        // Optional: Record to Income table if you have one
-        // Income::create([...]);
+        // CREATE INCOME RECORD (setelah treatment selesai)
+        \App\Models\Income::create([
+            'reservation_id' => $reservation->id,
+            'customer_name' => $reservation->name,
+            'customer_phone' => $reservation->phone,
+            'treatment_type' => $reservation->treatment_type,
+            'shape' => null,
+            'color' => null,
+            'finish' => null,
+            'accessory' => null,
+            'price_shape' => 0,
+            'price_color' => 0,
+            'price_finish' => 0,
+            'price_accessory' => 0,
+            'total_price' => $reservation->total_price ?? 0,
+            'ai_image_url' => null,
+            'payment_status' => 'paid',
+            'payment_method' => 'cash',
+            'reservation_date' => $reservation->reservation_date,
+        ]);
 
         return redirect()->route('dashboard.reservations')
             ->with('success', 'Payment processed successfully! Job Completed.');

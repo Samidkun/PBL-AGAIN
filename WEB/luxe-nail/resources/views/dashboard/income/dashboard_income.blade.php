@@ -139,7 +139,7 @@
                                     </td>
                                     <td class="text-center">
                                         <span class="badge rounded-pill px-3 py-2" style="background-color:{{ $income->payment_status == 'paid' ? '#46b96a' : ($income->payment_status == 'cancelled' ? '#dc3545' : '#fcca33') }};
-                                                     color:white; font-weight:500;">
+                                                             color:white; font-weight:500;">
                                             {{ ucfirst($income->payment_status) }}
                                         </span>
                                     </td>
@@ -205,10 +205,10 @@
             }
         });
 
-        // Auto-refresh every 25 seconds
+        // Auto-refresh every 30 seconds
         setInterval(function () {
             location.reload();
-        }, 25000); // Auto-refresh every 25 seconds
+        }, 30000); // Auto-refresh every 30 seconds
     </script>
 
 @endsection

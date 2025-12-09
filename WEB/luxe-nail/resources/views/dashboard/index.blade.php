@@ -199,7 +199,7 @@
                                             $payment->payment_method == 'cash' ? '#28a745' :
                                             ($payment->payment_method == 'transfer' ? '#007bff' :
                                                 ($payment->payment_method == 'bank_transfer' ? '#6c757d' : '#ff6b35'))
-                                                                                      }};"></span>
+                                                                                                                      }};"></span>
                                                                         {{ ucfirst($payment->payment_method) }}
                                                                     </span>
                                                                     <span class="fw-bold">
@@ -259,8 +259,7 @@
         'income_date' => $incomeFilter === 'daily' ? $incomeDate : null,
         'month_year' => $incomeFilter === 'monthly' ? $monthYear : null,
         'year' => $incomeFilter === 'yearly' ? $yearFilter : null,
-    ]) }}" class="btn btn-sm text-light"
-                                style="background:#d87a87; border-radius:10px; padding:6px 20px;">
+    ]) }}" class="btn btn-sm text-light" style="background:#d87a87; border-radius:10px; padding:6px 20px;">
                                 Reset
                             </a>
                         </form>
@@ -425,10 +424,10 @@
                 });
             }
 
-            // Auto-refresh every 25 seconds
+            // Auto-refresh every 30 seconds
             setInterval(function () {
                 location.reload();
-            }, 25000);
+            }, 30000);
         });
     </script>
 @endpush

@@ -383,8 +383,8 @@
         window.initModals = initModals;
 
         // Auto-refresh every 25 seconds
-        setInterval(function () {
-            location.reload();
-        }, 25000); // Auto-refresh every 25 seconds
+        setInterval(function() {
+    location.reload();
+}, 30000); // Auto-refresh every 30 seconds
     </script>
 @endsection

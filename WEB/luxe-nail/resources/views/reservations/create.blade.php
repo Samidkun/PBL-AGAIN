@@ -15,7 +15,7 @@
                         <h4 class="mb-3">Booking Rules</h4>
                         <ul>
                             <li>If you do not attend → booking fee is forfeited.</li>
-                            <li>Must download the booking receipt to get a queue number.</li>
+                            <li>Must download the booking receipt to get an invoice number.</li>
                             <li>Payment method: Transfer.</li>
                             <li>On-site booking is available but slots are limited.</li>
                         </ul>
