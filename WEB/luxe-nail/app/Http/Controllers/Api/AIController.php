@@ -52,14 +52,14 @@ class AIController extends Controller
                 "HTTP-Referer" => url('/'),
                 "X-Title" => "Nail Art App",
             ])->post("https://openrouter.ai/api/v1/chat/completions", [
-                "model" => $model,
-                "messages" => [
-                    [
-                        "role" => "user",
-                        "content" => "Create a simple, realistic photo of nail art on a hand. Requirements: " . $request->prompt . ". The image should be a clear, straightforward product photo showing the nails from a natural angle. No artistic effects, no dramatic lighting, no fancy backgrounds. Just a clean, realistic representation of the nail design as it would look in real life."
-                    ]
-                ]
-            ]);
+                        "model" => $model,
+                        "messages" => [
+                            [
+                                "role" => "user",
+                                "content" => "Create a simple, realistic photo of nail art on a hand. Requirements: " . $request->prompt . ". The image should be a clear, straightforward product photo showing the nails from a natural angle. No artistic effects, no dramatic lighting, no fancy backgrounds. Just a clean, realistic representation of the nail design as it would look in real life."
+                            ]
+                        ]
+                    ]);
 
             $json = $response->json();
 
@@ -95,13 +95,43 @@ class AIController extends Controller
             ], 500);
         }
 
-        // 6. Update generate count
+        // 6. Download and save image locally
+        try {
+            $imageContent = file_get_contents($imageUrl);
+
+            if ($imageContent === false) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to download image from AI service'
+                ], 500);
+            }
+
+            // Generate unique filename
+            $filename = 'ai_' . time() . '_' . $reservation->id . '.jpg';
+            $path = 'ai_generated/' . $filename;
+
+            // Save to storage/app/public/ai_generated/
+            \Storage::disk('public')->put($path, $imageContent);
+
+            // Generate local URL
+            $localImageUrl = url('/served-image/' . $path);
+
+        } catch (\Exception $e) {
+            Log::error("Image download failed: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save image',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+        // 7. Update generate count
         $reservation->increment('generate_count');
 
         return response()->json([
             'success' => true,
             'generate_count' => $reservation->generate_count,
-            'image_url' => $imageUrl
+            'image_url' => $localImageUrl
         ]);
     }
 }

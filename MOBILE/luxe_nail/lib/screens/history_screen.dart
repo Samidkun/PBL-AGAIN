@@ -14,7 +14,9 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   List<dynamic> history = [];
+  List<dynamic> filteredHistory = [];
   bool isLoading = true;
+  DateTime? selectedDate;
 
   @override
   void initState() {
@@ -42,10 +44,54 @@ class _HistoryScreenState extends State<HistoryScreen> {
               "${b['reservation_date']} ${b['reservation_time']}");
           return dateB.compareTo(dateA);
         });
+
+        // Initialize filtered history
+        filteredHistory = history;
       } else {
         history = [];
+        filteredHistory = [];
       }
     });
+  }
+
+  void _filterByDate(DateTime? date) {
+    setState(() {
+      selectedDate = date;
+      if (date == null) {
+        filteredHistory = history;
+      } else {
+        filteredHistory = history.where((item) {
+          DateTime itemDate = DateTime.parse(item['reservation_date']);
+          return itemDate.year == date.year &&
+              itemDate.month == date.month &&
+              itemDate.day == date.day;
+        }).toList();
+      }
+    });
+  }
+
+  Future<void> _pickDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFFAF7C85),
+              onPrimary: Colors.white,
+              onSurface: Color(0xFF451A2B),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      _filterByDate(picked);
+    }
   }
 
   @override
@@ -69,32 +115,76 @@ class _HistoryScreenState extends State<HistoryScreen> {
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFFAF7C85)))
-          : history.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.history, size: 60, color: Colors.grey),
-                      SizedBox(height: 16),
-                      Text(
-                        "No completed jobs yet",
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          color: Colors.grey,
+          : Column(
+              children: [
+                // Date Filter
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _pickDate,
+                          icon: const Icon(Icons.calendar_today, size: 18),
+                          label: Text(
+                            selectedDate == null
+                                ? 'Filter by Date'
+                                : DateFormat('dd/MM/yy').format(selectedDate!),
+                            style: const TextStyle(fontFamily: 'Poppins'),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF451A2B),
+                            side: const BorderSide(color: Color(0xFFAF7C85)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                          ),
                         ),
                       ),
+                      if (selectedDate != null) const SizedBox(width: 8),
+                      if (selectedDate != null)
+                        IconButton(
+                          onPressed: () => _filterByDate(null),
+                          icon: const Icon(Icons.clear),
+                          color: const Color(0xFF451A2B),
+                          tooltip: 'Clear filter',
+                        ),
                     ],
                   ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(20),
-                  itemCount: history.length,
-                  itemBuilder: (context, index) {
-                    final item = history[index];
-                    return _historyCard(item);
-                  },
                 ),
+                // History List
+                Expanded(
+                  child: filteredHistory.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.history,
+                                  size: 60, color: Colors.grey),
+                              const SizedBox(height: 16),
+                              Text(
+                                selectedDate == null
+                                    ? "No completed jobs yet"
+                                    : "No jobs on this date",
+                                style: const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          itemCount: filteredHistory.length,
+                          itemBuilder: (context, index) {
+                            final item = filteredHistory[index];
+                            return _historyCard(item);
+                          },
+                        ),
+                ),
+              ],
+            ),
     );
   }
 

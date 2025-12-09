@@ -36,11 +36,11 @@ class NailArtist extends Model
         $timeStr = $now->format('H:i');
 
         // 1. CHECK BREAK TIMES (Global Rules)
-        // 12:00-13:00, 15:00-16:00, 18:00-19:00
+        // 12:00-13:00 (lunch), 15:00-16:00 (afternoon), 17:30-18:30 (Maghrib)
         $breaks = [
             ['start' => '12:00', 'end' => '13:00'],
             ['start' => '15:00', 'end' => '16:00'],
-            ['start' => '18:00', 'end' => '19:00'],
+            ['start' => '17:30', 'end' => '18:30'],
         ];
 
         foreach ($breaks as $break) {
@@ -55,7 +55,7 @@ class NailArtist extends Model
             ->where('status', 'confirmed') // Only confirmed bookings make them busy
             ->where(function ($q) use ($timeStr) {
                 $q->where('reservation_time', '<=', $timeStr)
-                  ->where('end_time', '>', $timeStr);
+                    ->where('end_time', '>', $timeStr);
             })
             ->exists();
 
