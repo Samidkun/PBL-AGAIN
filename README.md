@@ -134,7 +134,7 @@ The **Gallery** page displays a collection of stunning nail designs to help cust
 The **Contact & Services** page allows customers to contact Luxe Nail for inquiries and access a full list of services.
 
 <p align="center">
-  <img width="100%" height="auto" alt="Contact and Services Page" src="URL_GAMBAR_CONTACT_SERVICES" />
+  <img width="100%" height="auto" alt="https://github.com/user-attachments/assets/4c2b7e9d-ee73-43d6-a3ad-7d2ce61b0197" />
 </p>
 
 - **Contact Information**: Get in touch with Luxe Nail.
@@ -215,8 +215,11 @@ The **Dashboard** provides an overview of key data and statistics for the **Luxe
 ---
 
 ## **3. Reservations 📅**
-
 The **Reservations** section allows the admin to view, edit, and manage customer bookings.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/af64fce5-8e0d-4678-b8bf-a7e7bc145e7b" width="80%" />
+</p>
 
 - **Customer Name**: Displays the name of the customer.
 - **Service**: Indicates the service booked (Nail Art, Nail Extension, etc.).
@@ -224,36 +227,30 @@ The **Reservations** section allows the admin to view, edit, and manage customer
 - **Date & Time**: Shows the reservation's scheduled time.
 - **Status**: Displays the status of the booking (e.g., Confirmed, Pending, or Waiting for Validation).
 
-<p align="center">
-  <img src="/mnt/data/530674ff-c4bf-43f8-92c3-fca9c4c4652e.png" width="80%" />
-</p>
-
 ---
 
 ## **4. Staff 👩‍🔧**
-
 The **Staff** section allows the admin to manage all staff accounts.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/69b6ae99-702c-4f14-9d78-8f8dfa9d1bba" width="80%" />
+</p>
 
 - **Staff List**: Displays the list of all staff members with their names and emails.
 - **Nail Artist Schedule**: Shows the status and schedule of each nail artist (e.g., Available, Busy, or Break).
 
-<p align="center">
-  <img src="/mnt/data/467002c7-613b-447c-b245-3784ba1c6f24.png" width="80%" />
-</p>
-
 ---
 
 ## **5. Income 💰**
-
 The **Income** section provides an overview of the income generated through reservations.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c700b3c6-e523-4cba-82ad-e7867080dfbc" width="80%" />
+</p>
 
 - **Filters**: Admin can filter income by date and service type.
 - **Reservation Customer Data**: Lists the reservations along with the amount charged to each customer.
 - **Total Monthly Income**: Displays the total income generated in the selected period.
-
-<p align="center">
-  <img src="/mnt/data/3d9e78a1-45ff-4105-b239-2302d1595921.png" width="80%" />
-</p>
 
 ---
 
@@ -274,22 +271,24 @@ The **Cashier Queue** allows the admin to manage pending payments.
 ---
 
 ## **7. Profile 👤**
-
 The **Profile** section allows the admin to view and update personal information.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6bd2e95c-e8b0-464b-a683-b5a50502efbd" width="80%" />
+</p>
 
 - **Full Name**: Admin’s name.
 - **Email Address**: Admin’s email address.
 - **Password**: Admin can update their password.
 
-<p align="center">
-  <img src="/mnt/data/467002c7-613b-447c-b245-3784ba1c6f24.png" width="80%" />
-</p>
-
 ---
 
 ## **8. Categories 📂**
-
 The **Categories** section allows the admin to manage the types of services offered.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/116d4353-d820-4fe8-a582-505c55a5ab89" width="80%" />
+</p>
 
 - **Add New Category**: Admin can add new categories for different services.
 - **Edit or Delete Categories**: Admin can manage existing service categories.

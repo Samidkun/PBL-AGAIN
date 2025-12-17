@@ -125,21 +125,38 @@ class DesignStepPage extends StatelessWidget {
                                 child: ClipRRect(
                                   borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(17)),
-                                  child: imageUrl != null
-                                      ? Image.network(
-                                          imageUrl,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Container(
-                                              color: Colors.grey[100],
-                                              child: const Icon(
-                                                  Icons.broken_image,
-                                                  color: Colors.grey),
-                                            );
-                                          },
-                                        )
+                                  child: item['image'] != null
+                                      ? (item['image']
+                                              .toString()
+                                              .startsWith('assets/')
+                                          ? Image.asset(
+                                              item['image'],
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Container(
+                                                  color: Colors.grey[100],
+                                                  child: const Icon(
+                                                      Icons.broken_image,
+                                                      color: Colors.grey),
+                                                );
+                                              },
+                                            )
+                                          : Image.network(
+                                              "${ApiService.baseUrl}/served-image/${item['image']}",
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Container(
+                                                  color: Colors.grey[100],
+                                                  child: const Icon(
+                                                      Icons.broken_image,
+                                                      color: Colors.grey),
+                                                );
+                                              },
+                                            ))
                                       : Container(
                                           color: Colors.grey[100],
                                           child: const Icon(Icons.image,

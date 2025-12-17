@@ -16,7 +16,8 @@ class ApiService {
   static Map<String, String> get _headers => {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true',
+        'Connection': 'keep-alive',
+        'Accept-Encoding': 'gzip',
       };
 
   // ===========================================================================
@@ -25,6 +26,8 @@ class ApiService {
   static Future<Map<String, dynamic>> login(
       String username, String password) async {
     final url = Uri.parse('$baseUrl/api/login');
+
+    print("➡️ LOGIN REQUEST TO: $url"); // <—— TARUH DI SINI
 
     try {
       final response = await http.post(
@@ -35,6 +38,8 @@ class ApiService {
           'password': password,
         }),
       );
+
+      print("⬅️ LOGIN RESPONSE: ${response.body}"); // <—— OPSIONAL
 
       final data = jsonDecode(response.body);
 
