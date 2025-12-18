@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,7 +12,7 @@ return new class extends Migration
     {
         Schema::table('nail_artists', function (Blueprint $table) {
             $table->time('jam_kerja_start')->default('08:00:00');
-            $table->time('jam_kerja_end')->default('16:00:00');
+            $table->time('jam_kerja_end')->default('20:00:00'); // Buka sampai jam 8 malam
         });
     }
 

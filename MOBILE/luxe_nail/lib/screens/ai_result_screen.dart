@@ -130,32 +130,47 @@ class _AIResultScreenState extends State<AIResultScreen> {
             // ---------- AI IMAGE ----------
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                widget.imageUrl,
-                fit: BoxFit.cover,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    height: 300,
-                    width: double.infinity,
-                    color: Colors.white,
-                    child: const Center(
-                      child:
-                          CircularProgressIndicator(color: Color(0xFFAF7C85)),
+              child: widget.imageUrl.startsWith('assets/')
+                  ? Image.asset(
+                      widget.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 300,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: const Center(
+                              child: Text("Gagal memuat gambar",
+                                  style: TextStyle(color: Colors.red))),
+                        );
+                      },
+                    )
+                  : Image.network(
+                      widget.imageUrl,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 300,
+                          width: double.infinity,
+                          color: Colors.white,
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                                color: Color(0xFFAF7C85)),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 300,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: const Center(
+                              child: Text("Gagal memuat gambar",
+                                  style: TextStyle(color: Colors.red))),
+                        );
+                      },
                     ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 300,
-                    width: double.infinity,
-                    color: Colors.grey[200],
-                    child: const Center(
-                        child: Text("Gagal memuat gambar",
-                            style: TextStyle(color: Colors.red))),
-                  );
-                },
-              ),
             ),
             const SizedBox(height: 20),
 
